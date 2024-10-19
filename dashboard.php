@@ -8,15 +8,16 @@ $password = "Lipton2019!";  // Remplacez par votre mot de passe de base de donn�
 $dbname = "outdoorsec";
 
 try {
+    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Récupérer les événements à venir (filtrés par date)
+    // Récupérer les événements à venir (par date)
     $stmt = $conn->prepare("SELECT id, event_name, event_image FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
     $stmt->execute();
     $upcomingEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
 ?>
@@ -58,7 +59,7 @@ try {
         }
         .event-card img {
             width: 100%;
-            height: 180px; /* Taille fixe pour réduire la hauteur des images */
+            height: 180px; /* Taille fixe pour uniformiser la hauteur des images */
             object-fit: cover;
         }
         .event-card-title {
