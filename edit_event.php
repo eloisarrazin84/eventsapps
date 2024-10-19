@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est un administrateur
+// Vérifier que l'utilisateur est un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
@@ -14,10 +14,11 @@ $password = "Lipton2019!";  // Remplacez par votre mot de passe de base de donn�
 $dbname = "outdoorsec";
 
 try {
+    // Connexion à la base de données via PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Vérifier si l'ID de l'événement est passé en paramètre dans l'URL
+    // Vérifier si un ID d'événement est passé en paramètre
     if (isset($_GET['id'])) {
         $eventId = $_GET['id'];
 
@@ -28,17 +29,18 @@ try {
         $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$event) {
+            // Si l'événement n'existe pas, afficher un message d'erreur
             echo "Événement non trouvé.";
             exit();
         }
 
-        // Si le formulaire a été soumis, mettre à jour l'événement
+        // Si le formulaire est soumis, mettre à jour l'événement
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $event_name = $_POST['event_name'];
             $event_date = $_POST['event_date'];
             $event_location = $_POST['event_location'];
 
-            // Mise à jour des informations de l'événement
+            // Mettre à jour les informations de l'événement dans la base de données
             $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location WHERE id = :id");
             $stmt->bindParam(':event_name', $event_name);
             $stmt->bindParam(':event_date', $event_date);
@@ -46,15 +48,17 @@ try {
             $stmt->bindParam(':id', $eventId);
             $stmt->execute();
 
-            // Rediriger vers la page de gestion des événements
+            // Redirection après modification
             header("Location: manage_events.php");
             exit();
         }
     } else {
+        // Si aucun ID d'événement n'est passé, afficher un message d'erreur
         echo "Aucun événement sélectionné.";
         exit();
     }
-} catch(PDOException $e) {
+} catch (PDOException $e) {
+    // Afficher l'erreur si la connexion ou la requête échoue
     echo "Erreur : " . $e->getMessage();
 }
 ?>
@@ -71,6 +75,7 @@ try {
 <div class="container">
     <h1 class="mt-5">Modifier l'événement</h1>
 
+    <!-- Formulaire de modification de l'événement -->
     <form method="POST" action="">
         <div class="form-group">
             <label for="event_name">Nom de l'événement</label>
@@ -90,3 +95,4 @@ try {
 </div>
 </body>
 </html>
+
