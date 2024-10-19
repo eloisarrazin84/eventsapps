@@ -1,48 +1,50 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est un administrateur
+// Vérification que l'utilisateur est bien administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    // Redirige vers la page de connexion si l'utilisateur n'est pas administrateur
     header("Location: login.php");
     exit();
 }
 
-// Connexion à la base de données
+// Connexion à la base de données (les informations doivent être sécurisées)
 $servername = "localhost";
 $username = "root";  // Remplacez par votre utilisateur de base de données
 $password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
 $dbname = "outdoorsec";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Récupération des données du formulaire
     $event_name = $_POST['event_name'];
     $event_date = $_POST['event_date'];
     $event_location = $_POST['event_location'];
     $event_image = null;
 
-    // Gérer l'upload de l'image
+    // Gestion de l'upload de l'image
     if (isset($_FILES['event_image']) && $_FILES['event_image']['error'] == 0) {
         $image_name = basename($_FILES['event_image']['name']);
         $image_path = 'uploads/' . $image_name;
         
-        // Déplacer le fichier uploadé vers le répertoire des uploads
+        // Déplacer l'image uploadée vers le dossier uploads
         if (move_uploaded_file($_FILES['event_image']['tmp_name'], $image_path)) {
-            $event_image = $image_path;
-            echo "Image uploadée avec succès : " . $image_path;
+            $event_image = $image_path;  // Chemin de l'image à stocker
         } else {
             echo "Erreur lors du déplacement du fichier.";
         }
     } else {
-        // Gérer les erreurs liées au téléchargement
+        // Gérer les erreurs lors du téléchargement de l'image
         if ($_FILES['event_image']['error'] != 0) {
             echo "Erreur de téléchargement : " . $_FILES['event_image']['error'];
         }
     }
 
     try {
+        // Connexion à la base de données avec PDO
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Insertion du nouvel événement avec l'image
+        // Insertion du nouvel événement avec son image dans la base de données
         $stmt = $conn->prepare("INSERT INTO events (event_name, event_date, event_location, event_image) 
                                 VALUES (:event_name, :event_date, :event_location, :event_image)");
         $stmt->bindParam(':event_name', $event_name);
@@ -51,6 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(':event_image', $event_image);
         $stmt->execute();
 
+        // Redirection après ajout
         header("Location: manage_events.php");
         exit();
 
@@ -72,6 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="container">
     <h1 class="mt-5">Ajouter un événement</h1>
 
+    <!-- Formulaire d'ajout d'événement avec envoi de fichier -->
     <form method="POST" action="" enctype="multipart/form-data">
         <div class="form-group">
             <label for="event_name">Nom de l'événement</label>
