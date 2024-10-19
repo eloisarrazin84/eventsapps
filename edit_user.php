@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est un administrateur
+// Vérifier que l'utilisateur est un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
@@ -14,6 +14,7 @@ $password = "Lipton2019!";  // Remplacez par votre mot de passe de base de donn�
 $dbname = "outdoorsec";
 
 try {
+    // Connexion à la base de données avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -28,6 +29,7 @@ try {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$user) {
+            // Si l'utilisateur n'existe pas, afficher un message d'erreur
             echo "Utilisateur non trouvé.";
             exit();
         }
@@ -41,25 +43,27 @@ try {
             if (!empty($_POST['password'])) {
                 $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
                 $stmt = $conn->prepare("UPDATE users SET username = :username, password = :password, role = :role WHERE id = :id");
-                $stmt->bindParam(':username', $username);
                 $stmt->bindParam(':password', $password);
             } else {
-                // Si pas de nouveau mot de passe, on met à jour sans changer le mot de passe
+                // Si pas de nouveau mot de passe, mettre à jour sans changer le mot de passe
                 $stmt = $conn->prepare("UPDATE users SET username = :username, role = :role WHERE id = :id");
-                $stmt->bindParam(':username', $username);
             }
+            $stmt->bindParam(':username', $username);
             $stmt->bindParam(':role', $role);
             $stmt->bindParam(':id', $userId);
             $stmt->execute();
 
+            // Redirection après la modification
             header("Location: manage_users.php");
             exit();
         }
     } else {
+        // Si aucun utilisateur n'est sélectionné, afficher un message d'erreur
         echo "Aucun utilisateur sélectionné.";
         exit();
     }
-} catch(PDOException $e) {
+} catch (PDOException $e) {
+    // Gestion des erreurs de connexion à la base de données
     echo "Erreur : " . $e->getMessage();
 }
 ?>
@@ -76,6 +80,7 @@ try {
 <div class="container">
     <h1 class="mt-5">Modifier l'utilisateur</h1>
 
+    <!-- Formulaire de modification d'utilisateur -->
     <form method="POST" action="">
         <div class="form-group">
             <label for="username">Nom d'utilisateur</label>
@@ -98,3 +103,4 @@ try {
 </div>
 </body>
 </html>
+
