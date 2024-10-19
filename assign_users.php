@@ -1,27 +1,29 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est un administrateur
+// Vérification que l'utilisateur est bien un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    // Redirige vers la page de connexion si l'utilisateur n'est pas administrateur
     header("Location: login.php");
     exit();
 }
 
-// Connexion à la base de données
+// Informations de connexion à la base de données
 $servername = "localhost";
 $username = "root";  // Remplacez par votre utilisateur de base de données
 $password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
 $dbname = "outdoorsec";
 
 try {
+    // Connexion à la base de données avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Vérifier si l'ID de l'événement est passé en paramètre dans l'URL
+    // Vérifier si un ID d'événement est passé en paramètre
     if (isset($_GET['event_id'])) {
         $eventId = $_GET['event_id'];
 
-        // Récupérer les utilisateurs disponibles
+        // Récupérer les utilisateurs avec le rôle "user"
         $stmt = $conn->prepare("SELECT id, username FROM users WHERE role = 'user'");
         $stmt->execute();
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -49,6 +51,7 @@ try {
                 $stmt->execute();
             }
 
+            // Redirection après l'assignation
             header("Location: manage_events.php");
             exit();
         }
@@ -58,6 +61,7 @@ try {
         exit();
     }
 } catch(PDOException $e) {
+    // Gestion des erreurs de base de données
     echo "Erreur : " . $e->getMessage();
 }
 ?>
@@ -74,6 +78,7 @@ try {
 <div class="container">
     <h1 class="mt-5">Assigner des utilisateurs à l'événement</h1>
 
+    <!-- Formulaire de sélection d'utilisateurs -->
     <form method="POST" action="">
         <div class="form-group">
             <label for="users">Sélectionner les utilisateurs</label>
@@ -91,3 +96,4 @@ try {
 </div>
 </body>
 </html>
+
