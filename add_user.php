@@ -1,41 +1,46 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est un administrateur
+// Vérification que l'utilisateur est bien un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    // Redirige vers la page de connexion si l'utilisateur n'est pas administrateur
     header("Location: login.php");
     exit();
 }
 
-// Connexion à la base de données
+// Informations de connexion à la base de données
 $servername = "localhost";
 $username = "root";  // Remplacez par votre utilisateur de base de données
 $password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
 $dbname = "outdoorsec";
 
+// Gestion du formulaire d'ajout d'utilisateur
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $role = $_POST['role'];
 
-    // Hachage du mot de passe
+    // Hachage du mot de passe pour plus de sécurité
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     try {
+        // Connexion à la base de données avec PDO
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Insertion du nouvel utilisateur
+        // Insertion du nouvel utilisateur avec mot de passe haché
         $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (:username, :password, :role)");
         $stmt->bindParam(':username', $username);
         $stmt->bindParam(':password', $hashedPassword);
         $stmt->bindParam(':role', $role);
         $stmt->execute();
 
+        // Redirection vers la gestion des utilisateurs après l'ajout
         header("Location: manage_users.php");
         exit();
 
     } catch(PDOException $e) {
+        // Affichage de l'erreur en cas de problème de base de données
         echo "Erreur : " . $e->getMessage();
     }
 }
@@ -53,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="container">
     <h1 class="mt-5">Ajouter un utilisateur</h1>
 
+    <!-- Formulaire d'ajout d'utilisateur -->
     <form method="POST" action="">
         <div class="form-group">
             <label for="username">Nom d'utilisateur</label>
@@ -75,3 +81,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 </body>
 </html>
+
