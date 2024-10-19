@@ -8,9 +8,11 @@ $password = "Lipton2019!";  // Remplacez par votre mot de passe de base de donn�
 $dbname = "outdoorsec";
 
 try {
+    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // Vérifier si un ID d'événement est passé
     if (isset($_GET['id'])) {
         $eventId = $_GET['id'];
 
@@ -20,7 +22,12 @@ try {
         $stmt->execute();
         $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Vérifier si l'utilisateur est déjà inscrit à cet événement
+        if (!$event) {
+            echo "Événement non trouvé.";
+            exit();
+        }
+
+        // Vérifier si l'utilisateur est déjà inscrit
         if (isset($_SESSION['user_id'])) {
             $userId = $_SESSION['user_id'];
             $stmt = $conn->prepare("SELECT * FROM event_user_assignments WHERE event_id = :event_id AND user_id = :user_id");
@@ -31,17 +38,16 @@ try {
         }
     }
 
-    // Inscription à l'événement si le formulaire est soumis
+    // Inscription à l'événement
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
         $userId = $_SESSION['user_id'];
 
-        // Inscrire l'utilisateur à l'événement s'il n'est pas déjà inscrit
         if (!$alreadyRegistered) {
             $stmt = $conn->prepare("INSERT INTO event_user_assignments (event_id, user_id) VALUES (:event_id, :user_id)");
             $stmt->bindParam(':event_id', $eventId);
             $stmt->bindParam(':user_id', $userId);
             $stmt->execute();
-            $alreadyRegistered = true; // Mettre à jour l'état de l'inscription
+            $alreadyRegistered = true; // Mettre à jour l'état d'inscription
         }
     }
 
@@ -148,3 +154,4 @@ try {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
