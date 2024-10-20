@@ -29,14 +29,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Stocker les informations utilisateur et le rôle dans la session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];  // Ajout du rôle dans la session
+                $_SESSION['role'] = $user['role'];
 
-                // Redirection selon le rôle
-                if ($_SESSION['role'] == 'admin') {
-                    header("Location: manage_users.php");
-                } else {
-                    header("Location: dashboard.php");
-                }
+                // Redirection vers le dashboard pour tous les rôles
+                header("Location: dashboard.php");
                 exit();
             } else {
                 $error = "Votre compte n'a pas encore été validé par un administrateur.";
