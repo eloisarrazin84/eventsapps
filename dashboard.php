@@ -13,7 +13,7 @@ try {
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Récupérer les événements à venir avec leurs latitudes et longitudes
-    $stmt = $conn->prepare("SELECT event_name, event_date, event_location, event_image, lat, lng FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
+    $stmt = $conn->prepare("SELECT id, event_name, event_date, event_location, event_image, lat, lng FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
     $stmt->execute();
     $upcomingEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -70,16 +70,18 @@ try {
 </head>
 <body>
 
+<?php include 'menu.php'; ?> <!-- Menu inclusion -->
+
 <div class="container">
     <h1 class="mt-5">Événements à venir</h1>
     
     <!-- Grille des événements -->
     <div class="event-grid">
         <?php foreach ($upcomingEvents as $event): ?>
-        <div class="event-card">
+        <a href="event_detail.php?id=<?php echo $event['id']; ?>" class="event-card">
             <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
             <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
-        </div>
+        </a>
         <?php endforeach; ?>
     </div>
 
