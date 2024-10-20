@@ -1,12 +1,9 @@
 <?php
 session_start();
-
-// Vérifier si l'utilisateur est connecté et administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
-
 // Connexion à la base de données
 $servername = "localhost";
 $username = "root";
