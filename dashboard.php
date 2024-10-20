@@ -8,12 +8,11 @@ $password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
-    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Récupérer les événements à venir avec leurs latitudes et longitudes
-    $stmt = $conn->prepare("SELECT id, event_name, event_date, event_location, event_image, lat, lng FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
+    // Récupérer les événements à venir
+    $stmt = $conn->prepare("SELECT id, event_name, event_date, event_location, event_image FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
     $stmt->execute();
     $upcomingEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -28,7 +27,6 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Événements à venir</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         body {
             background-color: #f7f9fc;
@@ -44,6 +42,7 @@ try {
             overflow: hidden;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
         }
         .event-card img {
             width: 100%;
@@ -62,78 +61,78 @@ try {
             font-size: 1rem;
             font-weight: bold;
         }
-        #map {
-            height: 400px;
-            margin-top: 30px;
-        }
     </style>
 </head>
 <body>
 
-<div class="container text-center">
-    <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1.png" alt="Logo Outdoor Secours" style="margin-top: 20px; width: 150px;">
-</div>
+<?php include 'menu.php'; ?> <!-- Menu inclusion -->
 
 <div class="container">
-    <?php if (!isset($_SESSION['user_id'])): ?>
-        <!-- Si l'utilisateur n'est pas connecté, afficher le message et le bouton "Se connecter" -->
-        <div class="text-center mt-5">
-            <p>Pour voir les prochains événements, veuillez cliquer sur le bouton suivant :</p>
-            <a href="login.php" class="btn btn-primary">Se connecter</a>
-        </div>
-    <?php else: ?>
-        <!-- Grille des événements uniquement si l'utilisateur est connecté -->
-        <h1 class="mt-5">Événements à venir</h1>
-        <div class="event-grid">
-            <?php foreach ($upcomingEvents as $event): ?>
-            <a href="event_details.php?id=<?php echo $event['id']; ?>" class="event-card">
+    <h1 class="mt-5">Événements à venir</h1>
+    
+    <div class="event-grid">
+        <?php foreach ($upcomingEvents as $event): ?>
+            <div class="event-card" data-id="<?php echo $event['id']; ?>" data-toggle="modal" data-target="#eventModal">
                 <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
                 <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
-            </a>
-            <?php endforeach; ?>
-        </div>
-
-        <!-- Section de la carte -->
-        <h2 class="mt-5">Carte des événements</h2>
-        <div id="map"></div>
-    <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
 </div>
 
-<!-- JavaScript pour la carte -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Détails de l'événement</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenu de l'événement sera injecté ici -->
+                <div id="eventDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS et jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    var map = L.map('map').setView([46.603354, 1.888334], 6);  // Vue centrée sur la France
+    $(document).ready(function(){
+        $('.event-card').on('click', function(){
+            var eventId = $(this).data('id');
+            
+            // Faire une requête AJAX pour obtenir les détails de l'événement
+            $.ajax({
+                url: 'event_details_ajax.php',
+                method: 'GET',
+                data: { id: eventId },
+                success: function(response) {
+                    $('#eventDetails').html(response);
 
-    // Ajout du fond de carte OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-    }).addTo(map);
-
-    // Ajout des marqueurs pour chaque événement
-    var events = <?php echo json_encode($upcomingEvents); ?>;
-    events.forEach(function(event) {
-        if (event.lat && event.lng) {
-            L.marker([event.lat, event.lng]).addTo(map)
-                .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
-        }
+                    // Ajouter un listener pour le bouton "S'inscrire"
+                    $('#registerButton').on('click', function() {
+                        $.ajax({
+                            url: 'register_event.php',
+                            method: 'POST',
+                            data: { event_id: eventId },
+                            success: function(response) {
+                                alert(response); // Affiche le message de succès ou d'erreur
+                            }
+                        });
+                    });
+                }
+            });
+        });
     });
-    function registerToEvent(eventId) {
-    $.ajax({
-        url: 'register_event.php',
-        method: 'POST',
-        data: { event_id: eventId },
-        success: function(response) {
-            if (response === 'success') {
-                alert('Vous êtes inscrit à cet événement.');
-                $('#eventModal').modal('hide');
-            } else if (response === 'already_registered') {
-                alert('Vous êtes déjà inscrit.');
-            } else {
-                alert('Erreur lors de l\'inscription.');
-            }
-        }
-    });
-}
 </script>
 
 </body>
