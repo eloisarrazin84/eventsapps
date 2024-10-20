@@ -88,8 +88,7 @@ if (isset($_GET['id'])) {
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         #map {
-            height: 400px;
-            width: 100%;
+            height: 300px;
             margin-top: 20px;
         }
     </style>
@@ -136,7 +135,7 @@ if (isset($_GET['id'])) {
     var marker = L.marker([<?php echo htmlspecialchars($event['lat']); ?>, <?php echo htmlspecialchars($event['lng']); ?>]).addTo(map);
 
     var geocoder = L.Control.Geocoder.nominatim();
-    L.Control.geocoder({
+    var control = L.Control.geocoder({
         geocoder: geocoder,
         defaultMarkGeocode: false
     }).on('markgeocode', function(e) {
