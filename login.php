@@ -3,13 +3,13 @@ session_start();
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
+    $username = htmlspecialchars($_POST['username']);
     $password = $_POST['password'];
 
-    // Connexion à la base de données
+    // Connexion à la base de données (à externaliser dans un fichier de configuration sécurisé)
     $servername = "localhost";
-    $username_db = "root";  // Remplacez par votre utilisateur de base de données
-    $password_db = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
+    $username_db = "root";  
+    $password_db = "Lipton2019!";
     $dbname = "outdoorsec";
 
     try {
@@ -22,9 +22,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Vérifier le mot de passe
+        // Vérification du mot de passe
         if ($user && password_verify($password, $user['password'])) {
-            // Vérifier si l'utilisateur est approuvé
+            // Vérification si l'utilisateur est approuvé
             if ($user['is_approved']) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
