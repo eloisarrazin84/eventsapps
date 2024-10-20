@@ -8,7 +8,6 @@ $password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
-    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -70,24 +69,31 @@ try {
 </head>
 <body>
 
-<?php include 'menu.php'; ?> <!-- Menu inclusion -->
+<?php include 'menu.php'; ?>
 
 <div class="container">
     <h1 class="mt-5">Événements à venir</h1>
     
-    <!-- Grille des événements -->
-    <div class="event-grid">
-        <?php foreach ($upcomingEvents as $event): ?>
-        <a href="event_details.php?id=<?php echo $event['id']; ?>" class="event-card">
-            <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
-            <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
-        </a>
-        <?php endforeach; ?>
-    </div>
+    <?php if (!isset($_SESSION['user_id'])): ?>
+        <!-- Si l'utilisateur n'est pas connecté, afficher le bouton "Se connecter" -->
+        <div class="text-center mt-5">
+            <a href="login.php" class="btn btn-primary">Se connecter</a>
+        </div>
+    <?php else: ?>
+        <!-- Grille des événements uniquement si l'utilisateur est connecté -->
+        <div class="event-grid">
+            <?php foreach ($upcomingEvents as $event): ?>
+            <a href="event_details.php?id=<?php echo $event['id']; ?>" class="event-card">
+                <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
+                <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
+            </a>
+            <?php endforeach; ?>
+        </div>
 
-    <!-- Section de la carte -->
-    <h2 class="mt-5">Carte des événements</h2>
-    <div id="map"></div>
+        <!-- Section de la carte -->
+        <h2 class="mt-5">Carte des événements</h2>
+        <div id="map"></div>
+    <?php endif; ?>
 </div>
 
 <!-- JavaScript pour la carte -->
