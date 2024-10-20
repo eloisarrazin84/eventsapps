@@ -32,6 +32,10 @@ try {
     } elseif ($action === 'reject') {
         // Rejeter l'utilisateur
         $stmt = $conn->prepare("DELETE FROM users WHERE id = :id");
+    } else {
+        // Action non valide
+        header("Location: manage_user.php?error=invalid_action");
+        exit();
     }
 
     $stmt->bindParam(':id', $userId);
@@ -41,6 +45,8 @@ try {
     exit();
 
 } catch (PDOException $e) {
+    // Gestion des erreurs de base de données
     echo "Erreur : " . $e->getMessage();
 }
 ?>
+
