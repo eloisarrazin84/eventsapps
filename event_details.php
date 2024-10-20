@@ -3,8 +3,8 @@ session_start();
 
 // Connexion à la base de données
 $servername = "localhost";
-$username = "root";  
-$password = "Lipton2019!";  
+$username = "root";  // Remplacez par votre utilisateur de base de données
+$password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
 $dbname = "outdoorsec";
 
 try {
@@ -16,7 +16,7 @@ try {
     if (isset($_GET['id'])) {
         $eventId = $_GET['id'];
 
-        // Récupérer les détails de l'événement
+        // Récupérer les détails de l'événement, incluant la latitude et la longitude
         $stmt = $conn->prepare("SELECT * FROM events WHERE id = :id");
         $stmt->bindParam(':id', $eventId);
         $stmt->execute();
@@ -158,15 +158,16 @@ try {
 </div>
 
 <script>
-    var lat = <?php echo !empty($event['lat']) ? $event['lat'] : 48.8566; ?>; // Default lat for Paris if empty
-    var lng = <?php echo !empty($event['lng']) ? $event['lng'] : 2.3522; ?>; // Default lng for Paris if empty
-    var map = L.map('map').setView([lat, lng], 13); // Use lat and lng from the database
+    var lat = <?php echo htmlspecialchars($event['lat']); ?>;
+    var lng = <?php echo htmlspecialchars($event['lng']); ?>;
+    var map = L.map('map').setView([lat, lng], 13);
+    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     
-    // Add a marker with the address of the event
-    var marker = L.marker([lat, lng]).addTo(map)
+    // Ajouter un marqueur avec l'adresse de l'événement
+    L.marker([lat, lng]).addTo(map)
         .bindPopup("<?php echo htmlspecialchars($event['event_location']); ?>")
         .openPopup();
 </script>
