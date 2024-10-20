@@ -17,9 +17,9 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Supprimer un événement si une requête DELETE est envoyée
-    if (isset($_GET['delete'])) {
-        $eventId = $_GET['delete'];
+    // Supprimer un événement via méthode POST
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
+        $eventId = $_POST['delete_id'];
         $stmt = $conn->prepare("DELETE FROM events WHERE id = :id");
         $stmt->bindParam(':id', $eventId);
         $stmt->execute();
@@ -32,7 +32,7 @@ try {
     $stmt->execute();
     $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
 ?>
@@ -86,7 +86,7 @@ try {
         <div class="event-row">
             <div>
                 <?php if (!empty($event['event_image'])): ?>
-                    <img class="event-image" src="<?php echo $event['event_image']; ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
+                    <img class="event-image" src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
                 <?php endif; ?>
             </div>
             <div class="event-details">
@@ -114,7 +114,11 @@ try {
             <div class="event-buttons">
                 <a href="edit_event.php?id=<?php echo $event['id']; ?>" class="btn btn-warning btn-sm btn-custom">Modifier</a>
                 <a href="assign_users.php?event_id=<?php echo $event['id']; ?>" class="btn btn-info btn-sm btn-custom">Assigner des utilisateurs</a>
-                <a href="manage_events.php?delete=<?php echo $event['id']; ?>" class="btn btn-danger btn-sm btn-custom" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">Supprimer</a>
+                <!-- Suppression via formulaire POST -->
+                <form method="POST" action="manage_events.php" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">
+                    <input type="hidden" name="delete_id" value="<?php echo $event['id']; ?>">
+                    <button type="submit" class="btn btn-danger btn-sm btn-custom">Supprimer</button>
+                </form>
             </div>
         </div>
         <?php endforeach; ?>
@@ -127,3 +131,4 @@ try {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
