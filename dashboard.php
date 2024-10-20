@@ -117,6 +117,23 @@ try {
                 .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
         }
     });
+    function registerToEvent(eventId) {
+    $.ajax({
+        url: 'register_event.php',
+        method: 'POST',
+        data: { event_id: eventId },
+        success: function(response) {
+            if (response === 'success') {
+                alert('Vous êtes inscrit à cet événement.');
+                $('#eventModal').modal('hide');
+            } else if (response === 'already_registered') {
+                alert('Vous êtes déjà inscrit.');
+            } else {
+                alert('Erreur lors de l\'inscription.');
+            }
+        }
+    });
+}
 </script>
 
 </body>
