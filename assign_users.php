@@ -47,7 +47,7 @@ try {
                 }
             }
 
-            // Optionnel : Supprimer les utilisateurs désassignés
+            // Supprimer les utilisateurs désassignés
             $usersToRemove = array_diff($assignedUsers, $selectedUsers);
             foreach ($usersToRemove as $userId) {
                 $stmt = $conn->prepare("DELETE FROM event_user_assignments WHERE event_id = :event_id AND user_id = :user_id");
@@ -60,6 +60,7 @@ try {
             header("Location: manage_events.php");
             exit();
         }
+
     } else {
         echo "Aucun événement sélectionné.";
         exit();
