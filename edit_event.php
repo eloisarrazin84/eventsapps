@@ -1,3 +1,83 @@
+<?php
+session_start();
+
+// Check if the user is an admin
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php");
+    exit();
+}
+
+// Database connection
+$servername = "localhost";
+$username = "root";  
+$password = "Lipton2019!";  
+$dbname = "outdoorsec";
+
+if (isset($_GET['id'])) {
+    $eventId = $_GET['id'];
+    
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Retrieve event details
+        $stmt = $conn->prepare("SELECT * FROM events WHERE id = :id");
+        $stmt->bindParam(':id', $eventId);
+        $stmt->execute();
+        $event = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$event) {
+            echo "Événement non trouvé.";
+            exit();
+        }
+
+        // Update event
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $event_name = $_POST['event_name'];
+            $event_date = $_POST['event_date'];
+            $event_location = $_POST['event_location'];
+            $lat = $_POST['lat'];
+            $lng = $_POST['lng'];
+            $event_description = $_POST['event_description'];
+            
+            $event_image = $event['event_image'];  // Keep the old image if not changed
+            
+            // Handle new image upload
+            if (isset($_FILES['event_image']) && $_FILES['event_image']['error'] == 0) {
+                $image_name = basename($_FILES['event_image']['name']);
+                $image_path = 'uploads/' . $image_name;
+                
+                if (move_uploaded_file($_FILES['event_image']['tmp_name'], $image_path)) {
+                    $event_image = $image_path;
+                } else {
+                    echo "Erreur lors du téléchargement de l'image.";
+                }
+            }
+
+            // Update event data
+            $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, lat = :lat, lng = :lng, event_image = :event_image, event_description = :event_description WHERE id = :id");
+            $stmt->bindParam(':event_name', $event_name);
+            $stmt->bindParam(':event_date', $event_date);
+            $stmt->bindParam(':event_location', $event_location);
+            $stmt->bindParam(':lat', $lat);
+            $stmt->bindParam(':lng', $lng);
+            $stmt->bindParam(':event_image', $event_image);
+            $stmt->bindParam(':event_description', $event_description);
+            $stmt->bindParam(':id', $eventId);
+            $stmt->execute();
+
+            header("Location: manage_events.php");
+            exit();
+        }
+    } catch (PDOException $e) {
+        echo "Erreur : " . $e->getMessage();
+    }
+} else {
+    echo "Aucun événement sélectionné.";
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
