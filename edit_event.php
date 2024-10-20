@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-// Check if the user is an admin
+// Vérifier si l'utilisateur est un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
 
-// Database connection
+// Connexion à la base de données
 $servername = "localhost";
 $username = "root";  
 $password = "Lipton2019!";  
@@ -20,7 +20,7 @@ if (isset($_GET['id'])) {
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Retrieve event details
+        // Récupérer les détails de l'événement
         $stmt = $conn->prepare("SELECT * FROM events WHERE id = :id");
         $stmt->bindParam(':id', $eventId);
         $stmt->execute();
@@ -31,7 +31,7 @@ if (isset($_GET['id'])) {
             exit();
         }
 
-        // Update event
+        // Mise à jour de l'événement
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $event_name = $_POST['event_name'];
             $event_date = $_POST['event_date'];
@@ -40,9 +40,9 @@ if (isset($_GET['id'])) {
             $lng = $_POST['lng'];
             $event_description = $_POST['event_description'];
             
-            $event_image = $event['event_image'];  // Keep the old image if not changed
+            $event_image = $event['event_image'];  // Garde l'image précédente si non modifiée
             
-            // Handle new image upload
+            // Gestion de l'upload de la nouvelle image
             if (isset($_FILES['event_image']) && $_FILES['event_image']['error'] == 0) {
                 $image_name = basename($_FILES['event_image']['name']);
                 $image_path = 'uploads/' . $image_name;
@@ -54,7 +54,7 @@ if (isset($_GET['id'])) {
                 }
             }
 
-            // Update event data
+            // Mise à jour des informations de l'événement
             $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, lat = :lat, lng = :lng, event_image = :event_image, event_description = :event_description WHERE id = :id");
             $stmt->bindParam(':event_name', $event_name);
             $stmt->bindParam(':event_date', $event_date);
@@ -88,7 +88,8 @@ if (isset($_GET['id'])) {
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         #map {
-            height: 300px;
+            height: 400px;
+            width: 100%;
             margin-top: 20px;
         }
     </style>
@@ -135,7 +136,7 @@ if (isset($_GET['id'])) {
     var marker = L.marker([<?php echo htmlspecialchars($event['lat']); ?>, <?php echo htmlspecialchars($event['lng']); ?>]).addTo(map);
 
     var geocoder = L.Control.Geocoder.nominatim();
-    var control = L.Control.geocoder({
+    L.Control.geocoder({
         geocoder: geocoder,
         defaultMarkGeocode: false
     }).on('markgeocode', function(e) {
