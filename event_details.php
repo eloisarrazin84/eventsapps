@@ -3,14 +3,16 @@ session_start();
 
 // Connexion à la base de données
 $servername = "localhost";
-$username = "root";  
-$password = "Lipton2019!";  
+$username = "root";  // Remplacez par votre utilisateur de base de données
+$password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
 $dbname = "outdoorsec";
 
 try {
+    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // Vérifier si un ID d'événement est passé
     if (isset($_GET['id'])) {
         $eventId = $_GET['id'];
 
@@ -25,6 +27,7 @@ try {
             exit();
         }
 
+        // Vérifier si l'utilisateur est déjà inscrit
         if (isset($_SESSION['user_id'])) {
             $userId = $_SESSION['user_id'];
             $stmt = $conn->prepare("SELECT * FROM event_user_assignments WHERE event_id = :event_id AND user_id = :user_id");
@@ -35,6 +38,7 @@ try {
         }
     }
 
+    // Inscription à l'événement
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
         $userId = $_SESSION['user_id'];
 
@@ -43,7 +47,7 @@ try {
             $stmt->bindParam(':event_id', $eventId);
             $stmt->bindParam(':user_id', $userId);
             $stmt->execute();
-            $alreadyRegistered = true;
+            $alreadyRegistered = true; // Mettre à jour l'état d'inscription
         }
     }
 
@@ -59,6 +63,8 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détails de l'événement</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
         body {
             background-color: #f7f9fc;
@@ -102,7 +108,8 @@ try {
             margin-top: 20px;
             text-align: center;
         }
-        .map-container {
+        #map {
+            height: 300px;
             margin-top: 20px;
         }
     </style>
@@ -124,27 +131,12 @@ try {
             <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>" class="event-image">
         <?php endif; ?>
 
-        <?php if (!empty($event['event_description'])): ?>
-            <div class="event-description">
-                <?php echo nl2br(htmlspecialchars($event['event_description'])); ?>
-            </div>
-        <?php endif; ?>
-
-        <div class="map-container">
-            <!-- Insérer la carte OpenStreetMap ici avec l'API Leaflet -->
-            <div id="map" style="height: 300px;"></div>
-            <script>
-                var map = L.map('map').setView([43.7102, 7.2620], 13); // Exemple avec Nice
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-
-                var marker = L.marker([43.7102, 7.2620]).addTo(map)
-                    .bindPopup('<?php echo htmlspecialchars($event['event_location']); ?>')
-                    .openPopup();
-            </script>
+        <div class="event-description">
+            <p><?php echo htmlspecialchars($event['event_description']); ?></p>
         </div>
+
+        <!-- Carte OpenStreetMap -->
+        <div id="map"></div>
 
         <div class="register-btn">
             <?php if (isset($_SESSION['user_id'])): ?>
@@ -165,10 +157,21 @@ try {
     <?php endif; ?>
 </div>
 
+<script>
+    var map = L.map('map').setView([43.7102, 7.2620], 13); // Coordonnées pour Nice
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Ajouter un marqueur avec l'adresse de l'événement
+    var marker = L.marker([43.7102, 7.2620]).addTo(map)
+        .bindPopup("<?php echo htmlspecialchars($event['event_location']); ?>")
+        .openPopup();
+</script>
+
 <!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </body>
 </html>
