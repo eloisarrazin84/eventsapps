@@ -3,8 +3,8 @@ session_start();
 
 // Connexion à la base de données
 $servername = "localhost";
-$username = "root";  // Remplacez par votre utilisateur de base de données
-$password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
+$username = "root";  
+$password = "Lipton2019!";  
 $dbname = "outdoorsec";
 
 try {
@@ -158,13 +158,15 @@ try {
 </div>
 
 <script>
-    var map = L.map('map').setView([43.7102, 7.2620], 13); // Coordonnées pour Nice
+    var lat = <?php echo htmlspecialchars($event['lat']); ?>;
+    var lng = <?php echo htmlspecialchars($event['lng']); ?>;
+    var map = L.map('map').setView([lat, lng], 13); // Use lat and lng from the database
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     
-    // Ajouter un marqueur avec l'adresse de l'événement
-    var marker = L.marker([43.7102, 7.2620]).addTo(map)
+    // Add a marker with the address of the event
+    var marker = L.marker([lat, lng]).addTo(map)
         .bindPopup("<?php echo htmlspecialchars($event['event_location']); ?>")
         .openPopup();
 </script>
