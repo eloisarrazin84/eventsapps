@@ -3,31 +3,31 @@ session_start();
 
 // Connexion à la base de données
 $servername = "localhost";
-$username = "root";  // Replace with your database username
-$password = "Lipton2019!";  // Replace with your database password
+$username = "root";  
+$password = "Lipton2019!";  
 $dbname = "outdoorsec";
 
 try {
-    // Connexion with PDO
+    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Check if an event ID is passed
+    // Vérifier si un ID d'événement est passé
     if (isset($_GET['id'])) {
         $eventId = $_GET['id'];
 
-        // Fetch event details
+        // Récupérer les détails de l'événement
         $stmt = $conn->prepare("SELECT * FROM events WHERE id = :id");
         $stmt->bindParam(':id', $eventId);
         $stmt->execute();
         $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$event) {
-            echo "Event not found.";
+            echo "Événement non trouvé.";
             exit();
         }
 
-        // Check if the user is already registered
+        // Vérifier si l'utilisateur est déjà inscrit
         if (isset($_SESSION['user_id'])) {
             $userId = $_SESSION['user_id'];
             $stmt = $conn->prepare("SELECT * FROM event_user_assignments WHERE event_id = :event_id AND user_id = :user_id");
@@ -38,7 +38,7 @@ try {
         }
     }
 
-    // Handle event registration
+    // Inscription à l'événement
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
         $userId = $_SESSION['user_id'];
 
@@ -47,12 +47,12 @@ try {
             $stmt->bindParam(':event_id', $eventId);
             $stmt->bindParam(':user_id', $userId);
             $stmt->execute();
-            $alreadyRegistered = true;
+            $alreadyRegistered = true; 
         }
     }
 
 } catch(PDOException $e) {
-    echo "Error: " . $e->getMessage();
+    echo "Erreur : " . $e->getMessage();
 }
 ?>
 
@@ -61,7 +61,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Details</title>
+    <title>Détails de l'événement</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -124,8 +124,8 @@ try {
         <div class="event-title">
             <?php echo htmlspecialchars($event['event_name']); ?>
         </div>
-        <p class="event-info"><strong>Date:</strong> <?php echo htmlspecialchars($event['event_date']); ?></p>
-        <p class="event-info"><strong>Location:</strong> <?php echo htmlspecialchars($event['event_location']); ?></p>
+        <p class="event-info"><strong>Date :</strong> <?php echo htmlspecialchars($event['event_date']); ?></p>
+        <p class="event-info"><strong>Lieu :</strong> <?php echo htmlspecialchars($event['event_location']); ?></p>
 
         <?php if (!empty($event['event_image'])): ?>
             <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>" class="event-image">
@@ -135,25 +135,25 @@ try {
             <p><?php echo htmlspecialchars($event['event_description']); ?></p>
         </div>
 
-        <!-- OpenStreetMap -->
+        <!-- Carte OpenStreetMap -->
         <div id="map"></div>
 
         <div class="register-btn">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <?php if ($alreadyRegistered): ?>
-                    <p class="text-success">You are already registered for this event.</p>
+                    <p class="text-success">Vous êtes déjà inscrit à cet événement.</p>
                 <?php else: ?>
                     <form method="POST" action="">
-                        <button type="submit" class="btn btn-primary">Register for this event</button>
+                        <button type="submit" class="btn btn-primary">S'inscrire à cet événement</button>
                     </form>
                 <?php endif; ?>
             <?php else: ?>
-                <p class="text-danger">You need to be logged in to register for this event.</p>
+                <p class="text-danger">Vous devez être connecté pour vous inscrire à cet événement.</p>
             <?php endif; ?>
         </div>
     </div>
     <?php else: ?>
-        <p class="text-center">No event found.</p>
+        <p class="text-center">Aucun événement trouvé.</p>
     <?php endif; ?>
 </div>
 
