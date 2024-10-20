@@ -7,13 +7,13 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
+            <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'manage_events.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="manage_events.php">Gestion des événements</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'manage_users.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="manage_users.php">Gestion des utilisateurs</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="dashboard.php">Tableau de bord</a>
             </li>
         </ul>
