@@ -3,15 +3,14 @@ session_start();
 
 // Vérification que l'utilisateur est bien un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    // Redirige vers la page de connexion si l'utilisateur n'est pas administrateur
     header("Location: login.php");
     exit();
 }
 
 // Informations de connexion à la base de données
 $servername = "localhost";
-$username = "root";  // Remplacez par votre utilisateur de base de données
-$password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
+$username = "root";
+$password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
@@ -38,14 +37,20 @@ try {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $selectedUsers = $_POST['users'] ?? [];
 
-            // Supprimer les anciennes assignations
-            $stmt = $conn->prepare("DELETE FROM event_user_assignments WHERE event_id = :event_id");
-            $stmt->bindParam(':event_id', $eventId);
-            $stmt->execute();
-
-            // Ajouter les nouvelles assignations
+            // Ajouter les nouveaux utilisateurs qui ne sont pas déjà assignés
             foreach ($selectedUsers as $userId) {
-                $stmt = $conn->prepare("INSERT INTO event_user_assignments (event_id, user_id) VALUES (:event_id, :user_id)");
+                if (!in_array($userId, $assignedUsers)) {
+                    $stmt = $conn->prepare("INSERT INTO event_user_assignments (event_id, user_id) VALUES (:event_id, :user_id)");
+                    $stmt->bindParam(':event_id', $eventId);
+                    $stmt->bindParam(':user_id', $userId);
+                    $stmt->execute();
+                }
+            }
+
+            // Optionnel : Supprimer les utilisateurs désassignés
+            $usersToRemove = array_diff($assignedUsers, $selectedUsers);
+            foreach ($usersToRemove as $userId) {
+                $stmt = $conn->prepare("DELETE FROM event_user_assignments WHERE event_id = :event_id AND user_id = :user_id");
                 $stmt->bindParam(':event_id', $eventId);
                 $stmt->bindParam(':user_id', $userId);
                 $stmt->execute();
@@ -55,13 +60,11 @@ try {
             header("Location: manage_events.php");
             exit();
         }
-
     } else {
         echo "Aucun événement sélectionné.";
         exit();
     }
 } catch(PDOException $e) {
-    // Gestion des erreurs de base de données
     echo "Erreur : " . $e->getMessage();
 }
 ?>
@@ -96,4 +99,3 @@ try {
 </div>
 </body>
 </html>
-
