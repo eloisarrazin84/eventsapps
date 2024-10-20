@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Vérifier que l'utilisateur est un administrateur
+// Vérifier si l'utilisateur est un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
@@ -9,12 +9,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 // Connexion à la base de données
 $servername = "localhost";
-$username = "root";  // Remplacez par votre utilisateur de base de données
-$password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
+$username = "root";
+$password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
-    // Connexion à la base de données avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -29,7 +28,6 @@ try {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$user) {
-            // Si l'utilisateur n'existe pas, afficher un message d'erreur
             echo "Utilisateur non trouvé.";
             exit();
         }
@@ -37,33 +35,36 @@ try {
         // Traitement du formulaire lors de la soumission
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $username = $_POST['username'];
+            $email = $_POST['email'];
+            $firstName = $_POST['first_name'];
+            $lastName = $_POST['last_name'];
             $role = $_POST['role'];
 
             // Vérifier si un nouveau mot de passe est défini
             if (!empty($_POST['password'])) {
                 $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                $stmt = $conn->prepare("UPDATE users SET username = :username, password = :password, role = :role WHERE id = :id");
+                $stmt = $conn->prepare("UPDATE users SET username = :username, email = :email, first_name = :first_name, last_name = :last_name, password = :password, role = :role WHERE id = :id");
                 $stmt->bindParam(':password', $password);
             } else {
-                // Si pas de nouveau mot de passe, mettre à jour sans changer le mot de passe
-                $stmt = $conn->prepare("UPDATE users SET username = :username, role = :role WHERE id = :id");
+                // Mise à jour sans changer le mot de passe
+                $stmt = $conn->prepare("UPDATE users SET username = :username, email = :email, first_name = :first_name, last_name = :last_name, role = :role WHERE id = :id");
             }
             $stmt->bindParam(':username', $username);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':first_name', $firstName);
+            $stmt->bindParam(':last_name', $lastName);
             $stmt->bindParam(':role', $role);
             $stmt->bindParam(':id', $userId);
             $stmt->execute();
 
-            // Redirection après la modification
             header("Location: manage_users.php");
             exit();
         }
     } else {
-        // Si aucun utilisateur n'est sélectionné, afficher un message d'erreur
         echo "Aucun utilisateur sélectionné.";
         exit();
     }
-} catch (PDOException $e) {
-    // Gestion des erreurs de connexion à la base de données
+} catch(PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
 ?>
@@ -73,18 +74,29 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier utilisateur</title>
+    <title>Modifier l'utilisateur</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
     <h1 class="mt-5">Modifier l'utilisateur</h1>
 
-    <!-- Formulaire de modification d'utilisateur -->
     <form method="POST" action="">
         <div class="form-group">
             <label for="username">Nom d'utilisateur</label>
             <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="first_name">Prénom</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="last_name">Nom</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
         </div>
         <div class="form-group">
             <label for="password">Nouveau mot de passe (laisser vide si inchangé)</label>
@@ -103,4 +115,3 @@ try {
 </div>
 </body>
 </html>
-
