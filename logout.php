@@ -1,9 +1,14 @@
 <?php
 session_start();
-session_unset();  // Libérer toutes les variables de session
-session_destroy();  // Détruire la session
 
-// Rediriger l'utilisateur vers la page de connexion
-header("Location: login.php");
-exit();
+// Vérifiez si l'utilisateur est déjà connecté
+if (isset($_SESSION['user_id'])) {
+    session_unset();  // Libérer les variables de session
+    session_destroy();  // Détruire la session
+    header("Location: login.php?message=deconnexion");  // Redirection avec message
+    exit();
+} else {
+    header("Location: login.php");
+    exit();
+}
 ?>
