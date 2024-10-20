@@ -3,20 +3,18 @@ session_start();
 
 // Connexion à la base de données
 $servername = "localhost";
-$username = "root";  // Remplacez par votre utilisateur de base de données
-$password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
+$username = "root";
+$password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
-    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Vérifier si un ID d'événement est passé
     if (isset($_GET['id'])) {
         $eventId = $_GET['id'];
 
-        // Récupérer les détails de l'événement
+        // Récupérer les détails de l'événement, y compris la description
         $stmt = $conn->prepare("SELECT * FROM events WHERE id = :id");
         $stmt->bindParam(':id', $eventId);
         $stmt->execute();
@@ -38,7 +36,6 @@ try {
         }
     }
 
-    // Inscription à l'événement
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
         $userId = $_SESSION['user_id'];
 
@@ -47,7 +44,7 @@ try {
             $stmt->bindParam(':event_id', $eventId);
             $stmt->bindParam(':user_id', $userId);
             $stmt->execute();
-            $alreadyRegistered = true; // Mettre à jour l'état d'inscription
+            $alreadyRegistered = true;
         }
     }
 
@@ -106,6 +103,11 @@ try {
             margin-top: 20px;
             text-align: center;
         }
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -126,8 +128,11 @@ try {
         <?php endif; ?>
 
         <div class="event-description">
-            <p>Ajoutez ici une description plus détaillée de l'événement si vous avez des informations supplémentaires à afficher.</p>
+            <p><?php echo nl2br(htmlspecialchars($event['event_description'])); ?></p>
         </div>
+
+        <!-- Carte OpenStreetMap -->
+        <div id="map"></div>
 
         <div class="register-btn">
             <?php if (isset($_SESSION['user_id'])): ?>
@@ -148,10 +153,19 @@ try {
     <?php endif; ?>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- OpenStreetMap avec Leaflet -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script>
+    var map = L.map('map').setView([43.7, 7.26], 13); // Centrer la carte sur Nice par exemple
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var marker = L.marker([43.7, 7.26]).addTo(map) // Remplacez par les coordonnées correctes
+        .bindPopup('<b><?php echo htmlspecialchars($event['event_location']); ?></b>')
+        .openPopup();
+</script>
 </body>
 </html>
-
