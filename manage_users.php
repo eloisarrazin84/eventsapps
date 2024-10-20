@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est connecté et qu'il a le rôle 'admin'
+// Vérifier si l'utilisateur est un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
@@ -17,7 +17,7 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Récupérer les utilisateurs de la base de données
+    // Récupérer les utilisateurs
     $stmt = $conn->prepare("SELECT * FROM users");
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -26,6 +26,7 @@ try {
     echo "Erreur : " . $e->getMessage();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -35,10 +36,15 @@ try {
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container">
-    <h2 class="mt-5">Gestion des utilisateurs</h2>
-    <table class="table">
-        <thead>
+
+<!-- Inclusion du menu -->
+<?php include 'menu.php'; ?>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Gestion des utilisateurs</h2>
+
+    <table class="table table-bordered">
+        <thead class="thead-light">
             <tr>
                 <th>Nom d'utilisateur</th>
                 <th>Email</th>
@@ -49,7 +55,8 @@ try {
             </tr>
         </thead>
         <tbody>
-        <?php foreach ($users as $user): ?>
+        <?php if (!empty($users)): ?>
+            <?php foreach ($users as $user): ?>
             <tr>
                 <td><?php echo htmlspecialchars($user['username']); ?></td>
                 <td><?php echo htmlspecialchars($user['email']); ?></td>
@@ -61,7 +68,12 @@ try {
                     <a href="delete_user.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
                 </td>
             </tr>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="6" class="text-center">Aucun utilisateur trouvé.</td>
+            </tr>
+        <?php endif; ?>
         </tbody>
     </table>
 </div>
@@ -72,3 +84,4 @@ try {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
