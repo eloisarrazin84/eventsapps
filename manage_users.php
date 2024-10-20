@@ -1,24 +1,23 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est connecté et a le rôle d'administrateur
+// Vérifier si l'utilisateur est connecté et administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    // Si l'utilisateur n'est pas administrateur ou pas connecté, le rediriger vers la page de connexion
     header("Location: login.php");
     exit();
 }
 
 // Connexion à la base de données
 $servername = "localhost";
-$username = "root";  // Remplacez par votre utilisateur de base de données
-$password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
+$username = "root";
+$password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Récupérer les utilisateurs de la base de données
+    // Récupérer les utilisateurs
     $stmt = $conn->prepare("SELECT * FROM users");
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -26,7 +25,6 @@ try {
 } catch (PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -48,6 +46,7 @@ try {
                 <th>Prénom</th>
                 <th>Nom</th>
                 <th>Rôle</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -58,6 +57,10 @@ try {
                 <td><?php echo htmlspecialchars($user['first_name']); ?></td>
                 <td><?php echo htmlspecialchars($user['last_name']); ?></td>
                 <td><?php echo htmlspecialchars($user['role']); ?></td>
+                <td>
+                    <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
+                    <a href="delete_user.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>
