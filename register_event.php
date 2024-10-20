@@ -38,3 +38,4 @@ if (isset($_POST['event_id']) && isset($_SESSION['user_id'])) {
 } else {
     echo 'error';
 }
+?>
