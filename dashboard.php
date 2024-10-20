@@ -78,7 +78,7 @@ try {
     <!-- Grille des événements -->
     <div class="event-grid">
         <?php foreach ($upcomingEvents as $event): ?>
-        <a href="event_detail.php?id=<?php echo $event['id']; ?>" class="event-card">
+        <a href="event_details.php?id=<?php echo $event['id']; ?>" class="event-card">
             <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
             <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
         </a>
