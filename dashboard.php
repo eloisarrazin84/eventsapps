@@ -8,6 +8,7 @@ $password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
+    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -69,18 +70,20 @@ try {
 </head>
 <body>
 
-<?php include 'menu.php'; ?>
+<div class="container text-center">
+    <img src="logo.png" alt="Logo Outdoor Secours" style="margin-top: 20px; width: 150px;">
+</div>
 
 <div class="container">
-    <h1 class="mt-5">Événements à venir</h1>
-    
     <?php if (!isset($_SESSION['user_id'])): ?>
-        <!-- Si l'utilisateur n'est pas connecté, afficher le bouton "Se connecter" -->
+        <!-- Si l'utilisateur n'est pas connecté, afficher le message et le bouton "Se connecter" -->
         <div class="text-center mt-5">
+            <p>Pour voir les prochains événements, veuillez cliquer sur le bouton suivant :</p>
             <a href="login.php" class="btn btn-primary">Se connecter</a>
         </div>
     <?php else: ?>
         <!-- Grille des événements uniquement si l'utilisateur est connecté -->
+        <h1 class="mt-5">Événements à venir</h1>
         <div class="event-grid">
             <?php foreach ($upcomingEvents as $event): ?>
             <a href="event_details.php?id=<?php echo $event['id']; ?>" class="event-card">
