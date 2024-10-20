@@ -1,29 +1,23 @@
 <?php
 session_start();
 
-// Ensure the user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
-// Database connection
+// Connexion à la base de données
 $servername = "localhost";
-$username = "root";  // Your database username
-$password = "Lipton2019!";  // Your database password
+$username = "root";  
+$password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
+    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Fetch upcoming events with their locations and images
-    $stmt = $conn->prepare("SELECT id, event_name, event_location, event_image, lat, lon FROM events WHERE event_date >= CURDATE()");
+    // Récupérer les événements à venir avec leurs latitudes et longitudes
+    $stmt = $conn->prepare("SELECT event_name, event_date, event_location, event_image, lat, lng FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
     $stmt->execute();
-    $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    $upcomingEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
+    echo "Erreur : " . $e->getMessage();
 }
 ?>
 
@@ -32,86 +26,85 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Dashboard - Événements à venir</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
+        body {
+            background-color: #f7f9fc;
+        }
         .event-grid {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            flex-wrap: wrap;
+            margin-top: 20px;
         }
         .event-card {
-            width: 30%;
-            border-radius: 10px;
+            position: relative;
             overflow: hidden;
+            border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: 0.3s;
         }
         .event-card img {
             width: 100%;
-            height: 180px;
+            height: 150px;
             object-fit: cover;
         }
         .event-card-title {
-            background-color: rgba(0, 0, 0, 0.7);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
             color: white;
-            padding: 10px;
-            font-size: 1.2rem;
+            text-align: center;
+            padding: 5px;
+            font-size: 1rem;
+            font-weight: bold;
         }
         #map {
             height: 400px;
-            margin-top: 20px;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h1>Événements à venir</h1>
+
+<div class="container">
+    <h1 class="mt-5">Événements à venir</h1>
+    
+    <!-- Grille des événements -->
     <div class="event-grid">
-        <?php foreach ($events as $event): ?>
+        <?php foreach ($upcomingEvents as $event): ?>
         <div class="event-card">
-            <a href="event_details.php?id=<?php echo $event['id']; ?>">
-                <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
-                <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
-            </a>
+            <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
+            <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
         </div>
         <?php endforeach; ?>
     </div>
 
-    <!-- Map -->
+    <!-- Section de la carte -->
     <h2 class="mt-5">Carte des événements</h2>
     <div id="map"></div>
 </div>
 
-<!-- Scripts -->
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<!-- JavaScript pour la carte -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-    // Initialize the map
-    var map = L.map('map').setView([46.603354, 1.888334], 6); // Center of France
+    var map = L.map('map').setView([46.603354, 1.888334], 6);  // Vue centrée sur la France
 
-    // Add the OpenStreetMap tiles
+    // Ajout du fond de carte OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        maxZoom: 19,
     }).addTo(map);
 
-    // Add markers for each event from PHP
-    var events = [
-        <?php foreach ($events as $event): ?>
-        {
-            name: '<?php echo addslashes($event['event_name']); ?>',
-            location: '<?php echo addslashes($event['event_location']); ?>',
-            lat: <?php echo $event['lat']; ?>,
-            lon: <?php echo $event['lon']; ?>
-        },
-        <?php endforeach; ?>
-    ];
-
-    // Loop through the events and add markers to the map
+    // Ajout des marqueurs pour chaque événement
+    var events = <?php echo json_encode($upcomingEvents); ?>;
     events.forEach(function(event) {
-        L.marker([event.lat, event.lon]).addTo(map)
-            .bindPopup("<strong>" + event.name + "</strong><br>" + event.location);
+        if (event.lat && event.lng) {
+            L.marker([event.lat, event.lng]).addTo(map)
+                .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
+        }
     });
 </script>
 
