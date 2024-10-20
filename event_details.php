@@ -158,8 +158,8 @@ try {
 </div>
 
 <script>
-    var lat = <?php echo htmlspecialchars($event['lat']); ?>;
-    var lng = <?php echo htmlspecialchars($event['lng']); ?>;
+    var lat = <?php echo !empty($event['lat']) ? $event['lat'] : 48.8566; ?>; // Default lat for Paris if empty
+    var lng = <?php echo !empty($event['lng']) ? $event['lng'] : 2.3522; ?>; // Default lng for Paris if empty
     var map = L.map('map').setView([lat, lng], 13); // Use lat and lng from the database
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
