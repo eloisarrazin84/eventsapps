@@ -71,7 +71,7 @@ try {
 <body>
 
 <div class="container text-center">
-    <img src="logo.png" alt="Logo Outdoor Secours" style="margin-top: 20px; width: 150px;">
+    <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1.png" alt="Logo Outdoor Secours" style="margin-top: 20px; width: 150px;">
 </div>
 
 <div class="container">
