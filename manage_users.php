@@ -1,9 +1,12 @@
 <?php
 session_start();
+
+// Vérifier si l'utilisateur est connecté et qu'il a le rôle 'admin'
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
+
 // Connexion à la base de données
 $servername = "localhost";
 $username = "root";
@@ -14,7 +17,7 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Récupérer les utilisateurs
+    // Récupérer les utilisateurs de la base de données
     $stmt = $conn->prepare("SELECT * FROM users");
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -23,7 +26,6 @@ try {
     echo "Erreur : " . $e->getMessage();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
