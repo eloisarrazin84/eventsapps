@@ -4,54 +4,18 @@ session_start();
 // Connexion à la base de données
 $servername = "localhost";
 $username = "root";  
-$password = "Lipton2019!";  
+$password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
-    // Connexion avec PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Vérifier si un ID d'événement est passé
-    if (isset($_GET['id'])) {
-        $eventId = $_GET['id'];
-
-        // Récupérer les détails de l'événement
-        $stmt = $conn->prepare("SELECT * FROM events WHERE id = :id");
-        $stmt->bindParam(':id', $eventId);
-        $stmt->execute();
-        $event = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$event) {
-            echo "Événement non trouvé.";
-            exit();
-        }
-
-        // Vérifier si l'utilisateur est déjà inscrit
-        if (isset($_SESSION['user_id'])) {
-            $userId = $_SESSION['user_id'];
-            $stmt = $conn->prepare("SELECT * FROM event_user_assignments WHERE event_id = :event_id AND user_id = :user_id");
-            $stmt->bindParam(':event_id', $eventId);
-            $stmt->bindParam(':user_id', $userId);
-            $stmt->execute();
-            $alreadyRegistered = $stmt->rowCount() > 0;
-        }
-    }
-
-    // Inscription à l'événement
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
-        $userId = $_SESSION['user_id'];
-
-        if (!$alreadyRegistered) {
-            $stmt = $conn->prepare("INSERT INTO event_user_assignments (event_id, user_id) VALUES (:event_id, :user_id)");
-            $stmt->bindParam(':event_id', $eventId);
-            $stmt->bindParam(':user_id', $userId);
-            $stmt->execute();
-            $alreadyRegistered = true; 
-        }
-    }
-
-} catch(PDOException $e) {
+    // Récupérer les événements à venir
+    $stmt = $conn->prepare("SELECT id, event_name, event_date, event_location, event_image FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
+    $stmt->execute();
+    $upcomingEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
 ?>
@@ -61,121 +25,104 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détails de l'événement</title>
+    <title>Dashboard - Événements à venir</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         body {
             background-color: #f7f9fc;
         }
-        .event-container {
-            max-width: 800px;
-            margin: 40px auto;
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .event-card {
+            position: relative;
+            overflow: hidden;
             border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
         }
-        .event-image {
+        .event-card img {
             width: 100%;
-            height: auto;
-            max-height: 450px;
+            height: 150px;
             object-fit: cover;
-            border-radius: 8px;
         }
-        .event-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        .event-info {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        .event-info strong {
-            color: #333;
-        }
-        .event-description {
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-top: 20px;
-            color: #444;
-        }
-        .register-btn {
-            margin-top: 20px;
+        .event-card-title {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
             text-align: center;
-        }
-        #map {
-            height: 300px;
-            margin-top: 20px;
+            padding: 5px;
+            font-size: 1rem;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-<?php include 'menu.php'; ?>
+<?php include 'menu.php'; ?> <!-- Menu inclusion -->
 
 <div class="container">
-    <?php if ($event): ?>
-    <div class="event-container">
-        <div class="event-title">
-            <?php echo htmlspecialchars($event['event_name']); ?>
-        </div>
-        <p class="event-info"><strong>Date :</strong> <?php echo htmlspecialchars($event['event_date']); ?></p>
-        <p class="event-info"><strong>Lieu :</strong> <?php echo htmlspecialchars($event['event_location']); ?></p>
-
-        <?php if (!empty($event['event_image'])): ?>
-            <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>" class="event-image">
-        <?php endif; ?>
-
-        <div class="event-description">
-            <p><?php echo htmlspecialchars($event['event_description']); ?></p>
-        </div>
-
-        <!-- Carte OpenStreetMap -->
-        <div id="map"></div>
-
-        <div class="register-btn">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <?php if ($alreadyRegistered): ?>
-                    <p class="text-success">Vous êtes déjà inscrit à cet événement.</p>
-                <?php else: ?>
-                    <form method="POST" action="">
-                        <button type="submit" class="btn btn-primary">S'inscrire à cet événement</button>
-                    </form>
-                <?php endif; ?>
-            <?php else: ?>
-                <p class="text-danger">Vous devez être connecté pour vous inscrire à cet événement.</p>
-            <?php endif; ?>
-        </div>
+    <h1 class="mt-5">Événements à venir</h1>
+    
+    <div class="event-grid">
+        <?php foreach ($upcomingEvents as $event): ?>
+            <div class="event-card" data-id="<?php echo $event['id']; ?>" data-toggle="modal" data-target="#eventModal">
+                <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
+                <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
+            </div>
+        <?php endforeach; ?>
     </div>
-    <?php else: ?>
-        <p class="text-center">Aucun événement trouvé.</p>
-    <?php endif; ?>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Détails de l'événement</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenu de l'événement sera injecté ici -->
+                <div id="eventDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS et jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    var lat = <?php echo htmlspecialchars($event['lat']); ?>;
-    var lng = <?php echo htmlspecialchars($event['lng']); ?>;
-    
-    // Initialize the map with the event's coordinates
-    var map = L.map('map').setView([lat, lng], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    
-    // Add a marker at the event's location
-    var marker = L.marker([lat, lng]).addTo(map)
-        .bindPopup("<?php echo htmlspecialchars($event['event_location']); ?>")
-        .openPopup();
+    $(document).ready(function(){
+        $('.event-card').on('click', function(){
+            var eventId = $(this).data('id');
+            
+            // Faire une requête AJAX pour obtenir les détails de l'événement
+            $.ajax({
+                url: 'event_details_ajax.php',  // Page qui renverra les détails de l'événement
+                method: 'GET',
+                data: { id: eventId },
+                success: function(response) {
+                    $('#eventDetails').html(response); // Insérer les détails dans le modal
+                }
+            });
+        });
+    });
 </script>
 
-<!-- Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
