@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = htmlspecialchars($_POST['username']);
     $password = $_POST['password'];
 
-    // Connexion à la base de données (à externaliser dans un fichier de configuration sécurisé)
+    // Connexion à la base de données
     $servername = "localhost";
     $username_db = "root";  
     $password_db = "Lipton2019!";
@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Récupérer l'utilisateur correspondant au nom d'utilisateur
+        // Récupérer l'utilisateur
         $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
         $stmt->bindParam(':username', $username);
         $stmt->execute();
@@ -26,9 +26,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user && password_verify($password, $user['password'])) {
             // Vérification si l'utilisateur est approuvé
             if ($user['is_approved']) {
+                // Stocker les informations utilisateur et le rôle dans la session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
-                header("Location: dashboard.php");
+                $_SESSION['role'] = $user['role'];  // Ajout du rôle dans la session
+
+                // Redirection selon le rôle
+                if ($_SESSION['role'] == 'admin') {
+                    header("Location: manage_users.php");
+                } else {
+                    header("Location: dashboard.php");
+                }
                 exit();
             } else {
                 $error = "Votre compte n'a pas encore été validé par un administrateur.";
