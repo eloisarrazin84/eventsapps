@@ -5,55 +5,66 @@ $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Récupération des données du formulaire
-    $username = $_POST['username'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);  // Hash du mot de passe
-    $email = $_POST['email'];
-    $firstName = $_POST['first_name'];
-    $lastName = $_POST['last_name'];
+    $username = htmlspecialchars($_POST['username']);
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
+    $firstName = htmlspecialchars($_POST['first_name']);
+    $lastName = htmlspecialchars($_POST['last_name']);
 
-    // Connexion à la base de données
-    $servername = "localhost";
-    $username_db = "root";
-    $password_db = "Lipton2019!";
-    $dbname = "outdoorsec";
+    if (!$email) {
+        $error = "Adresse email invalide.";
+    } else {
+        // Connexion à la base de données
+        $servername = "localhost";
+        $username_db = "root";
+        $password_db = "Lipton2019!";
+        $dbname = "outdoorsec";
 
-    try {
-        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        try {
+            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Insertion de l'utilisateur en attente de validation
-        $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, is_approved) 
-                                VALUES (:username, :password, :email, :first_name, :last_name, FALSE)");
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':password', $password);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':first_name', $firstName);
-        $stmt->bindParam(':last_name', $lastName);
-        $stmt->execute();
+            // Insertion de l'utilisateur en attente de validation
+            $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, is_approved) 
+                                    VALUES (:username, :password, :email, :first_name, :last_name, FALSE)");
+            $stmt->bindParam(':username', $username);
+            $stmt->bindParam(':password', $password);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':first_name', $firstName);
+            $stmt->bindParam(':last_name', $lastName);
+            $stmt->execute();
 
-        // Récupérer l'ID de l'utilisateur nouvellement créé
-        $userId = $conn->lastInsertId();
+            // Récupérer l'ID de l'utilisateur nouvellement créé
+            $userId = $conn->lastInsertId();
 
-        // Gérer les fichiers joints (diplômes, cartes professionnelles, etc.)
-        foreach ($_FILES['documents']['tmp_name'] as $key => $tmp_name) {
-            $file_name = $_FILES['documents']['name'][$key];
-            $file_tmp = $_FILES['documents']['tmp_name'][$key];
-            $file_path = "uploads/" . basename($file_name);
+            // Gérer les fichiers joints (diplômes, cartes professionnelles, etc.)
+            foreach ($_FILES['documents']['tmp_name'] as $key => $tmp_name) {
+                $file_name = $_FILES['documents']['name'][$key];
+                $file_tmp = $_FILES['documents']['tmp_name'][$key];
+                $file_type = mime_content_type($file_tmp);
+                $file_size = $_FILES['documents']['size'][$key];
+                $file_path = "uploads/" . basename($file_name);
 
-            // Téléverser le fichier dans le dossier uploads
-            if (move_uploaded_file($file_tmp, $file_path)) {
-                // Insérer les informations du document dans la base de données
-                $stmt = $conn->prepare("INSERT INTO documents (user_id, file_name, file_path) VALUES (:user_id, :file_name, :file_path)");
-                $stmt->bindParam(':user_id', $userId);
-                $stmt->bindParam(':file_name', $file_name);
-                $stmt->bindParam(':file_path', $file_path);
-                $stmt->execute();
+                // Vérifier le type et la taille du fichier
+                if ($file_size > 5000000 || !in_array($file_type, ['application/pdf', 'image/jpeg', 'image/png'])) {
+                    $error = "Fichier invalide ou trop volumineux.";
+                } else {
+                    // Téléverser le fichier dans le dossier uploads
+                    if (move_uploaded_file($file_tmp, $file_path)) {
+                        // Insérer les informations du document dans la base de données
+                        $stmt = $conn->prepare("INSERT INTO documents (user_id, file_name, file_path) VALUES (:user_id, :file_name, :file_path)");
+                        $stmt->bindParam(':user_id', $userId);
+                        $stmt->bindParam(':file_name', $file_name);
+                        $stmt->bindParam(':file_path', $file_path);
+                        $stmt->execute();
+                    }
+                }
             }
-        }
 
-        $success = "Votre compte a été créé. Il doit être validé par un administrateur.";
-    } catch (PDOException $e) {
-        $error = "Erreur : " . $e->getMessage();
+            $success = "Votre compte a été créé. Il doit être validé par un administrateur.";
+        } catch (PDOException $e) {
+            $error = "Erreur : " . $e->getMessage();
+        }
     }
 }
 ?>
