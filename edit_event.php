@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est un administrateur
+// Vérification que l'utilisateur est bien administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
@@ -15,7 +15,7 @@ $dbname = "outdoorsec";
 
 if (isset($_GET['id'])) {
     $eventId = $_GET['id'];
-    
+
     try {
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -36,33 +36,30 @@ if (isset($_GET['id'])) {
             $event_name = $_POST['event_name'];
             $event_date = $_POST['event_date'];
             $event_location = $_POST['event_location'];
-            $lat = $_POST['lat'];
-            $lng = $_POST['lng'];
             $event_description = $_POST['event_description'];
-            
-            $event_image = $event['event_image'];  // Garde l'image précédente si non modifiée
-            
-            // Gestion de l'upload de la nouvelle image
+
+            $event_image = $event['event_image'];  // Conserver l'image précédente si non modifiée
+
+            // Gestion de l'upload de l'image
             if (isset($_FILES['event_image']) && $_FILES['event_image']['error'] == 0) {
                 $image_name = basename($_FILES['event_image']['name']);
                 $image_path = 'uploads/' . $image_name;
-                
+
+                // Déplacer l'image uploadée
                 if (move_uploaded_file($_FILES['event_image']['tmp_name'], $image_path)) {
                     $event_image = $image_path;
                 } else {
-                    echo "Erreur lors du téléchargement de l'image.";
+                    echo "Erreur lors du déplacement du fichier.";
                 }
             }
 
             // Mise à jour des informations de l'événement
-            $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, lat = :lat, lng = :lng, event_image = :event_image, event_description = :event_description WHERE id = :id");
+            $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, event_description = :event_description, event_image = :event_image WHERE id = :id");
             $stmt->bindParam(':event_name', $event_name);
             $stmt->bindParam(':event_date', $event_date);
             $stmt->bindParam(':event_location', $event_location);
-            $stmt->bindParam(':lat', $lat);
-            $stmt->bindParam(':lng', $lng);
-            $stmt->bindParam(':event_image', $event_image);
             $stmt->bindParam(':event_description', $event_description);
+            $stmt->bindParam(':event_image', $event_image);
             $stmt->bindParam(':id', $eventId);
             $stmt->execute();
 
@@ -85,16 +82,67 @@ if (isset($_GET['id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier l'événement</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    
+    <!-- Inclusion de Leaflet.js pour la carte -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <script>
+        // Fonction d'initialisation de la carte et autocomplétion
+        function initMap() {
+            const map = L.map('map').setView([48.8566, 2.3522], 5);  // Vue centrée sur Paris
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            const searchInput = document.getElementById('event_location');
+            const searchResults = document.getElementById('search-results');
+
+            searchInput.addEventListener('input', function() {
+                const query = searchInput.value;
+                if (query.length > 2) {
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+                        data.forEach(item => {
+                            const option = document.createElement('div');
+                            option.className = 'search-item';
+                            option.textContent = item.display_name;
+                            option.onclick = function() {
+                                searchInput.value = item.display_name;
+                                map.setView([item.lat, item.lon], 12);
+                                searchResults.innerHTML = '';
+                            };
+                            searchResults.appendChild(option);
+                        });
+                    });
+                }
+            });
+        }
+    </script>
     <style>
+        #search-results {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        .search-item {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .search-item:hover {
+            background-color: #f0f0f0;
+        }
         #map {
             height: 300px;
             margin-top: 20px;
         }
     </style>
 </head>
-<body>
+<body onload="initMap()">
 <div class="container">
     <h1 class="mt-5">Modifier l'événement</h1>
 
@@ -109,57 +157,21 @@ if (isset($_GET['id'])) {
         </div>
         <div class="form-group">
             <label for="event_location">Lieu de l'événement</label>
-            <input type="text" class="form-control" id="event_location" name="event_location" value="<?php echo htmlspecialchars($event['event_location']); ?>" required>
-            <input type="hidden" id="lat" name="lat" value="<?php echo htmlspecialchars($event['lat']); ?>">
-            <input type="hidden" id="lng" name="lng" value="<?php echo htmlspecialchars($event['lng']); ?>">
+            <input type="text" class="form-control" id="event_location" name="event_location" value="<?php echo htmlspecialchars($event['event_location']); ?>">
+            <div id="search-results"></div>
+        </div>
+        <div id="map"></div>
+        <div class="form-group">
+            <label for="event_description">Description de l'événement</label>
+            <textarea class="form-control" id="event_description" name="event_description"><?php echo htmlspecialchars($event['event_description']); ?></textarea>
         </div>
         <div class="form-group">
             <label for="event_image">Image de l'événement (laisser vide si inchangée)</label>
             <input type="file" class="form-control-file" id="event_image" name="event_image">
         </div>
-        <div class="form-group">
-            <label for="event_description">Description de l'événement</label>
-            <textarea class="form-control" id="event_description" name="event_description"><?php echo htmlspecialchars($event['event_description']); ?></textarea>
-        </div>
-        <div id="map"></div>
-        <button type="submit" class="btn btn-primary mt-3">Modifier</button>
-        <a href="manage_events.php" class="btn btn-secondary mt-3">Retour</a>
+        <button type="submit" class="btn btn-primary">Modifier</button>
+        <a href="manage_events.php" class="btn btn-secondary">Retour</a>
     </form>
 </div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-<script>
-    var map = L.map('map').setView([<?php echo htmlspecialchars($event['lat']); ?>, <?php echo htmlspecialchars($event['lng']); ?>], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-
-    var marker = L.marker([<?php echo htmlspecialchars($event['lat']); ?>, <?php echo htmlspecialchars($event['lng']); ?>]).addTo(map);
-
-    var geocoder = L.Control.Geocoder.nominatim();
-    var control = L.Control.geocoder({
-        geocoder: geocoder,
-        defaultMarkGeocode: false
-    }).on('markgeocode', function(e) {
-        var latlng = e.geocode.center;
-        marker.setLatLng(latlng).update();
-        map.setView(latlng, 13);
-        document.getElementById('lat').value = latlng.lat;
-        document.getElementById('lng').value = latlng.lng;
-        document.getElementById('event_location').value = e.geocode.name;
-    }).addTo(map);
-
-    var searchBox = document.getElementById('event_location');
-    searchBox.addEventListener('input', function() {
-        geocoder.geocode(searchBox.value, function(results) {
-            if (results.length > 0) {
-                var latlng = results[0].center;
-                marker.setLatLng(latlng).update();
-                map.setView(latlng, 13);
-                document.getElementById('lat').value = latlng.lat;
-                document.getElementById('lng').value = latlng.lng;
-            }
-        });
-    });
-</script>
 </body>
 </html>
