@@ -1,4 +1,4 @@
-<?php
+<<?php
 session_start();
 
 // Vérifier si l'utilisateur est un administrateur
@@ -51,6 +51,7 @@ try {
                 <th>Prénom</th>
                 <th>Nom</th>
                 <th>Rôle</th>
+                <th>Approuvé</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -64,6 +65,13 @@ try {
                 <td><?php echo htmlspecialchars($user['last_name']); ?></td>
                 <td><?php echo htmlspecialchars($user['role']); ?></td>
                 <td>
+                    <?php if ($user['is_approved']): ?>
+                        <span class="text-success">Oui</span>
+                    <?php else: ?>
+                        <a href="approve_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-success">Approuver</a>
+                    <?php endif; ?>
+                </td>
+                <td>
                     <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
                     <a href="delete_user.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
                 </td>
@@ -71,7 +79,7 @@ try {
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="6" class="text-center">Aucun utilisateur trouvé.</td>
+                <td colspan="7" class="text-center">Aucun utilisateur trouvé.</td>
             </tr>
         <?php endif; ?>
         </tbody>
@@ -84,4 +92,3 @@ try {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-
