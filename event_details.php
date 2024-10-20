@@ -3,31 +3,31 @@ session_start();
 
 // Connexion à la base de données
 $servername = "localhost";
-$username = "root";  // Remplacez par votre utilisateur de base de données
-$password = "Lipton2019!";  // Remplacez par votre mot de passe de base de données
+$username = "root";  // Replace with your database username
+$password = "Lipton2019!";  // Replace with your database password
 $dbname = "outdoorsec";
 
 try {
-    // Connexion avec PDO
+    // Connexion with PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Vérifier si un ID d'événement est passé
+    // Check if an event ID is passed
     if (isset($_GET['id'])) {
         $eventId = $_GET['id'];
 
-        // Récupérer les détails de l'événement, incluant la latitude et la longitude
+        // Fetch event details
         $stmt = $conn->prepare("SELECT * FROM events WHERE id = :id");
         $stmt->bindParam(':id', $eventId);
         $stmt->execute();
         $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$event) {
-            echo "Événement non trouvé.";
+            echo "Event not found.";
             exit();
         }
 
-        // Vérifier si l'utilisateur est déjà inscrit
+        // Check if the user is already registered
         if (isset($_SESSION['user_id'])) {
             $userId = $_SESSION['user_id'];
             $stmt = $conn->prepare("SELECT * FROM event_user_assignments WHERE event_id = :event_id AND user_id = :user_id");
@@ -38,7 +38,7 @@ try {
         }
     }
 
-    // Inscription à l'événement
+    // Handle event registration
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
         $userId = $_SESSION['user_id'];
 
@@ -47,12 +47,12 @@ try {
             $stmt->bindParam(':event_id', $eventId);
             $stmt->bindParam(':user_id', $userId);
             $stmt->execute();
-            $alreadyRegistered = true; // Mettre à jour l'état d'inscription
+            $alreadyRegistered = true;
         }
     }
 
 } catch(PDOException $e) {
-    echo "Erreur : " . $e->getMessage();
+    echo "Error: " . $e->getMessage();
 }
 ?>
 
@@ -61,7 +61,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détails de l'événement</title>
+    <title>Event Details</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -124,8 +124,8 @@ try {
         <div class="event-title">
             <?php echo htmlspecialchars($event['event_name']); ?>
         </div>
-        <p class="event-info"><strong>Date :</strong> <?php echo htmlspecialchars($event['event_date']); ?></p>
-        <p class="event-info"><strong>Lieu :</strong> <?php echo htmlspecialchars($event['event_location']); ?></p>
+        <p class="event-info"><strong>Date:</strong> <?php echo htmlspecialchars($event['event_date']); ?></p>
+        <p class="event-info"><strong>Location:</strong> <?php echo htmlspecialchars($event['event_location']); ?></p>
 
         <?php if (!empty($event['event_image'])): ?>
             <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>" class="event-image">
@@ -135,39 +135,40 @@ try {
             <p><?php echo htmlspecialchars($event['event_description']); ?></p>
         </div>
 
-        <!-- Carte OpenStreetMap -->
+        <!-- OpenStreetMap -->
         <div id="map"></div>
 
         <div class="register-btn">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <?php if ($alreadyRegistered): ?>
-                    <p class="text-success">Vous êtes déjà inscrit à cet événement.</p>
+                    <p class="text-success">You are already registered for this event.</p>
                 <?php else: ?>
                     <form method="POST" action="">
-                        <button type="submit" class="btn btn-primary">S'inscrire à cet événement</button>
+                        <button type="submit" class="btn btn-primary">Register for this event</button>
                     </form>
                 <?php endif; ?>
             <?php else: ?>
-                <p class="text-danger">Vous devez être connecté pour vous inscrire à cet événement.</p>
+                <p class="text-danger">You need to be logged in to register for this event.</p>
             <?php endif; ?>
         </div>
     </div>
     <?php else: ?>
-        <p class="text-center">Aucun événement trouvé.</p>
+        <p class="text-center">No event found.</p>
     <?php endif; ?>
 </div>
 
 <script>
     var lat = <?php echo htmlspecialchars($event['lat']); ?>;
     var lng = <?php echo htmlspecialchars($event['lng']); ?>;
-    var map = L.map('map').setView([lat, lng], 13);
     
+    // Initialize the map with the event's coordinates
+    var map = L.map('map').setView([lat, lng], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     
-    // Ajouter un marqueur avec l'adresse de l'événement
-    L.marker([lat, lng]).addTo(map)
+    // Add a marker at the event's location
+    var marker = L.marker([lat, lng]).addTo(map)
         .bindPopup("<?php echo htmlspecialchars($event['event_location']); ?>")
         .openPopup();
 </script>
