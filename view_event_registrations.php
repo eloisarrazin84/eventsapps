@@ -27,13 +27,15 @@ try {
         $stmt->execute();
         $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Récupérer les utilisateurs inscrits à cet événement
+        // Récupérer les utilisateurs inscrits et leurs réponses regroupées
         $stmt = $conn->prepare("
-            SELECT users.username, user_event_data.field_name, user_event_data.field_value
+            SELECT users.username, 
+                   GROUP_CONCAT(CONCAT(user_event_data.field_name, ': ', user_event_data.field_value) SEPARATOR '<br>') AS user_data
             FROM users 
             JOIN event_user_assignments ON users.id = event_user_assignments.user_id
             JOIN user_event_data ON users.id = user_event_data.user_id
             WHERE event_user_assignments.event_id = :event_id AND user_event_data.event_id = :event_id
+            GROUP BY users.username
         ");
         $stmt->bindParam(':event_id', $eventId);
         $stmt->execute();
@@ -64,16 +66,14 @@ try {
             <thead>
                 <tr>
                     <th>Nom d'utilisateur</th>
-                    <th>Champ</th>
-                    <th>Réponse</th>
+                    <th>Réponses</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($registrations as $registration): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($registration['username']); ?></td>
-                        <td><?php echo htmlspecialchars($registration['field_name']); ?></td>
-                        <td><?php echo htmlspecialchars($registration['field_value']); ?></td>
+                        <td><?php echo $registration['user_data']; ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
