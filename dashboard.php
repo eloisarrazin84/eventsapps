@@ -62,11 +62,14 @@ try {
             font-size: 1rem;
             font-weight: bold;
         }
-        #map {
-            height: 500px;  /* Adjust the height as needed */
-            width: 100%;
-            margin-top: 30px;
+        .map-container {
+            height: 400px;
+            width: 100%; /* Ajuster la largeur pour correspondre au conteneur des événements */
+            max-width: 1000px; /* Vous pouvez personnaliser la largeur maximale */
+            margin: 0 auto; /* Centrer la carte */
+            margin-top: 20px;
         }
+
     </style>
 </head>
 <body>
@@ -84,6 +87,10 @@ try {
             </div>
         <?php endforeach; ?>
     </div>
+
+    <!-- Section de la carte -->
+    <h2 class="mt-5">Carte des événements</h2>
+    <div id="map" class="map-container"></div>
 </div>
 
 <!-- Modal -->
