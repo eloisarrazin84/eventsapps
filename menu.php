@@ -6,6 +6,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
+        <?php if (isset($_SESSION['user_id'])): ?>
         <ul class="navbar-nav mr-auto">
             <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'manage_events.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="manage_events.php">Gestion des événements</a>
@@ -18,15 +19,16 @@
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <li class="nav-item">
-                    <a class="btn btn-danger btn-sm ml-2" href="logout.php">Déconnexion</a>
-                </li>
-            <?php else: ?>
-                <li class="nav-item">
-                    <a class="btn btn-primary btn-sm ml-2" href="login.php">Connexion</a>
-                </li>
-            <?php endif; ?>
+            <li class="nav-item">
+                <a class="btn btn-danger btn-sm ml-2" href="logout.php">Déconnexion</a>
+            </li>
         </ul>
+        <?php else: ?>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="btn btn-primary btn-sm ml-2" href="login.php">Connexion</a>
+            </li>
+        </ul>
+        <?php endif; ?>
     </div>
 </nav>
