@@ -34,7 +34,7 @@ try {
         $stmt->bindParam(':nom', $nom);
         $stmt->bindParam(':role', $role);
         $stmt->bindParam(':password', $password);
-        $stmt->bindParam(':is_approved', $approved);
+        $stmt->bindParam(':approved', $approved);
         $stmt->execute();
 
         header("Location: manage_users.php");
