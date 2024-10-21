@@ -17,14 +17,57 @@ try {
     $stmt->execute();
     $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Récupérer les champs supplémentaires de l'événement
+    $stmt = $conn->prepare("SELECT * FROM event_fields WHERE event_id = :event_id");
+    $stmt->bindParam(':event_id', $event_id);
+    $stmt->execute();
+    $event_fields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     if ($event) {
         echo "<h5>" . htmlspecialchars($event['event_name']) . "</h5>";
         echo "<p><strong>Date :</strong> " . htmlspecialchars($event['event_date']) . "</p>";
         echo "<p><strong>Lieu :</strong> " . htmlspecialchars($event['event_location']) . "</p>";
         echo "<p><strong>Description :</strong> " . htmlspecialchars($event['event_description']) . "</p>";
+
+        // Formulaire d'inscription
+        echo '<form id="registrationForm">';
         
+        foreach ($event_fields as $field) {
+            echo '<div class="form-group">';
+            echo '<label>' . htmlspecialchars($field['field_name']) . '</label>';
+            
+            switch ($field['field_type']) {
+                case 'text':
+                    echo '<input type="text" class="form-control" name="fields[' . htmlspecialchars($field['field_name']) . ']">';
+                    break;
+                case 'number':
+                    echo '<input type="number" class="form-control" name="fields[' . htmlspecialchars($field['field_name']) . ']">';
+                    break;
+                case 'date':
+                    echo '<input type="date" class="form-control" name="fields[' . htmlspecialchars($field['field_name']) . ']">';
+                    break;
+                case 'checkbox':
+                    echo '<input type="checkbox" name="fields[' . htmlspecialchars($field['field_name']) . ']">';
+                    break;
+                case 'multiple':
+                    $options = explode(',', $field['field_options']);
+                    echo '<select class="form-control" name="fields[' . htmlspecialchars($field['field_name']) . ']">';
+                    foreach ($options as $option) {
+                        echo '<option value="' . htmlspecialchars(trim($option)) . '">' . htmlspecialchars(trim($option)) . '</option>';
+                    }
+                    echo '</select>';
+                    break;
+            }
+
+            if (!empty($field['field_description'])) {
+                echo '<small class="form-text text-muted">' . htmlspecialchars($field['field_description']) . '</small>';
+            }
+            echo '</div>';
+        }
+
         // Bouton d'inscription
-        echo '<button id="registerButton" class="btn btn-primary" onclick="registerForEvent(' . htmlspecialchars($event_id) . ')">S\'inscrire à cet événement</button>';
+        echo '<button type="button" class="btn btn-primary" onclick="registerForEvent(' . htmlspecialchars($event_id) . ')">S\'inscrire à cet événement</button>';
+        echo '</form>';
     } else {
         echo "Événement non trouvé.";
     }
