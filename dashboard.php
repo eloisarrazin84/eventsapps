@@ -229,29 +229,31 @@ try {
         });
 
         // Filtrer par lieu
-        $('#filterLocation').on('change', function() {
-            var selectedLocation = $(this).val().toLowerCase();
-            $('.event-card').each(function() {
-                var eventLocation = $(this).find('.event-card-title').text().toLowerCase();
-                if (eventLocation.includes(selectedLocation) || selectedLocation === '') {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        });
+$('#filterLocation').on('input', function() {
+    var filterValue = $(this).val().toLowerCase();
+    $('.event-card').each(function() {
+        var eventLocation = $(this).find('.event-card-title').text().toLowerCase();
+        if (eventLocation.includes(filterValue)) {
+            $(this).show();  // Afficher la carte si le lieu correspond
+        } else {
+            $(this).hide();  // Masquer la carte si le lieu ne correspond pas
+        }
+    });
+});
 
-        // Filtrer par date
-        $('#filterDate').on('change', function() {
-            var selectedDate = $(this).val();
-            $('.event-card').each(function() {
-                var eventDate = $(this).data('date');
-                if (eventDate === selectedDate || selectedDate === '') {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
+// Filtrer par date
+$('#filterDate').on('change', function() {
+    var filterDate = $(this).val();
+    $('.event-card').each(function() {
+        var eventDate = $(this).data('date');  // Récupérer la date à partir de la carte
+        if (eventDate === filterDate) {
+            $(this).show();  // Afficher la carte si la date correspond
+        } else {
+            $(this).hide();  // Masquer la carte si la date ne correspond pas
+        }
+    });
+});
+
         });
     });
 </script>
