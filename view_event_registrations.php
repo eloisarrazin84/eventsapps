@@ -27,25 +27,20 @@ try {
         $stmt->execute();
         $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Récupérer les utilisateurs inscrits à cet événement avec les données les plus récentes
-        $stmt = $conn->prepare("
-    SELECT u.username, ued.field_name, ued.field_value
+        // Récupérer les utilisateurs inscrits avec les champs les plus récents
+$stmt = $conn->prepare("
+    SELECT u.username, ued.field_name, MAX(ued.field_value) AS field_value
     FROM users u
     JOIN event_user_assignments eua ON u.id = eua.user_id
     JOIN user_event_data ued ON u.id = ued.user_id
     WHERE eua.event_id = :event_id AND ued.event_id = :event_id
-    AND ued.timestamp = (
-        SELECT MAX(ued2.timestamp)
-        FROM user_event_data ued2
-        WHERE ued2.user_id = ued.user_id 
-        AND ued2.field_name = ued.field_name 
-        AND ued2.event_id = ued.event_id
-    )
-    ORDER BY u.username, ued.timestamp DESC
+    GROUP BY u.username, ued.field_name
+    ORDER BY u.username ASC
 ");
-        $stmt->bindParam(':event_id', $eventId);
-        $stmt->execute();
-        $registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->bindParam(':event_id', $eventId);
+$stmt->execute();
+$registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     } else {
         echo "Aucun événement sélectionné.";
         exit();
@@ -68,25 +63,33 @@ try {
     <h1 class="mt-5">Inscriptions pour l'événement : <?php echo htmlspecialchars($event['event_name']); ?></h1>
 
     <?php if (!empty($registrations)): ?>
-        <table class="table table-bordered mt-4">
-            <thead>
-                <tr>
-                    <th>Nom d'utilisateur</th>
-                    <th>Réponses</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($registrations as $registration): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($registration['username']); ?></td>
-                        <td><?php echo $registration['user_data']; ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php else: ?>
-        <p>Aucune inscription pour cet événement.</p>
-    <?php endif; ?>
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>Nom d'utilisateur</th>
+                <th>Réponses</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $lastUsername = '';
+            foreach ($registrations as $registration): 
+                if ($lastUsername !== $registration['username']): 
+                    if ($lastUsername !== ''):
+                        echo '</td></tr>'; // Fermer la ligne précédente
+                    endif;
+                    echo '<tr><td>' . htmlspecialchars($registration['username']) . '</td><td>';
+                    $lastUsername = $registration['username'];
+                endif;
+                echo htmlspecialchars($registration['field_name']) . ': ' . htmlspecialchars($registration['field_value']) . '<br>';
+            endforeach;
+            echo '</td></tr>'; // Fermer la dernière ligne
+            ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <p>Aucune inscription pour cet événement.</p>
+<?php endif; ?>
 
     <a href="manage_events.php" class="btn btn-secondary">Retour</a>
 </div>
