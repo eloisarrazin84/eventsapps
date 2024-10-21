@@ -19,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $event_location = $_POST['event_location'];
     $event_description = $_POST['event_description'];
     $event_image = null;
+    $registration_deadline = $_POST['registration_deadline']; // Ajout du champ de date limite d'inscription
 
     // Gestion de l'upload de l'image
     if (isset($_FILES['event_image']) && $_FILES['event_image']['error'] == 0) {
@@ -46,9 +47,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Insertion de l'événement avec les coordonnées et l'image
-            $stmt = $conn->prepare("INSERT INTO events (event_name, event_date, event_location, event_description, event_image, lat, lng) 
-                                    VALUES (:event_name, :event_date, :event_location, :event_description, :event_image, :lat, :lng)");
+            // Insertion de l'événement avec les coordonnées, l'image, et la date limite d'inscription
+            $stmt = $conn->prepare("INSERT INTO events (event_name, event_date, event_location, event_description, event_image, lat, lng, registration_deadline) 
+                                    VALUES (:event_name, :event_date, :event_location, :event_description, :event_image, :lat, :lng, :registration_deadline)");
             $stmt->bindParam(':event_name', $event_name);
             $stmt->bindParam(':event_date', $event_date);
             $stmt->bindParam(':event_location', $event_location);
@@ -56,6 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(':event_image', $event_image);
             $stmt->bindParam(':lat', $lat);
             $stmt->bindParam(':lng', $lng);
+            $stmt->bindParam(':registration_deadline', $registration_deadline);
             $stmt->execute();
 
             header("Location: manage_events.php");
@@ -149,6 +151,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="form-group">
             <label for="event_date">Date de l'événement</label>
             <input type="date" class="form-control" id="event_date" name="event_date" required>
+        </div>
+        <div class="form-group">
+            <label for="registration_deadline">Date limite d'inscription</label>
+            <input type="date" class="form-control" id="registration_deadline" name="registration_deadline" required>
         </div>
         <div class="form-group">
             <label for="event_location">Lieu de l'événement</label>
