@@ -120,14 +120,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </script>
     <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
         #search-results {
             max-height: 150px;
             overflow-y: auto;
             border: 1px solid #ccc;
-            margin-top: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            background: #fff;
         }
         .search-item {
-            padding: 5px;
+            padding: 10px;
             cursor: pointer;
         }
         .search-item:hover {
@@ -136,12 +149,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         #map {
             height: 300px;
             margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        button {
+            width: 100%;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body onload="initMap()">
 <div class="container">
-    <h1 class="mt-5">Ajouter un événement</h1>
+    <h1 class="mt-3 mb-4 text-center">Ajouter un événement</h1>
 
     <form method="POST" action="" enctype="multipart/form-data">
         <div class="form-group">
@@ -162,9 +184,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div id="search-results"></div>
         </div>
         <div id="map"></div>
-        <div class="form-group">
+        <div class="form-group mt-4">
             <label for="event_description">Description de l'événement</label>
-            <textarea class="form-control" id="event_description" name="event_description"></textarea>
+            <textarea class="form-control" id="event_description" name="event_description" rows="4"></textarea>
         </div>
         <div class="form-group">
             <label for="event_image">Image de l'événement</label>
