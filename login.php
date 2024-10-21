@@ -82,20 +82,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-bottom: 15px;
         }
 
-        .social-icons img {
-            width: 40px;
-            margin: 0 10px;
-        }
+       .btn-block {
+    margin-bottom: 15px; /* Adds space between buttons */
+    padding: 10px;
+}
 
-        .btn-help {
-            margin-top: 20px;
-        }
+.social-icons {
+    margin: 20px 0; /* Adds space above and below the social icons */
+}
 
-        .btn {
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 25px;
-        }
+.social-icons a {
+    margin: 0 10px;
+}
+
+.btn-help {
+    margin-top: 30px; /* Adds more space above the 'Besoin d'aide' link */
+}
+
     </style>
 </head>
 
