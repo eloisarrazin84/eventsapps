@@ -63,9 +63,12 @@ try {
             font-weight: bold;
         }
         #map {
-            height: 500px;
+            height: 400px;  /* Adjusted height */
             width: 100%;
             margin-top: 30px;
+            max-width: 1200px; /* Corresponds to the event grid width */
+            margin-left: auto;
+            margin-right: auto;
         }
     </style>
 </head>
