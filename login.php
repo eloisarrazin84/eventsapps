@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Connexion</title>
     <style>
         body {
-            background: url('https://media.licdn.com/dms/image/v2/D4E22AQHTpl7Pa9nKBw/feedshare-shrink_1280/feedshare-shrink_1280/0/1717604419877?e=1732147200&v=beta&t=QIOj_-jAU5laLCKt-haOF3BUZcqT8fZUjxRFV_5Aupk') no-repeat center center fixed;
+            background: url('https://www.odsradio.com/media/news/haute-savoie-deux-morts-en-montagne-et-une-fuite-de-gaz_65f9df9a57367.jpg') no-repeat center center fixed;
             background-size: cover;
             height: 100vh;
             display: flex;
