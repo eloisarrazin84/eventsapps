@@ -52,14 +52,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Connexion</title>
     <style>
         body {
-            background-color: #f7f9fc;
+            background: url('https://media.licdn.com/dms/image/v2/D4E22AQHTpl7Pa9nKBw/feedshare-shrink_1280/feedshare-shrink_1280/0/1717604419877?e=1732147200&v=beta&t=QIOj_-jAU5laLCKt-haOF3BUZcqT8fZUjxRFV_5Aupk') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
         }
         .login-container {
-            background-color: white;
+            background-color: rgba(255, 255, 255, 0.8); /* Transparence du conteneur */
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             padding: 30px;
@@ -75,15 +76,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: #dc3545;
             margin-bottom: 15px;
         }
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .social-icons img {
-            width: 40px;
-            height: 40px;
+        .social-icons a {
+            margin: 0 10px;
         }
         .btn-help {
             margin-top: 20px;
@@ -123,8 +117,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Réseaux sociaux -->
     <div class="social-icons">
-        <a href="#"><img src="https://cdn-icons-png.flaticon.com/256/124/124010.png" alt="Facebook"></a>
-        <a href="#"><img src="https://cdn-icons-png.freepik.com/256/15707/15707869.png?semt=ais_hybrid" alt="Instagram"></a>
+        <a href="#"><img src="https://cdn-icons-png.flaticon.com/256/124/124010.png" alt="Facebook" width="40"></a>
+        <a href="#"><img src="https://cdn-icons-png.freepik.com/256/15707/15707869.png?semt=ais_hybrid" alt="Instagram" width="40"></a>
     </div>
 
     <!-- Bouton Aide -->
@@ -137,3 +131,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
