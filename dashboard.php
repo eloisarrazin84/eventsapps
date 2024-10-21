@@ -35,36 +35,64 @@ try {
         body {
             background-color: #f7f9fc;
         }
+
         .event-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
+
         .event-card {
             position: relative;
             overflow: hidden;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             cursor: pointer;
+            transition: transform 0.3s ease;
         }
+
         .event-card img {
             width: 100%;
-            height: 150px;
+            height: 180px;
             object-fit: cover;
+            border-radius: 15px 15px 0 0;
         }
+
+        .event-card:hover {
+            transform: scale(1.05);
+        }
+
         .event-card-title {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             text-align: center;
-            padding: 5px;
-            font-size: 1rem;
+            padding: 10px;
+            font-size: 1.1rem;
             font-weight: bold;
+            border-radius: 0 0 15px 15px;
         }
+
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filters input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+            max-width: 300px;
+        }
+
         #map {
             height: 400px;
             width: 100%;
@@ -72,12 +100,22 @@ try {
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .participants {
+            background: #f8f9fa;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            border-radius: 0 0 15px 15px;
         }
     </style>
 </head>
 <body>
 
-<?php include 'menu.php'; ?> <!-- Menu inclusion -->
+<?php include 'menu.php'; ?>
 
 <div class="container">
     <h1 class="mt-5">Événements à venir</h1>
@@ -92,15 +130,16 @@ try {
             <div class="event-card" data-id="<?php echo $event['id']; ?>" data-toggle="modal" data-target="#eventModal">
                 <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
                 <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
-                <?php
-                // Récupérer nombre de participants
-                $stmtParticipants = $conn->prepare("SELECT COUNT(*) FROM event_user_assignments WHERE event_id = :event_id");
-                $stmtParticipants->bindParam(':event_id', $event['id']);
-                $stmtParticipants->execute();
-                $numParticipants = $stmtParticipants->fetchColumn();
-                ?>
-                <p>Participants inscrits : <?= $numParticipants ?></p>
-                <p>Date limite d'inscription : <?= $event['registration_deadline'] ?></p>
+                <div class="participants">
+                    <?php
+                    $stmtParticipants = $conn->prepare("SELECT COUNT(*) FROM event_user_assignments WHERE event_id = :event_id");
+                    $stmtParticipants->bindParam(':event_id', $event['id']);
+                    $stmtParticipants->execute();
+                    $numParticipants = $stmtParticipants->fetchColumn();
+                    ?>
+                    <p>Participants inscrits : <?= $numParticipants ?></p>
+                    <p>Date limite d'inscription : <?= $event['registration_deadline'] ?></p>
+                </div>
             </div>
         <?php endforeach; ?>
     </div>
@@ -117,7 +156,6 @@ try {
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Contenu de l'événement sera injecté ici -->
                 <div id="eventDetails"></div>
             </div>
             <div class="modal-footer">
@@ -127,7 +165,7 @@ try {
     </div>
 </div>
 
-<!-- Section de la carte -->
+<!-- Carte -->
 <div id="map"></div>
 
 <!-- Bootstrap JS et jQuery -->
@@ -137,61 +175,23 @@ try {
 
 <script>
     // Carte Leaflet
-    var map = L.map('map').setView([46.603354, 1.888334], 6);  // Centré sur la France
+    var map = L.map('map').setView([46.603354, 1.888334], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
     }).addTo(map);
 
-    var markers = []; // Stocker les marqueurs ajoutés
-
     // Ajouter les événements sur la carte
     var events = <?php echo json_encode($upcomingEvents); ?>;
-    console.log(events); // Debugging: voir les événements et leurs coordonnées
+    console.log(events);
 
-    // Fonction pour ajouter un marqueur
-    function addMarker(event) {
+    events.forEach(function(event) {
         if (event.lat && event.lng) {
-            var marker = L.marker([event.lat, event.lng])
-                .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date)
-                .addTo(map);
-            markers.push(marker); // Ajouter à la liste des marqueurs
+            L.marker([event.lat, event.lng]).addTo(map)
+                .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
         } else {
             console.error("Pas de coordonnées pour l'événement : " + event.event_name);
         }
-    }
-
-    // Affichage initial des événements
-    events.forEach(addMarker);
-
-    // Filtrer par lieu
-    $('#filterLocation').on('input', function() {
-        var filterValue = $(this).val().toLowerCase();
-        clearMarkers(); // Supprimer les anciens marqueurs
-        events.forEach(function(event) {
-            if (event.event_location.toLowerCase().includes(filterValue)) {
-                addMarker(event);
-            }
-        });
     });
-
-    // Filtrer par date
-    $('#filterDate').on('change', function() {
-        var filterDate = $(this).val();
-        clearMarkers(); // Supprimer les anciens marqueurs
-        events.forEach(function(event) {
-            if (event.event_date === filterDate) {
-                addMarker(event);
-            }
-        });
-    });
-
-    // Fonction pour supprimer les anciens marqueurs
-    function clearMarkers() {
-        markers.forEach(function(marker) {
-            map.removeLayer(marker);
-        });
-        markers = [];
-    }
 
     // Gestion du clic sur les événements
     $(document).ready(function(){
@@ -200,20 +200,18 @@ try {
             
             // Requête AJAX pour obtenir les détails de l'événement
             $.ajax({
-                url: 'event_details_ajax.php',  // Page pour récupérer les détails
+                url: 'event_details_ajax.php',
                 method: 'GET',
                 data: { id: eventId },
                 success: function(response) {
-                    $('#eventDetails').html(response); // Insérer les détails dans le modal
-
-                    // Ajouter un listener pour le bouton "S'inscrire"
+                    $('#eventDetails').html(response);
                     $('#registerButton').on('click', function() {
                         $.ajax({
                             url: 'register_event.php',
                             method: 'POST',
                             data: { event_id: eventId },
                             success: function(response) {
-                                alert(response); // Affiche le message de succès ou d'erreur
+                                alert(response);
                             }
                         });
                     });
