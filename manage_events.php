@@ -45,18 +45,32 @@ try {
     <title>Gestion des événements</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+        .event-card {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
         .event-image {
             width: 150px;
             height: auto;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-        }
-        .event-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
         .event-details {
             flex: 1;
@@ -65,10 +79,29 @@ try {
         .event-buttons {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .btn-custom {
-            padding: 5px 10px;
+            padding: 10px;
             font-size: 0.9rem;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #565e64;
+            border-color: #565e64;
         }
     </style>
 </head>
@@ -77,13 +110,13 @@ try {
 <?php include 'menu.php'; ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Gestion des événements</h1>
+    <h1 class="mb-4 text-center">Gestion des événements</h1>
 
     <a href="add_event.php" class="btn btn-primary mb-4">Ajouter un événement</a>
 
     <div class="event-list">
         <?php foreach ($events as $event): ?>
-        <div class="event-row">
+        <div class="event-card">
             <div>
                 <?php if (!empty($event['event_image'])): ?>
                     <img class="event-image" src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
@@ -91,10 +124,10 @@ try {
             </div>
             <div class="event-details">
                 <h5><?php echo htmlspecialchars($event['event_name']); ?></h5>
-                <p>Date : <?php echo htmlspecialchars($event['event_date']); ?></p>
-                <p>Lieu : <?php echo htmlspecialchars($event['event_location']); ?></p>
+                <p><strong>Date :</strong> <?php echo htmlspecialchars($event['event_date']); ?></p>
+                <p><strong>Lieu :</strong> <?php echo htmlspecialchars($event['event_location']); ?></p>
                 <p>
-                    Utilisateurs assignés : 
+                    <strong>Utilisateurs assignés :</strong> 
                     <?php
                     $stmt = $conn->prepare("SELECT users.username FROM users
                                             JOIN event_user_assignments ON users.id = event_user_assignments.user_id
