@@ -56,10 +56,22 @@ if (isset($_GET['id'])) {
                 }
             }
 
+            // Gestion des champs personnalisés
+            $custom_fields = [];
+            if (isset($_POST['field_label'])) {
+                foreach ($_POST['field_label'] as $key => $label) {
+                    $custom_fields[] = [
+                        'label' => $label,
+                        'type' => $_POST['field_type'][$key]
+                    ];
+                }
+            }
+            $custom_form_fields = json_encode($custom_fields);
+
             // Mise à jour des informations de l'événement
             $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, 
                                     event_description = :event_description, event_image = :event_image, lat = :lat, lng = :lng, 
-                                    registration_deadline = :registration_deadline WHERE id = :id");
+                                    registration_deadline = :registration_deadline, custom_form_fields = :custom_form_fields WHERE id = :id");
             $stmt->bindParam(':event_name', $event_name);
             $stmt->bindParam(':event_date', $event_date);
             $stmt->bindParam(':event_location', $event_location);
@@ -68,6 +80,7 @@ if (isset($_GET['id'])) {
             $stmt->bindParam(':lat', $lat);
             $stmt->bindParam(':lng', $lng);
             $stmt->bindParam(':registration_deadline', $registration_deadline);
+            $stmt->bindParam(':custom_form_fields', $custom_form_fields);
             $stmt->bindParam(':id', $eventId);
             $stmt->execute();
 
@@ -134,6 +147,26 @@ if (isset($_GET['id'])) {
                 }
             });
         }
+
+        // Fonction pour ajouter des champs personnalisés
+        function addCustomField() {
+            const container = document.getElementById('custom-fields');
+            const div = document.createElement('div');
+            div.classList.add('form-group');
+            div.innerHTML = `
+                <label>Nom du champ</label>
+                <input type="text" name="field_label[]" class="form-control" required>
+                <label>Type de champ</label>
+                <select name="field_type[]" class="form-control" required>
+                    <option value="text">Texte</option>
+                    <option value="date">Date</option>
+                    <option value="number">Nombre</option>
+                    <option value="checkbox">Case à cocher</option>
+                    <option value="select">Choix multiple</option>
+                </select>
+            `;
+            container.appendChild(div);
+        }
     </script>
     <style>
         #search-results {
@@ -178,7 +211,7 @@ if (isset($_GET['id'])) {
             <div id="search-results"></div>
         </div>
         <div id="map"></div>
-        <div class="form-group">
+        <div class="form-group mt-4">
             <label for="event_description">Description de l'événement</label>
             <textarea class="form-control" id="event_description" name="event_description"><?php echo htmlspecialchars($event['event_description']); ?></textarea>
         </div>
@@ -193,6 +226,10 @@ if (isset($_GET['id'])) {
         <div class="form-group">
             <label for="event_image">Image de l'événement (laisser vide si inchangée)</label>
             <input type="file" class="form-control-file" id="event_image" name="event_image">
+        </div>
+        <div class="form-group mt-4" id="custom-fields">
+            <h4>Champs personnalisés pour le formulaire d'inscription</h4>
+            <button type="button" class="btn btn-secondary mb-3" onclick="addCustomField()">Ajouter un champ personnalisé</button>
         </div>
         <button type="submit" class="btn btn-primary">Modifier</button>
         <a href="manage_events.php" class="btn btn-secondary">Retour</a>
