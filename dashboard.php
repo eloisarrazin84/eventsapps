@@ -126,13 +126,17 @@ try {
     }).addTo(map);
 
     // Ajouter les événements sur la carte
-    var events = <?php echo json_encode($upcomingEvents); ?>;
-    events.forEach(function(event) {
-        if (event.lat && event.lng) {
-            L.marker([event.lat, event.lng]).addTo(map)
-                .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
-        }
-    });
+var events = <?php echo json_encode($upcomingEvents); ?>;
+console.log(events); // Vérifier que les données des événements sont correctement récupérées
+
+events.forEach(function(event) {
+    if (event.lat && event.lng) {
+        L.marker([event.lat, event.lng]).addTo(map)
+            .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
+    } else {
+        console.error("Pas de coordonnées pour l'événement : ", event.event_name);
+    }
+});
 
     // Gestion du clic sur les événements
     $(document).ready(function(){
