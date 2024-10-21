@@ -26,12 +26,12 @@ try {
         $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
         $approved = isset($_POST['approved']) ? 1 : 0;
 
-        $stmt = $conn->prepare("INSERT INTO users (username, email, prenom, nom, role, password, approved) 
-                                VALUES (:username, :email, :prenom, :nom, :role, :password, :approved)");
+        $stmt = $conn->prepare("INSERT INTO users (username, email, first_name, last_name, role, password, approved) 
+                                VALUES (:username, :email, :first_name, :last_name, :role, :password, :approved)");
         $stmt->bindParam(':username', $username);
         $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':prenom', $prenom);
-        $stmt->bindParam(':nom', $nom);
+        $stmt->bindParam(':first_name', first_name);
+        $stmt->bindParam(':last_name', last_name);
         $stmt->bindParam(':role', $role);
         $stmt->bindParam(':password', $password);
         $stmt->bindParam(':approved', $approved);
@@ -67,11 +67,11 @@ try {
         </div>
         <div class="form-group">
             <label for="prenom">Prénom</label>
-            <input type="text" class="form-control" id="prenom" name="prenom" required>
+            <input type="text" class="form-control" id="first_name" name="first_name" required>
         </div>
         <div class="form-group">
             <label for="nom">Nom</label>
-            <input type="text" class="form-control" id="nom" name="nom" required>
+            <input type="text" class="form-control" id="last_name" name="last_name" required>
         </div>
         <div class="form-group">
             <label for="role">Rôle</label>
