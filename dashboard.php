@@ -65,16 +65,16 @@ try {
 
         .event-card-title {
             position: absolute;
-            bottom: -30px;
+            top: 0; /* Positionne le titre en haut de l'image */
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent pour le texte */
             color: white;
             text-align: center;
             padding: 10px;
             font-size: 1.1rem;
             font-weight: bold;
-            border-radius: 0 0 15px 15px;
+            border-radius: 15px 15px 0 0; /* Bord supérieur arrondi */
         }
 
         .filters {
