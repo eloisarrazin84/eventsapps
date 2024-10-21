@@ -155,8 +155,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .form-group label {
             font-weight: bold;
         }
-        button {
-            width: 100%;
+        .btn {
+            width: 48%;
             margin-top: 10px;
         }
         .btn-primary {
@@ -210,8 +210,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label for="event_image">Image de l'événement</label>
             <input type="file" class="form-control-file" id="event_image" name="event_image">
         </div>
-        <button type="submit" class="btn btn-primary">Ajouter</button>
-        <a href="manage_events.php" class="btn btn-secondary">Retour</a>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+            <a href="manage_events.php" class="btn btn-secondary">Retour</a>
+        </div>
     </form>
 </div>
 </body>
