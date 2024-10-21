@@ -12,7 +12,7 @@ try {
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Récupérer les événements à venir
-    $stmt = $conn->prepare("SELECT id, event_name, event_date, event_location, event_image FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
+    $stmt = $conn->prepare("SELECT id, event_name, event_date, event_location, event_image, lat, lng FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
     $stmt->execute();
     $upcomingEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -61,6 +61,10 @@ try {
             font-size: 1rem;
             font-weight: bold;
         }
+        #map {
+            height: 500px;
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -78,6 +82,10 @@ try {
             </div>
         <?php endforeach; ?>
     </div>
+
+    <!-- Carte des événements -->
+    <h2 class="mt-5">Carte des événements</h2>
+    <div id="map"></div>
 </div>
 
 <!-- Modal -->
@@ -104,33 +112,48 @@ try {
 <!-- Bootstrap JS et jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-    $(document).ready(function(){
-        $('.event-card').on('click', function(){
-            var eventId = $(this).data('id');
-            
-            // Faire une requête AJAX pour obtenir les détails de l'événement
-            $.ajax({
-                url: 'event_details_ajax.php',
-                method: 'GET',
-                data: { id: eventId },
-                success: function(response) {
-                    $('#eventDetails').html(response);
+    // Carte Leaflet
+    var map = L.map('map').setView([46.603354, 1.888334], 6);  // Vue centrée sur la France
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
 
-                    // Ajouter un listener pour le bouton "S'inscrire"
-                    $('#registerButton').on('click', function() {
-                        $.ajax({
-                            url: 'register_event.php',
-                            method: 'POST',
-                            data: { event_id: eventId },
-                            success: function(response) {
-                                alert(response); // Affiche le message de succès ou d'erreur
-                            }
-                        });
+    // Ajouter des marqueurs pour les événements
+    var events = <?php echo json_encode($upcomingEvents); ?>;
+    events.forEach(function(event) {
+        if (event.lat && event.lng) {
+            L.marker([event.lat, event.lng]).addTo(map)
+                .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
+        }
+    });
+
+    // Ouverture du modal pour afficher les détails de l'événement
+    $('.event-card').on('click', function(){
+        var eventId = $(this).data('id');
+        
+        // Requête AJAX pour obtenir les détails de l'événement
+        $.ajax({
+            url: 'event_details_ajax.php',
+            method: 'GET',
+            data: { id: eventId },
+            success: function(response) {
+                $('#eventDetails').html(response);
+
+                // Bouton pour s'inscrire à l'événement
+                $('#registerButton').on('click', function() {
+                    $.ajax({
+                        url: 'register_event.php',
+                        method: 'POST',
+                        data: { event_id: eventId },
+                        success: function(response) {
+                            alert(response); // Affiche le message de succès ou d'erreur
+                        }
                     });
-                }
-            });
+                });
+            }
         });
     });
 </script>
