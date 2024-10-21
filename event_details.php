@@ -102,6 +102,31 @@ try {
     </div>
 </div>
 
+<!-- Modal d'inscription -->
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="registerModalLabel">Inscription à l'événement</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulaire d'inscription sera injecté ici -->
+                <form id="registrationForm">
+                    <!-- Champs supplémentaires à ajouter ici via AJAX -->
+                    <div id="extraFields"></div>
+                    <button type="button" class="btn btn-primary" id="submitRegistration">S'inscrire</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bootstrap JS et jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -118,6 +143,39 @@ try {
                 data: { id: eventId },
                 success: function(response) {
                     $('#eventDetails').html(response); // Insérer les détails dans le modal
+                }
+            });
+        });
+
+        // Gestion du bouton d'inscription
+        $('#submitRegistration').on('click', function() {
+            var eventId = $('.event-card').data('id');
+            var formData = $('#registrationForm').serialize(); // Sérialise les données du formulaire
+
+            // Requête AJAX pour soumettre l'inscription
+            $.ajax({
+                url: 'register_event.php',
+                method: 'POST',
+                data: formData + '&event_id=' + eventId,
+                success: function(response) {
+                    alert(response); // Afficher le message de confirmation
+                    $('#registerModal').modal('hide'); // Fermer la modale
+                }
+            });
+        });
+
+        // Lorsque l'utilisateur clique sur "S'inscrire", afficher le formulaire d'inscription avec les champs supplémentaires
+        $(document).on('click', '#registerButton', function() {
+            var eventId = $(this).data('id');
+            $('#registerModal').modal('show');
+
+            // Charger les champs supplémentaires pour l'événement
+            $.ajax({
+                url: 'load_event_fields.php',
+                method: 'GET',
+                data: { event_id: eventId },
+                success: function(response) {
+                    $('#extraFields').html(response); // Insérer les champs supplémentaires dans la modale
                 }
             });
         });
