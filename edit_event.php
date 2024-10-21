@@ -63,10 +63,12 @@ if (isset($_GET['id'])) {
             $custom_fields = [];
             if (isset($_POST['field_label'])) {
                 foreach ($_POST['field_label'] as $key => $label) {
-                    $custom_fields[] = [
-                        'label' => $label,
-                        'type' => $_POST['field_type'][$key]
-                    ];
+                    if (!empty($label)) { // Ignorer les champs vides
+                        $custom_fields[] = [
+                            'label' => $label,
+                            'type' => $_POST['field_type'][$key]
+                        ];
+                    }
                 }
             }
             $custom_form_fields = json_encode($custom_fields);
@@ -167,8 +169,14 @@ if (isset($_GET['id'])) {
                     <option value="checkbox">Case à cocher</option>
                     <option value="select">Choix multiple</option>
                 </select>
+                <button type="button" class="btn btn-danger mt-2" onclick="removeCustomField(this)">Supprimer ce champ</button>
             `;
             container.appendChild(div);
+        }
+
+        // Fonction pour supprimer un champ personnalisé
+        function removeCustomField(button) {
+            button.parentElement.remove();
         }
     </script>
     <style>
@@ -246,6 +254,7 @@ if (isset($_GET['id'])) {
                             <option value="checkbox" <?php echo $field['type'] == 'checkbox' ? 'selected' : ''; ?>>Case à cocher</option>
                             <option value="select" <?php echo $field['type'] == 'select' ? 'selected' : ''; ?>>Choix multiple</option>
                         </select>
+                        <button type="button" class="btn btn-danger mt-2" onclick="removeCustomField(this)">Supprimer ce champ</button>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
