@@ -31,6 +31,9 @@ if (isset($_GET['id'])) {
             exit();
         }
 
+        // Décoder les champs personnalisés
+        $custom_fields = !empty($event['custom_form_fields']) ? json_decode($event['custom_form_fields'], true) : [];
+
         // Mise à jour de l'événement
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $event_name = $_POST['event_name'];
@@ -230,6 +233,22 @@ if (isset($_GET['id'])) {
         <div class="form-group mt-4" id="custom-fields">
             <h4>Champs personnalisés pour le formulaire d'inscription</h4>
             <button type="button" class="btn btn-secondary mb-3" onclick="addCustomField()">Ajouter un champ personnalisé</button>
+            <?php if (!empty($custom_fields)) : ?>
+                <?php foreach ($custom_fields as $field) : ?>
+                    <div class="form-group">
+                        <label>Nom du champ</label>
+                        <input type="text" name="field_label[]" class="form-control" value="<?php echo htmlspecialchars($field['label']); ?>" required>
+                        <label>Type de champ</label>
+                        <select name="field_type[]" class="form-control" required>
+                            <option value="text" <?php echo $field['type'] == 'text' ? 'selected' : ''; ?>>Texte</option>
+                            <option value="date" <?php echo $field['type'] == 'date' ? 'selected' : ''; ?>>Date</option>
+                            <option value="number" <?php echo $field['type'] == 'number' ? 'selected' : ''; ?>>Nombre</option>
+                            <option value="checkbox" <?php echo $field['type'] == 'checkbox' ? 'selected' : ''; ?>>Case à cocher</option>
+                            <option value="select" <?php echo $field['type'] == 'select' ? 'selected' : ''; ?>>Choix multiple</option>
+                        </select>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
         <button type="submit" class="btn btn-primary">Modifier</button>
         <a href="manage_events.php" class="btn btn-secondary">Retour</a>
