@@ -29,13 +29,20 @@ try {
 
         // Récupérer les utilisateurs inscrits à cet événement avec les données les plus récentes
         $stmt = $conn->prepare("
-            SELECT u.username, GROUP_CONCAT(CONCAT(ued.field_name, ': ', ued.field_value) ORDER BY ued.timestamp DESC SEPARATOR '<br>') AS user_data
-            FROM users u
-            JOIN event_user_assignments eua ON u.id = eua.user_id
-            JOIN user_event_data ued ON u.id = ued.user_id AND eua.event_id = ued.event_id
-            WHERE eua.event_id = :event_id
-            GROUP BY u.id
-        ");
+    SELECT u.username, ued.field_name, ued.field_value
+    FROM users u
+    JOIN event_user_assignments eua ON u.id = eua.user_id
+    JOIN user_event_data ued ON u.id = ued.user_id
+    WHERE eua.event_id = :event_id AND ued.event_id = :event_id
+    AND ued.timestamp = (
+        SELECT MAX(ued2.timestamp)
+        FROM user_event_data ued2
+        WHERE ued2.user_id = ued.user_id 
+        AND ued2.field_name = ued.field_name 
+        AND ued2.event_id = ued.event_id
+    )
+    ORDER BY u.username, ued.timestamp DESC
+");
         $stmt->bindParam(':event_id', $eventId);
         $stmt->execute();
         $registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
