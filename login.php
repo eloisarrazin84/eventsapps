@@ -24,14 +24,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Vérification du mot de passe
         if ($user && password_verify($password, $user['password'])) {
-            // Vérification si l'utilisateur est approuvé
             if ($user['is_approved']) {
-                // Stocker les informations utilisateur et le rôle dans la session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
-
-                // Redirection vers le dashboard pour tous les rôles
                 header("Location: dashboard.php");
                 exit();
             } else {
@@ -57,33 +53,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <style>
         body {
             background-color: #f7f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
             border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-container img {
+            width: 100px;
+            margin-bottom: 20px;
         }
         .error {
             color: #dc3545;
             margin-bottom: 15px;
-            text-align: center;
         }
-        .btn-register {
-            background-color: #28a745;
-            color: white;
-            margin-top: 10px;
+        .social-icons a {
+            margin: 0 10px;
+            color: #333;
+        }
+        .btn-help {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
 <div class="login-container">
+    <!-- Logo -->
+    <img src="chemin/vers/logo.png" alt="Logo Outdoor Secours">
+    
     <h2 class="text-center">Connexion</h2>
+    <p>Bienvenue chez Outdoor Secours. Connectez-vous pour accéder à vos événements et services.</p>
 
-    <!-- Affichage du message d'erreur -->
+    <!-- Message d'erreur -->
     <?php if (!empty($error)): ?>
         <p class="error"><?php echo $error; ?></p>
     <?php endif; ?>
@@ -102,8 +112,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Bouton S'inscrire -->
     <div class="text-center">
-        <a href="register.php" class="btn btn-register btn-block">S'inscrire</a>
+        <a href="register.php" class="btn btn-success btn-block">S'inscrire</a>
     </div>
+
+    <!-- Réseaux sociaux -->
+    <div class="social-icons">
+        <a href="#"><img src="chemin/vers/icon-facebook.png" alt="Facebook"></a>
+        <a href="#"><img src="chemin/vers/icon-twitter.png" alt="Twitter"></a>
+        <a href="#"><img src="chemin/vers/icon-instagram.png" alt="Instagram"></a>
+    </div>
+
+    <!-- Bouton Aide -->
+    <a href="contact.php" class="btn btn-link btn-help">Besoin d'aide ?</a>
 </div>
 
 <!-- Bootstrap JS -->
