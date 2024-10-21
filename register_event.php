@@ -35,13 +35,15 @@ try {
         $stmt->execute();
 
         // Sauvegarder les champs supplémentaires
-        foreach ($_POST['fields'] as $field_name => $field_value) {
-            $stmt = $conn->prepare("INSERT INTO user_event_data (user_id, event_id, field_name, field_value) VALUES (:user_id, :event_id, :field_name, :field_value)");
-            $stmt->bindParam(':user_id', $user_id);
-            $stmt->bindParam(':event_id', $event_id);
-            $stmt->bindParam(':field_name', $field_name);
-            $stmt->bindParam(':field_value', $field_value);
-            $stmt->execute();
+        if (isset($_POST['fields']) && is_array($_POST['fields'])) {
+            foreach ($_POST['fields'] as $field_name => $field_value) {
+                $stmt = $conn->prepare("INSERT INTO user_event_data (user_id, event_id, field_name, field_value) VALUES (:user_id, :event_id, :field_name, :field_value)");
+                $stmt->bindParam(':user_id', $user_id);
+                $stmt->bindParam(':event_id', $event_id);
+                $stmt->bindParam(':field_name', $field_name);
+                $stmt->bindParam(':field_value', $field_value);
+                $stmt->execute();
+            }
         }
 
         echo "Inscription réussie.";
