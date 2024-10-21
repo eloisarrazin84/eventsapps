@@ -159,6 +159,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
             margin-top: 10px;
         }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #565e64;
+            border-color: #565e64;
+        }
     </style>
 </head>
 <body onload="initMap()">
