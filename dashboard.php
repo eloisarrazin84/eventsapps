@@ -142,26 +142,34 @@ try {
         maxZoom: 19,
     }).addTo(map);
 
+    var markers = []; // Stocker les marqueurs ajoutés
+
     // Ajouter les événements sur la carte
     var events = <?php echo json_encode($upcomingEvents); ?>;
     console.log(events); // Debugging: voir les événements et leurs coordonnées
 
-    events.forEach(function(event) {
+    // Fonction pour ajouter un marqueur
+    function addMarker(event) {
         if (event.lat && event.lng) {
-            L.marker([event.lat, event.lng]).addTo(map)
-                .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
+            var marker = L.marker([event.lat, event.lng])
+                .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date)
+                .addTo(map);
+            markers.push(marker); // Ajouter à la liste des marqueurs
         } else {
             console.error("Pas de coordonnées pour l'événement : " + event.event_name);
         }
-    });
+    }
+
+    // Affichage initial des événements
+    events.forEach(addMarker);
 
     // Filtrer par lieu
     $('#filterLocation').on('input', function() {
         var filterValue = $(this).val().toLowerCase();
+        clearMarkers(); // Supprimer les anciens marqueurs
         events.forEach(function(event) {
             if (event.event_location.toLowerCase().includes(filterValue)) {
-                // Afficher ou masquer les marqueurs selon le filtre
-                L.marker([event.lat, event.lng]).addTo(map);
+                addMarker(event);
             }
         });
     });
@@ -169,13 +177,21 @@ try {
     // Filtrer par date
     $('#filterDate').on('change', function() {
         var filterDate = $(this).val();
+        clearMarkers(); // Supprimer les anciens marqueurs
         events.forEach(function(event) {
             if (event.event_date === filterDate) {
-                // Afficher le marqueur correspondant
-                L.marker([event.lat, event.lng]).addTo(map);
+                addMarker(event);
             }
         });
     });
+
+    // Fonction pour supprimer les anciens marqueurs
+    function clearMarkers() {
+        markers.forEach(function(marker) {
+            map.removeLayer(marker);
+        });
+        markers = [];
+    }
 
     // Gestion du clic sur les événements
     $(document).ready(function(){
