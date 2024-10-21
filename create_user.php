@@ -20,8 +20,8 @@ try {
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $username = $_POST['username'];
         $email = $_POST['email'];
-        $prenom = $_POST['prenom'];
-        $nom = $_POST['nom'];
+        $prenom = $_POST['first_name'];
+        $nom = $_POST['last_name'];
         $role = $_POST['role'];
         $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
         $approved = isset($_POST['approved']) ? 1 : 0;
