@@ -55,30 +55,21 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <title>Profile</title>
+    <title>Mon profil</title>
 </head>
 <body>
-<div class="container">
-    <h1>Votre profil</h1>
-    <form method="POST" action="">
-        <div class="form-group">
-            <label for="username">Nom d'utilisateur</label>
-            <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
-        </div>
-        <div class="form-group">
-            <label for="new_password">Nouveau mot de passe</label>
-            <input type="password" class="form-control" id="new_password" name="new_password">
-        </div>
-        <div class="form-group">
-            <label for="confirm_password">Confirmer le nouveau mot de passe</label>
-            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
-        </div>
-        <button type="submit" class="btn btn-primary">Modifier</button>
-    </form>
+
+<div class="container mt-5">
+    <h1>Mon profil</h1>
+    <!-- Profil details and update form goes here -->
+
+    <!-- Button to return to the dashboard -->
+    <a href="dashboard.php" class="btn btn-secondary mt-4">Retour au tableau de bord</a>
 </div>
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
