@@ -11,8 +11,11 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Récupérer les événements à venir
-    $stmt = $conn->prepare("SELECT id, event_name, event_date, event_location, event_image, lat, lng FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC");
+    // Limite initiale des événements chargés
+    $limit = 10;
+    $stmt = $conn->prepare("SELECT id, event_name, event_date, event_location, event_image, lat, lng, registration_deadline 
+                            FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC LIMIT :limit");
+    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
     $stmt->execute();
     $upcomingEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -63,10 +66,10 @@ try {
             font-weight: bold;
         }
         #map {
-            height: 400px;  /* Adjusted height */
+            height: 400px;
             width: 100%;
             margin-top: 30px;
-            max-width: 1200px; /* Corresponds to the event grid width */
+            max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -78,12 +81,26 @@ try {
 
 <div class="container">
     <h1 class="mt-5">Événements à venir</h1>
+
+    <div class="filters">
+        <input type="text" id="filterLocation" placeholder="Filtrer par lieu">
+        <input type="date" id="filterDate" placeholder="Filtrer par date">
+    </div>
     
     <div class="event-grid">
         <?php foreach ($upcomingEvents as $event): ?>
             <div class="event-card" data-id="<?php echo $event['id']; ?>" data-toggle="modal" data-target="#eventModal">
                 <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
                 <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
+                <?php
+                // Récupérer nombre de participants
+                $stmtParticipants = $conn->prepare("SELECT COUNT(*) FROM event_user_assignments WHERE event_id = :event_id");
+                $stmtParticipants->bindParam(':event_id', $event['id']);
+                $stmtParticipants->execute();
+                $numParticipants = $stmtParticipants->fetchColumn();
+                ?>
+                <p>Participants inscrits : <?= $numParticipants ?></p>
+                <p>Date limite d'inscription : <?= $event['registration_deadline'] ?></p>
             </div>
         <?php endforeach; ?>
     </div>
@@ -120,23 +137,45 @@ try {
 
 <script>
     // Carte Leaflet
-var map = L.map('map').setView([46.603354, 1.888334], 6);  // Centré sur la France
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-}).addTo(map);
+    var map = L.map('map').setView([46.603354, 1.888334], 6);  // Centré sur la France
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
 
-// Ajouter les événements sur la carte
-var events = <?php echo json_encode($upcomingEvents); ?>;
-console.log(events); // Debugging: voir les événements et leurs coordonnées
+    // Ajouter les événements sur la carte
+    var events = <?php echo json_encode($upcomingEvents); ?>;
+    console.log(events); // Debugging: voir les événements et leurs coordonnées
 
-events.forEach(function(event) {
-    if (event.lat && event.lng) {
-        L.marker([event.lat, event.lng]).addTo(map)
-            .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
-    } else {
-        console.error("Pas de coordonnées pour l'événement : " + event.event_name);
-    }
-});
+    events.forEach(function(event) {
+        if (event.lat && event.lng) {
+            L.marker([event.lat, event.lng]).addTo(map)
+                .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
+        } else {
+            console.error("Pas de coordonnées pour l'événement : " + event.event_name);
+        }
+    });
+
+    // Filtrer par lieu
+    $('#filterLocation').on('input', function() {
+        var filterValue = $(this).val().toLowerCase();
+        events.forEach(function(event) {
+            if (event.event_location.toLowerCase().includes(filterValue)) {
+                // Afficher ou masquer les marqueurs selon le filtre
+                L.marker([event.lat, event.lng]).addTo(map);
+            }
+        });
+    });
+
+    // Filtrer par date
+    $('#filterDate').on('change', function() {
+        var filterDate = $(this).val();
+        events.forEach(function(event) {
+            if (event.event_date === filterDate) {
+                // Afficher le marqueur correspondant
+                L.marker([event.lat, event.lng]).addTo(map);
+            }
+        });
+    });
 
     // Gestion du clic sur les événements
     $(document).ready(function(){
