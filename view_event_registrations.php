@@ -61,6 +61,8 @@ $registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
 <div class="container">
     <h1 class="mt-5">Inscriptions pour l'événement : <?php echo htmlspecialchars($event['event_name']); ?></h1>
+    <!-- Bouton pour exporter en Excel -->
+    <a href="export_to_excel.php?event_id=<?php echo $eventId; ?>" class="btn btn-success mb-3">Exporter en Excel</a>
 
     <?php if (!empty($registrations)): ?>
     <table class="table table-bordered mt-4">
