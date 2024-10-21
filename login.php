@@ -51,47 +51,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Connexion</title>
     <style>
-    body {
-        background-color: #f7f9fc;
-    }
-    .login-container {
-        max-width: 400px;
-        margin: 50px auto;
-        padding: 20px;
-        background-color: #fff;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-    }
-    .logo {
-        display: block;
-        margin: 0 auto 20px;
-        width: 100px;
-    }
-    .error {
-        color: #dc3545;
-        margin-bottom: 15px;
-        text-align: center;
-    }
-    .btn-register {
-        background-color: #28a745;
-        color: white;
-        margin-top: 10px;
-    }
-    .social-icons {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 20px;
-    }
-    .social-icons img {
-        width: 40px;
-        height: 40px;
-    }
-    .help-link {
-        text-align: center;
-        margin-top: 20px;
-    }
-</style>
+        body {
+            background-color: #f7f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-container img {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+        .error {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .social-icons img {
+            width: 40px;
+            height: 40px;
+        }
+        .btn-help {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
