@@ -22,8 +22,8 @@ try {
     if (isset($_GET['event_id'])) {
         $eventId = $_GET['event_id'];
 
-        // Récupérer les utilisateurs avec le rôle "user"
-        $stmt = $conn->prepare("SELECT id, username FROM users WHERE role = 'user'");
+        // Récupérer les utilisateurs avec le rôle "user" ou "admin"
+        $stmt = $conn->prepare("SELECT id, username FROM users WHERE role IN ('user', 'admin')");
         $stmt->execute();
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
