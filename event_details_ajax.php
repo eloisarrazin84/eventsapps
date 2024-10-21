@@ -75,16 +75,20 @@ try {
     echo "Erreur : " . $e->getMessage();
 }
 ?>
+
 <script>
     function registerForEvent(eventId) {
+        const form = document.getElementById('registrationForm');
+        const formData = new FormData(form);
+        formData.append('event_id', eventId);
+
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "register_event.php", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 alert(xhr.responseText);
             }
         };
-        xhr.send("event_id=" + eventId);
+        xhr.send(formData);
     }
 </script>
