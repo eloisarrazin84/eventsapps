@@ -40,9 +40,9 @@ try {
 <!-- Inclusion du menu -->
 <?php include 'menu.php'; ?>
 
-<div class="container mt-5">
-    <h2 class="mb-4">Gestion des utilisateurs</h2>
-
+<div class="container">
+    <h1 class="mt-5">Gestion des utilisateurs</h1>
+    <a href="create_user.php" class="btn btn-success mb-3">Créer un nouvel utilisateur</a>
     <table class="table table-bordered">
         <thead class="thead-light">
             <tr>
