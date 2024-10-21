@@ -24,7 +24,7 @@ try {
         echo "<p><strong>Description :</strong> " . htmlspecialchars($event['event_description']) . "</p>";
         
         // Bouton d'inscription
-        echo '<button id="registerButton" class="btn btn-primary">S\'inscrire à cet événement</button>';
+        echo '<button id="registerButton" class="btn btn-primary" onclick="registerForEvent(' . htmlspecialchars($event_id) . ')">S\'inscrire à cet événement</button>';
     } else {
         echo "Événement non trouvé.";
     }
@@ -32,3 +32,16 @@ try {
     echo "Erreur : " . $e->getMessage();
 }
 ?>
+<script>
+    function registerForEvent(eventId) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "register_event.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                alert(xhr.responseText);
+            }
+        };
+        xhr.send("event_id=" + eventId);
+    }
+</script>
