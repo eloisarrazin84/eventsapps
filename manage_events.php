@@ -145,14 +145,15 @@ try {
                 </p>
             </div>
             <div class="event-buttons">
-                <a href="edit_event.php?id=<?php echo $event['id']; ?>" class="btn btn-warning btn-sm btn-custom">Modifier</a>
-                <a href="assign_users.php?event_id=<?php echo $event['id']; ?>" class="btn btn-info btn-sm btn-custom">Assigner des utilisateurs</a>
-                <!-- Suppression via formulaire POST -->
-                <form method="POST" action="manage_events.php" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">
-                    <input type="hidden" name="delete_id" value="<?php echo $event['id']; ?>">
-                    <button type="submit" class="btn btn-danger btn-sm btn-custom">Supprimer</button>
-                </form>
-            </div>
+    <a href="view_event_registrations.php?event_id=<?php echo $event['id']; ?>" class="btn btn-info btn-sm">Voir les inscriptions</a>
+    <a href="edit_event.php?id=<?php echo $event['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
+    <a href="assign_users.php?event_id=<?php echo $event['id']; ?>" class="btn btn-info btn-sm">Assigner des utilisateurs</a>
+    <!-- Suppression via formulaire POST -->
+    <form method="POST" action="manage_events.php" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">
+        <input type="hidden" name="delete_id" value="<?php echo $event['id']; ?>">
+        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+    </form>
+</div>
         </div>
         <?php endforeach; ?>
     </div>
