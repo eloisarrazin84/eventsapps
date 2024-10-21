@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="login-container">
     <!-- Logo -->
-    <img src="chemin/vers/logo.png" alt="Logo Outdoor Secours">
+    <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1.png" alt="Logo Outdoor Secours">
     
     <h2 class="text-center">Connexion</h2>
     <p>Bienvenue chez Outdoor Secours. Connectez-vous pour accéder à vos événements et services.</p>
