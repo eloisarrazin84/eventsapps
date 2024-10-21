@@ -117,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Réseaux sociaux -->
     <div class="social-icons">
-        <a href="#"><img src="chemin/vers/icon-facebook.png" alt="Facebook"></a>
+        <a href="#"><img src="https://cdn-icons-png.flaticon.com/256/124/124010.png" alt="Facebook"></a>
         <a href="#"><img src="chemin/vers/icon-twitter.png" alt="Twitter"></a>
         <a href="#"><img src="chemin/vers/icon-instagram.png" alt="Instagram"></a>
     </div>
