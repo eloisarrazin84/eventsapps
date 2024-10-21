@@ -30,7 +30,20 @@ try {
         echo "<p><strong>Description :</strong> " . htmlspecialchars($event['event_description']) . "</p>";
 
         // Formulaire d'inscription
-        echo '<form id="registrationForm">';
+        echo '<button class="btn btn-primary" data-toggle="modal" data-target="#registrationModal">S\'inscrire à cet événement</button>';
+        
+        // Création du formulaire dans une modale distincte
+        echo '<div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="registrationModalLabel">Formulaire d\'inscription</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="registrationForm">';
         
         foreach ($event_fields as $field) {
             echo '<div class="form-group">';
@@ -65,9 +78,15 @@ try {
             echo '</div>';
         }
 
-        // Bouton d'inscription
-        echo '<button type="button" class="btn btn-primary" onclick="registerForEvent(' . htmlspecialchars($event_id) . ')">S\'inscrire à cet événement</button>';
-        echo '</form>';
+        echo '</form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <button type="button" class="btn btn-primary" onclick="registerForEvent(' . htmlspecialchars($event_id) . ')">S\'inscrire</button>
+                        </div>
+                    </div>
+                </div>
+            </div>';
     } else {
         echo "Événement non trouvé.";
     }
@@ -87,6 +106,7 @@ try {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 alert(xhr.responseText);
+                $('#registrationModal').modal('hide');
             }
         };
         xhr.send(formData);
