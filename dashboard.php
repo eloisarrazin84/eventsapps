@@ -8,10 +8,11 @@ $password = "Lipton2019!";
 $dbname = "outdoorsec";
 
 try {
+    // Connexion à la base de données via PDO
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Limite initiale des événements chargés
+    // Requête pour récupérer les événements à venir
     $limit = 10;
     $stmt = $conn->prepare("SELECT id, event_name, event_date, event_location, event_image, lat, lng, registration_deadline 
                             FROM events WHERE event_date >= CURDATE() ORDER BY event_date ASC LIMIT :limit");
@@ -65,16 +66,16 @@ try {
 
         .event-card-title {
             position: absolute;
-            top: 0; /* Positionne le titre en haut de l'image */
+            top: 0;
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent pour le texte */
+            background: rgba(0, 0, 0, 0.5);
             color: white;
             text-align: center;
             padding: 10px;
             font-size: 1.1rem;
             font-weight: bold;
-            border-radius: 15px 15px 0 0; /* Bord supérieur arrondi */
+            border-radius: 15px 15px 0 0;
         }
 
         .filters {
@@ -136,11 +137,12 @@ try {
     <!-- Grille des événements -->
     <div class="event-grid">
         <?php foreach ($upcomingEvents as $event): ?>
-            <div class="event-card" data-id="<?php echo $event['id']; ?>" data-toggle="modal" data-target="#eventModal">
+            <div class="event-card" data-id="<?php echo $event['id']; ?>" data-date="<?php echo $event['event_date']; ?>" data-location="<?php echo htmlspecialchars($event['event_location']); ?>" data-toggle="modal" data-target="#eventModal">
                 <img src="<?php echo htmlspecialchars($event['event_image']); ?>" alt="<?php echo htmlspecialchars($event['event_name']); ?>">
                 <div class="event-card-title"><?php echo htmlspecialchars($event['event_name']); ?></div>
                 <div class="participants">
                     <?php
+                    // Requête pour récupérer le nombre de participants inscrits
                     $stmtParticipants = $conn->prepare("SELECT COUNT(*) FROM event_user_assignments WHERE event_id = :event_id");
                     $stmtParticipants->bindParam(':event_id', $event['id']);
                     $stmtParticipants->execute();
@@ -191,69 +193,76 @@ try {
 
     // Ajouter les événements à la carte
     var events = <?php echo json_encode($upcomingEvents); ?>;
-    console.log(events);
+
+    // Variable pour stocker les marqueurs pour filtrage
+    var markers = [];
 
     events.forEach(function(event) {
         if (event.lat && event.lng) {
-            L.marker([event.lat, event.lng]).addTo(map)
+            var marker = L.marker([event.lat, event.lng])
                 .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
-        } else {
-            console.error("Pas de coordonnées pour l'événement : " + event.event_name);
+            marker.addTo(map);
+            markers.push({marker: marker, event: event});
         }
     });
 
-    // Gérer les événements cliqués
-    $(document).ready(function(){
-        $('.event-card').on('click', function(){
+    // Filtrer par lieu
+    $('#filterLocation').on('change', function() {
+        var filterValue = $(this).val().toLowerCase();
+        $('.event-card').each(function() {
+            var eventLocation = $(this).data('location').toLowerCase();
+            if (eventLocation.includes(filterValue) || filterValue === "") {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+
+        // Mise à jour des marqueurs sur la carte
+        markers.forEach(function(item) {
+            if (item.event.event_location.toLowerCase().includes(filterValue) || filterValue === "") {
+                item.marker.addTo(map);
+            } else {
+                map.removeLayer(item.marker);
+            }
+        });
+    });
+
+    // Filtrer par date
+    $('#filterDate').on('change', function() {
+        var filterDate = $(this).val();
+        $('.event-card').each(function() {
+            var eventDate = $(this).data('date');
+            if (eventDate === filterDate || filterDate === "") {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+
+        // Mise à jour des marqueurs sur la carte
+        markers.forEach(function(item) {
+            if (item.event.event_date === filterDate || filterDate === "") {
+                item.marker.addTo(map);
+            } else {
+                map.removeLayer(item.marker);
+            }
+        });
+    });
+
+    // Gérer les événements cliqués pour ouvrir le modal
+    $(document).ready(function() {
+        $('.event-card').on('click', function() {
             var eventId = $(this).data('id');
-            
-            // Requête AJAX pour obtenir les détails
+            // Requête AJAX pour obtenir les détails de l'événement
             $.ajax({
                 url: 'event_details_ajax.php',
                 method: 'GET',
                 data: { id: eventId },
                 success: function(response) {
                     $('#eventDetails').html(response);
-                    $('#registerButton').on('click', function() {
-                        $.ajax({
-                            url: 'register_event.php',
-                            method: 'POST',
-                            data: { event_id: eventId },
-                            success: function(response) {
-                                alert(response);
-                            }
-                        });
-                    });
                 }
             });
-        });
-
-        // Filtrer par lieu
-$('#filterLocation').on('input', function() {
-    var filterValue = $(this).val().toLowerCase();
-    $('.event-card').each(function() {
-        var eventLocation = $(this).find('.event-card-title').text().toLowerCase();
-        if (eventLocation.includes(filterValue)) {
-            $(this).show();  // Afficher la carte si le lieu correspond
-        } else {
-            $(this).hide();  // Masquer la carte si le lieu ne correspond pas
-        }
-    });
-});
-
-// Filtrer par date
-$('#filterDate').on('change', function() {
-    var filterDate = $(this).val();
-    $('.event-card').each(function() {
-        var eventDate = $(this).data('date');  // Récupérer la date à partir de la carte
-        if (eventDate === filterDate) {
-            $(this).show();  // Afficher la carte si la date correspond
-        } else {
-            $(this).hide();  // Masquer la carte si la date ne correspond pas
-        }
-    });
-});
-
         });
     });
 </script>
