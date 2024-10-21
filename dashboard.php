@@ -44,10 +44,6 @@ try {
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        .event-card:hover {
-            transform: translateY(-5px);
         }
         .event-card img {
             width: 100%;
@@ -67,10 +63,9 @@ try {
             font-weight: bold;
         }
         #map {
-            height: 400px;  
+            height: 500px;
             width: 100%;
-            max-width: 900px;
-            margin: 30px auto;
+            margin-top: 30px;
         }
     </style>
 </head>
