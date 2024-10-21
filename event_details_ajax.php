@@ -59,17 +59,19 @@ try {
                 case 'date':
                     echo '<input type="date" class="form-control" name="fields[' . htmlspecialchars($field['field_name']) . ']">';
                     break;
-                case 'checkbox':
-                    echo '<input type="checkbox" name="fields[' . htmlspecialchars($field['field_name']) . ']">';
-                    break;
-                case 'multiple':
-                    $options = explode(',', $field['field_options']);
-                    echo '<select class="form-control" name="fields[' . htmlspecialchars($field['field_name']) . ']">';
-                    foreach ($options as $option) {
-                        echo '<option value="' . htmlspecialchars(trim($option)) . '">' . htmlspecialchars(trim($option)) . '</option>';
-                    }
-                    echo '</select>';
-                    break;
+               case 'checkbox':
+    echo '<input type="checkbox" name="fields[' . htmlspecialchars($field['field_name']) . ']" value="1">';
+    break;
+
+               case 'multiple':
+    $options = explode(',', $field['field_options']);
+    echo '<select class="form-control" name="fields[' . htmlspecialchars($field['field_name']) . ']">';
+    foreach ($options as $option) {
+        echo '<option value="' . htmlspecialchars(trim($option)) . '">' . htmlspecialchars(trim($option)) . '</option>';
+    }
+    echo '</select>';
+    break;
+
             }
 
             if (!empty($field['field_description'])) {
