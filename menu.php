@@ -18,6 +18,11 @@
             <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="dashboard.php">Tableau de bord</a>
             </li>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : ''; ?>">
+                    <a class="nav-link" href="profile.php">Mon profil</a>
+                </li>
+            <?php endif; ?>
         </ul>
         <ul class="navbar-nav ml-auto">
             <?php if (isset($_SESSION['user_id'])): ?>
