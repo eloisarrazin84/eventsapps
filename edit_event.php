@@ -37,6 +37,7 @@ if (isset($_GET['id'])) {
             $event_date = $_POST['event_date'];
             $event_location = $_POST['event_location'];
             $event_description = $_POST['event_description'];
+            $registration_deadline = $_POST['registration_deadline'];
             $lat = $_POST['lat'];
             $lng = $_POST['lng'];
 
@@ -56,7 +57,9 @@ if (isset($_GET['id'])) {
             }
 
             // Mise à jour des informations de l'événement
-            $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, event_description = :event_description, event_image = :event_image, lat = :lat, lng = :lng WHERE id = :id");
+            $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, 
+                                    event_description = :event_description, event_image = :event_image, lat = :lat, lng = :lng, 
+                                    registration_deadline = :registration_deadline WHERE id = :id");
             $stmt->bindParam(':event_name', $event_name);
             $stmt->bindParam(':event_date', $event_date);
             $stmt->bindParam(':event_location', $event_location);
@@ -64,6 +67,7 @@ if (isset($_GET['id'])) {
             $stmt->bindParam(':event_image', $event_image);
             $stmt->bindParam(':lat', $lat);
             $stmt->bindParam(':lng', $lng);
+            $stmt->bindParam(':registration_deadline', $registration_deadline);
             $stmt->bindParam(':id', $eventId);
             $stmt->execute();
 
@@ -163,6 +167,10 @@ if (isset($_GET['id'])) {
         <div class="form-group">
             <label for="event_date">Date de l'événement</label>
             <input type="date" class="form-control" id="event_date" name="event_date" value="<?php echo htmlspecialchars($event['event_date']); ?>" required>
+        </div>
+        <div class="form-group">
+            <label for="registration_deadline">Date limite d'inscription</label>
+            <input type="date" class="form-control" id="registration_deadline" name="registration_deadline" value="<?php echo htmlspecialchars($event['registration_deadline']); ?>" required>
         </div>
         <div class="form-group">
             <label for="event_location">Lieu de l'événement</label>
