@@ -26,6 +26,12 @@ if (isset($_GET['id'])) {
         $stmt->execute();
         $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Récupérer les champs supplémentaires
+        $stmt = $conn->prepare("SELECT * FROM event_fields WHERE event_id = :event_id");
+        $stmt->bindParam(':event_id', $eventId);
+        $stmt->execute();
+        $eventFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         if (!$event) {
             echo "Événement non trouvé.";
             exit();
@@ -70,6 +76,27 @@ if (isset($_GET['id'])) {
             $stmt->bindParam(':registration_deadline', $registration_deadline);
             $stmt->bindParam(':id', $eventId);
             $stmt->execute();
+
+            // Mise à jour des champs supplémentaires
+            if (isset($_POST['field_id'])) {
+                foreach ($_POST['field_id'] as $key => $fieldId) {
+                    if (isset($_POST['delete_field']) && in_array($fieldId, $_POST['delete_field'])) {
+                        // Supprimer le champ supplémentaire
+                        $stmt = $conn->prepare("DELETE FROM event_fields WHERE id = :field_id");
+                        $stmt->bindParam(':field_id', $fieldId);
+                        $stmt->execute();
+                    } else {
+                        // Mettre à jour le champ supplémentaire
+                        $field_label = $_POST['field_label'][$key];
+                        $field_type = $_POST['field_type'][$key];
+                        $stmt = $conn->prepare("UPDATE event_fields SET label = :label, field_type = :field_type WHERE id = :field_id");
+                        $stmt->bindParam(':label', $field_label);
+                        $stmt->bindParam(':field_type', $field_type);
+                        $stmt->bindParam(':field_id', $fieldId);
+                        $stmt->execute();
+                    }
+                }
+            }
 
             header("Location: manage_events.php");
             exit();
@@ -231,11 +258,70 @@ if (isset($_GET['id'])) {
             <label for="event_image">Image de l'événement (laisser vide si inchangée)</label>
             <input type="file" class="form-control-file" id="event_image" name="event_image">
         </div>
+
+        <!-- Champs supplémentaires -->
+        <h4 class="mt-5">Champs supplémentaires</h4>
+        <div id="additional-fields">
+            <?php foreach ($eventFields as $field) : ?>
+                <div class="form-group additional-field">
+                    <label>Nom du champ</label>
+                    <input type="text" name="field_label[]" class="form-control" value="<?php echo htmlspecialchars($field['label']); ?>" required>
+                    <label>Type de champ</label>
+                    <select name="field_type[]" class="form-control">
+                        <option value="text" <?php echo ($field['field_type'] == 'text') ? 'selected' : ''; ?>>Texte</option>
+                        <option value="number" <?php echo ($field['field_type'] == 'number') ? 'selected' : ''; ?>>Nombre</option>
+                        <option value="date" <?php echo ($field['field_type'] == 'date') ? 'selected' : ''; ?>>Date</option>
+                        <option value="checkbox" <?php echo ($field['field_type'] == 'checkbox') ? 'selected' : ''; ?>>Case à cocher</option>
+                        <option value="multiple" <?php echo ($field['field_type'] == 'multiple') ? 'selected' : ''; ?>>Choix multiple</option>
+                    </select>
+                    <input type="hidden" name="field_id[]" value="<?php echo $field['id']; ?>">
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-danger remove-field">Supprimer ce champ</button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <button type="button" id="add-field" class="btn btn-success mt-3">Ajouter un champ</button>
+
         <div class="d-flex justify-content-between mt-4">
             <button type="submit" class="btn btn-primary">Modifier</button>
             <a href="manage_events.php" class="btn btn-secondary">Retour</a>
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('add-field').addEventListener('click', function () {
+            const additionalFields = document.getElementById('additional-fields');
+            const fieldHTML = `
+                <div class="form-group additional-field">
+                    <label>Nom du champ</label>
+                    <input type="text" name="field_label[]" class="form-control" required>
+                    <label>Type de champ</label>
+                    <select name="field_type[]" class="form-control">
+                        <option value="text">Texte</option>
+                        <option value="number">Nombre</option>
+                        <option value="date">Date</option>
+                        <option value="checkbox">Case à cocher</option>
+                        <option value="multiple">Choix multiple</option>
+                    </select>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-danger remove-field">Supprimer ce champ</button>
+                    </div>
+                </div>
+            `;
+            additionalFields.insertAdjacentHTML('beforeend', fieldHTML);
+        });
+
+        document.getElementById('additional-fields').addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-field')) {
+                const fieldGroup = event.target.closest('.additional-field');
+                fieldGroup.remove();
+            }
+        });
+    });
+</script>
 </body>
 </html>
