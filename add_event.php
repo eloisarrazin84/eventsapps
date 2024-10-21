@@ -33,25 +33,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    try {
-        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Appel à l'API Nominatim pour récupérer les coordonnées de l'adresse
+    $url = "https://nominatim.openstreetmap.org/search?q=" . urlencode($event_location) . "&format=json&limit=1";
+    $response = file_get_contents($url);
+    $data = json_decode($response, true);
 
-        // Insertion du nouvel événement avec son image
-        $stmt = $conn->prepare("INSERT INTO events (event_name, event_date, event_location, event_description, event_image) 
-                                VALUES (:event_name, :event_date, :event_location, :event_description, :event_image)");
-        $stmt->bindParam(':event_name', $event_name);
-        $stmt->bindParam(':event_date', $event_date);
-        $stmt->bindParam(':event_location', $event_location);
-        $stmt->bindParam(':event_description', $event_description);
-        $stmt->bindParam(':event_image', $event_image);
-        $stmt->execute();
+    if (!empty($data)) {
+        $lat = $data[0]['lat'];
+        $lng = $data[0]['lon'];
 
-        header("Location: manage_events.php");
-        exit();
+        try {
+            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    } catch(PDOException $e) {
-        echo "Erreur : " . $e->getMessage();
+            // Insertion de l'événement avec les coordonnées et l'image
+            $stmt = $conn->prepare("INSERT INTO events (event_name, event_date, event_location, event_description, event_image, lat, lng) 
+                                    VALUES (:event_name, :event_date, :event_location, :event_description, :event_image, :lat, :lng)");
+            $stmt->bindParam(':event_name', $event_name);
+            $stmt->bindParam(':event_date', $event_date);
+            $stmt->bindParam(':event_location', $event_location);
+            $stmt->bindParam(':event_description', $event_description);
+            $stmt->bindParam(':event_image', $event_image);
+            $stmt->bindParam(':lat', $lat);
+            $stmt->bindParam(':lng', $lng);
+            $stmt->execute();
+
+            header("Location: manage_events.php");
+            exit();
+
+        } catch(PDOException $e) {
+            echo "Erreur : " . $e->getMessage();
+        }
+    } else {
+        echo "Erreur : adresse non trouvée.";
     }
 }
 ?>
