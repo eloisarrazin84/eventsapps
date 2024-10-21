@@ -120,21 +120,21 @@ try {
 
 <script>
     // Carte Leaflet
-    var map = L.map('map').setView([46.603354, 1.888334], 6);  // Centré sur la France
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-    }).addTo(map);
+var map = L.map('map').setView([46.603354, 1.888334], 6);  // Centré sur la France
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+}).addTo(map);
 
-    // Ajouter les événements sur la carte
+// Ajouter les événements sur la carte
 var events = <?php echo json_encode($upcomingEvents); ?>;
-console.log(events); // Vérifier que les données des événements sont correctement récupérées
+console.log(events); // Debugging: voir les événements et leurs coordonnées
 
 events.forEach(function(event) {
     if (event.lat && event.lng) {
         L.marker([event.lat, event.lng]).addTo(map)
             .bindPopup("<strong>" + event.event_name + "</strong><br>" + event.event_location + "<br>Date : " + event.event_date);
     } else {
-        console.error("Pas de coordonnées pour l'événement : ", event.event_name);
+        console.error("Pas de coordonnées pour l'événement : " + event.event_name);
     }
 });
 
