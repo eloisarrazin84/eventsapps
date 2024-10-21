@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Connexion</title>
     <style>
         body {
-            background-image: url('https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1.png');
+            background-image: url('https://www.odsradio.com/media/news/haute-savoie-deux-morts-en-montagne-et-une-fuite-de-gaz_65f9df9a57367.jpg');
             background-size: cover;
             display: flex;
             justify-content: center;
