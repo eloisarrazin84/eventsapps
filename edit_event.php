@@ -53,18 +53,32 @@ if (isset($_GET['id'])) {
                 }
             }
 
-            // Mise à jour des informations de l'événement
-            $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, event_description = :event_description, event_image = :event_image WHERE id = :id");
-            $stmt->bindParam(':event_name', $event_name);
-            $stmt->bindParam(':event_date', $event_date);
-            $stmt->bindParam(':event_location', $event_location);
-            $stmt->bindParam(':event_description', $event_description);
-            $stmt->bindParam(':event_image', $event_image);
-            $stmt->bindParam(':id', $eventId);
-            $stmt->execute();
+            // Utiliser l'API de géocodage Nominatim pour obtenir les coordonnées
+            $geocode_url = "https://nominatim.openstreetmap.org/search?format=json&q=" . urlencode($event_location);
+            $geocode_data = file_get_contents($geocode_url);
+            $geocode = json_decode($geocode_data, true);
 
-            header("Location: manage_events.php");
-            exit();
+            if (!empty($geocode)) {
+                $lat = $geocode[0]['lat'];
+                $lng = $geocode[0]['lon'];
+
+                // Mise à jour des informations de l'événement avec les coordonnées
+                $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, event_description = :event_description, event_image = :event_image, lat = :lat, lng = :lng WHERE id = :id");
+                $stmt->bindParam(':event_name', $event_name);
+                $stmt->bindParam(':event_date', $event_date);
+                $stmt->bindParam(':event_location', $event_location);
+                $stmt->bindParam(':event_description', $event_description);
+                $stmt->bindParam(':event_image', $event_image);
+                $stmt->bindParam(':lat', $lat);
+                $stmt->bindParam(':lng', $lng);
+                $stmt->bindParam(':id', $eventId);
+                $stmt->execute();
+
+                header("Location: manage_events.php");
+                exit();
+            } else {
+                echo "Erreur : Impossible de récupérer les coordonnées pour l'adresse fournie.";
+            }
         }
     } catch (PDOException $e) {
         echo "Erreur : " . $e->getMessage();
