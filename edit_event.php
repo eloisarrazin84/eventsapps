@@ -37,6 +37,8 @@ if (isset($_GET['id'])) {
             $event_date = $_POST['event_date'];
             $event_location = $_POST['event_location'];
             $event_description = $_POST['event_description'];
+            $lat = $_POST['lat'];
+            $lng = $_POST['lng'];
 
             $event_image = $event['event_image'];  // Conserver l'image précédente si non modifiée
 
@@ -53,32 +55,20 @@ if (isset($_GET['id'])) {
                 }
             }
 
-            // Utiliser l'API de géocodage Nominatim pour obtenir les coordonnées
-            $geocode_url = "https://nominatim.openstreetmap.org/search?format=json&q=" . urlencode($event_location);
-            $geocode_data = file_get_contents($geocode_url);
-            $geocode = json_decode($geocode_data, true);
+            // Mise à jour des informations de l'événement
+            $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, event_description = :event_description, event_image = :event_image, lat = :lat, lng = :lng WHERE id = :id");
+            $stmt->bindParam(':event_name', $event_name);
+            $stmt->bindParam(':event_date', $event_date);
+            $stmt->bindParam(':event_location', $event_location);
+            $stmt->bindParam(':event_description', $event_description);
+            $stmt->bindParam(':event_image', $event_image);
+            $stmt->bindParam(':lat', $lat);
+            $stmt->bindParam(':lng', $lng);
+            $stmt->bindParam(':id', $eventId);
+            $stmt->execute();
 
-            if (!empty($geocode)) {
-                $lat = $geocode[0]['lat'];
-                $lng = $geocode[0]['lon'];
-
-                // Mise à jour des informations de l'événement avec les coordonnées
-                $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, event_description = :event_description, event_image = :event_image, lat = :lat, lng = :lng WHERE id = :id");
-                $stmt->bindParam(':event_name', $event_name);
-                $stmt->bindParam(':event_date', $event_date);
-                $stmt->bindParam(':event_location', $event_location);
-                $stmt->bindParam(':event_description', $event_description);
-                $stmt->bindParam(':event_image', $event_image);
-                $stmt->bindParam(':lat', $lat);
-                $stmt->bindParam(':lng', $lng);
-                $stmt->bindParam(':id', $eventId);
-                $stmt->execute();
-
-                header("Location: manage_events.php");
-                exit();
-            } else {
-                echo "Erreur : Impossible de récupérer les coordonnées pour l'adresse fournie.";
-            }
+            header("Location: manage_events.php");
+            exit();
         }
     } catch (PDOException $e) {
         echo "Erreur : " . $e->getMessage();
@@ -120,12 +110,17 @@ if (isset($_GET['id'])) {
                     .then(response => response.json())
                     .then(data => {
                         searchResults.innerHTML = '';
+                        if (data.length === 0) {
+                            alert("Impossible de récupérer les coordonnées pour l'adresse fournie. Veuillez vérifier l'adresse.");
+                        }
                         data.forEach(item => {
                             const option = document.createElement('div');
                             option.className = 'search-item';
                             option.textContent = item.display_name;
                             option.onclick = function() {
                                 searchInput.value = item.display_name;
+                                document.getElementById('lat').value = item.lat;
+                                document.getElementById('lng').value = item.lon;
                                 map.setView([item.lat, item.lon], 12);
                                 searchResults.innerHTML = '';
                             };
@@ -178,6 +173,14 @@ if (isset($_GET['id'])) {
         <div class="form-group">
             <label for="event_description">Description de l'événement</label>
             <textarea class="form-control" id="event_description" name="event_description"><?php echo htmlspecialchars($event['event_description']); ?></textarea>
+        </div>
+        <div class="form-group">
+            <label for="lat">Latitude</label>
+            <input type="text" class="form-control" id="lat" name="lat" value="<?php echo htmlspecialchars($event['lat']); ?>" readonly>
+        </div>
+        <div class="form-group">
+            <label for="lng">Longitude</label>
+            <input type="text" class="form-control" id="lng" name="lng" value="<?php echo htmlspecialchars($event['lng']); ?>" readonly>
         </div>
         <div class="form-group">
             <label for="event_image">Image de l'événement (laisser vide si inchangée)</label>
