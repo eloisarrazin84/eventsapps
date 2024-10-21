@@ -31,8 +31,11 @@ if (isset($_GET['id'])) {
             exit();
         }
 
-        // Décoder les champs personnalisés
-        $custom_fields = !empty($event['custom_form_fields']) ? json_decode($event['custom_form_fields'], true) : [];
+        // Récupérer les champs supplémentaires de l'événement
+        $stmt = $conn->prepare("SELECT * FROM event_fields WHERE event_id = :event_id");
+        $stmt->bindParam(':event_id', $eventId);
+        $stmt->execute();
+        $eventFields = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Mise à jour de l'événement
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -59,24 +62,10 @@ if (isset($_GET['id'])) {
                 }
             }
 
-            // Gestion des champs personnalisés
-            $custom_fields = [];
-            if (isset($_POST['field_label'])) {
-                foreach ($_POST['field_label'] as $key => $label) {
-                    if (!empty($label)) { // Ignorer les champs vides
-                        $custom_fields[] = [
-                            'label' => $label,
-                            'type' => $_POST['field_type'][$key]
-                        ];
-                    }
-                }
-            }
-            $custom_form_fields = json_encode($custom_fields);
-
             // Mise à jour des informations de l'événement
             $stmt = $conn->prepare("UPDATE events SET event_name = :event_name, event_date = :event_date, event_location = :event_location, 
                                     event_description = :event_description, event_image = :event_image, lat = :lat, lng = :lng, 
-                                    registration_deadline = :registration_deadline, custom_form_fields = :custom_form_fields WHERE id = :id");
+                                    registration_deadline = :registration_deadline WHERE id = :id");
             $stmt->bindParam(':event_name', $event_name);
             $stmt->bindParam(':event_date', $event_date);
             $stmt->bindParam(':event_location', $event_location);
@@ -85,9 +74,45 @@ if (isset($_GET['id'])) {
             $stmt->bindParam(':lat', $lat);
             $stmt->bindParam(':lng', $lng);
             $stmt->bindParam(':registration_deadline', $registration_deadline);
-            $stmt->bindParam(':custom_form_fields', $custom_form_fields);
             $stmt->bindParam(':id', $eventId);
             $stmt->execute();
+
+            // Suppression des champs existants
+            if (isset($_POST['delete_field'])) {
+                foreach ($_POST['delete_field'] as $fieldId) {
+                    $stmt = $conn->prepare("DELETE FROM event_fields WHERE id = :field_id");
+                    $stmt->bindParam(':field_id', $fieldId);
+                    $stmt->execute();
+                }
+            }
+
+            // Ajout ou mise à jour des champs supplémentaires
+            if (isset($_POST['field_name']) && isset($_POST['field_type'])) {
+                for ($i = 0; $i < count($_POST['field_name']); $i++) {
+                    $field_name = $_POST['field_name'][$i];
+                    $field_type = $_POST['field_type'][$i];
+                    $field_options = isset($_POST['field_options'][$i]) ? $_POST['field_options'][$i] : null;
+
+                    if (isset($_POST['field_id'][$i])) {
+                        // Mise à jour du champ existant
+                        $field_id = $_POST['field_id'][$i];
+                        $stmt = $conn->prepare("UPDATE event_fields SET field_name = :field_name, field_type = :field_type, field_options = :field_options WHERE id = :field_id");
+                        $stmt->bindParam(':field_name', $field_name);
+                        $stmt->bindParam(':field_type', $field_type);
+                        $stmt->bindParam(':field_options', $field_options);
+                        $stmt->bindParam(':field_id', $field_id);
+                        $stmt->execute();
+                    } else {
+                        // Ajout d'un nouveau champ
+                        $stmt = $conn->prepare("INSERT INTO event_fields (event_id, field_name, field_type, field_options) VALUES (:event_id, :field_name, :field_type, :field_options)");
+                        $stmt->bindParam(':event_id', $eventId);
+                        $stmt->bindParam(':field_name', $field_name);
+                        $stmt->bindParam(':field_type', $field_type);
+                        $stmt->bindParam(':field_options', $field_options);
+                        $stmt->execute();
+                    }
+                }
+            }
 
             header("Location: manage_events.php");
             exit();
@@ -153,30 +178,49 @@ if (isset($_GET['id'])) {
             });
         }
 
-        // Fonction pour ajouter des champs personnalisés
-        function addCustomField() {
-            const container = document.getElementById('custom-fields');
-            const div = document.createElement('div');
-            div.classList.add('form-group');
-            div.innerHTML = `
-                <label>Nom du champ</label>
-                <input type="text" name="field_label[]" class="form-control" required>
-                <label>Type de champ</label>
-                <select name="field_type[]" class="form-control" required>
-                    <option value="text">Texte</option>
-                    <option value="date">Date</option>
-                    <option value="number">Nombre</option>
-                    <option value="checkbox">Case à cocher</option>
-                    <option value="select">Choix multiple</option>
-                </select>
-                <button type="button" class="btn btn-danger mt-2" onclick="removeCustomField(this)">Supprimer ce champ</button>
+        // Ajouter ou supprimer des champs supplémentaires
+        function addField() {
+            const container = document.getElementById('fields-container');
+            const fieldDiv = document.createElement('div');
+            fieldDiv.classList.add('field');
+
+            const fieldHTML = `
+                <div class="form-group">
+                    <label for="field_name">Nom du champ</label>
+                    <input type="text" class="form-control" name="field_name[]" placeholder="Nom du champ" required>
+                </div>
+                <div class="form-group">
+                    <label for="field_type">Type de champ</label>
+                    <select class="form-control field-type" name="field_type[]" onchange="toggleOptions(this)">
+                        <option value="text">Texte</option>
+                        <option value="number">Nombre</option>
+                        <option value="date">Date</option>
+                        <option value="checkbox">Case à cocher</option>
+                        <option value="multiple">Choix multiple</option>
+                    </select>
+                </div>
+                <div class="form-group field-options" style="display: none;">
+                    <label for="field_options">Options (séparées par une virgule)</label>
+                    <input type="text" class="form-control" name="field_options[]" placeholder="Exemple : Option 1, Option 2, Option 3">
+                </div>
+                <button type="button" class="btn btn-danger mt-2" onclick="removeField(this)">Supprimer ce champ</button>
             `;
-            container.appendChild(div);
+
+            fieldDiv.innerHTML = fieldHTML;
+            container.appendChild(fieldDiv);
         }
 
-        // Fonction pour supprimer un champ personnalisé
-        function removeCustomField(button) {
+        function removeField(button) {
             button.parentElement.remove();
+        }
+
+        function toggleOptions(selectElement) {
+            const optionsDiv = selectElement.parentElement.nextElementSibling;
+            if (selectElement.value === 'checkbox' || selectElement.value === 'multiple') {
+                optionsDiv.style.display = 'block';
+            } else {
+                optionsDiv.style.display = 'none';
+            }
         }
     </script>
     <style>
@@ -222,7 +266,7 @@ if (isset($_GET['id'])) {
             <div id="search-results"></div>
         </div>
         <div id="map"></div>
-        <div class="form-group mt-4">
+        <div class="form-group">
             <label for="event_description">Description de l'événement</label>
             <textarea class="form-control" id="event_description" name="event_description"><?php echo htmlspecialchars($event['event_description']); ?></textarea>
         </div>
@@ -238,29 +282,38 @@ if (isset($_GET['id'])) {
             <label for="event_image">Image de l'événement (laisser vide si inchangée)</label>
             <input type="file" class="form-control-file" id="event_image" name="event_image">
         </div>
-        <div class="form-group mt-4" id="custom-fields">
-            <h4>Champs personnalisés pour le formulaire d'inscription</h4>
-            <button type="button" class="btn btn-secondary mb-3" onclick="addCustomField()">Ajouter un champ personnalisé</button>
-            <?php if (!empty($custom_fields)) : ?>
-                <?php foreach ($custom_fields as $field) : ?>
+        
+        <h3>Champs supplémentaires</h3>
+        <div id="fields-container">
+            <?php foreach ($eventFields as $field): ?>
+                <div class="field">
+                    <input type="hidden" name="field_id[]" value="<?php echo $field['id']; ?>">
                     <div class="form-group">
-                        <label>Nom du champ</label>
-                        <input type="text" name="field_label[]" class="form-control" value="<?php echo htmlspecialchars($field['label']); ?>" required>
-                        <label>Type de champ</label>
-                        <select name="field_type[]" class="form-control" required>
-                            <option value="text" <?php echo $field['type'] == 'text' ? 'selected' : ''; ?>>Texte</option>
-                            <option value="date" <?php echo $field['type'] == 'date' ? 'selected' : ''; ?>>Date</option>
-                            <option value="number" <?php echo $field['type'] == 'number' ? 'selected' : ''; ?>>Nombre</option>
-                            <option value="checkbox" <?php echo $field['type'] == 'checkbox' ? 'selected' : ''; ?>>Case à cocher</option>
-                            <option value="select" <?php echo $field['type'] == 'select' ? 'selected' : ''; ?>>Choix multiple</option>
-                        </select>
-                        <button type="button" class="btn btn-danger mt-2" onclick="removeCustomField(this)">Supprimer ce champ</button>
+                        <label for="field_name">Nom du champ</label>
+                        <input type="text" class="form-control" name="field_name[]" value="<?php echo htmlspecialchars($field['field_name']); ?>" required>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+                    <div class="form-group">
+                        <label for="field_type">Type de champ</label>
+                        <select class="form-control field-type" name="field_type[]" onchange="toggleOptions(this)">
+                            <option value="text" <?php if ($field['field_type'] == 'text') echo 'selected'; ?>>Texte</option>
+                            <option value="number" <?php if ($field['field_type'] == 'number') echo 'selected'; ?>>Nombre</option>
+                            <option value="date" <?php if ($field['field_type'] == 'date') echo 'selected'; ?>>Date</option>
+                            <option value="checkbox" <?php if ($field['field_type'] == 'checkbox') echo 'selected'; ?>>Case à cocher</option>
+                            <option value="multiple" <?php if ($field['field_type'] == 'multiple') echo 'selected'; ?>>Choix multiple</option>
+                        </select>
+                    </div>
+                    <div class="form-group field-options" <?php if ($field['field_type'] != 'checkbox' && $field['field_type'] != 'multiple') echo 'style="display: none;"'; ?>>
+                        <label for="field_options">Options (séparées par une virgule)</label>
+                        <input type="text" class="form-control" name="field_options[]" value="<?php echo htmlspecialchars($field['field_options']); ?>">
+                    </div>
+                    <button type="button" class="btn btn-danger mt-2" onclick="removeField(this)">Supprimer ce champ</button>
+                </div>
+            <?php endforeach; ?>
         </div>
-        <button type="submit" class="btn btn-primary">Modifier</button>
-        <a href="manage_events.php" class="btn btn-secondary">Retour</a>
+        <button type="button" class="btn btn-success mt-3" onclick="addField()">Ajouter un champ</button>
+
+        <button type="submit" class="btn btn-primary mt-4">Modifier</button>
+        <a href="manage_events.php" class="btn btn-secondary mt-4">Retour</a>
     </form>
 </div>
 </body>
