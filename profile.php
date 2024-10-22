@@ -1,6 +1,7 @@
 <?php
 session_start();
 $user_id = $_SESSION['user_id'];
+$updateSuccess = false;
 
 // Connect to database
 $servername = "localhost";
@@ -43,29 +44,8 @@ try {
         $updateStmt->bindParam(':user_id', $user_id);
         $updateStmt->execute();
 
-        echo "Profil mis à jour avec succès!";
+        $updateSuccess = true;
     }
-
-    // Handle file upload
-    if (isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
-        $documentName = $_FILES['document']['name'];
-        $documentTmpPath = $_FILES['document']['tmp_name'];
-        $destination = 'uploads/' . $documentName;
-
-        if (move_uploaded_file($documentTmpPath, $destination)) {
-            $stmt = $conn->prepare("INSERT INTO documents (user_id, document_name) VALUES (:user_id, :document_name)");
-            $stmt->bindParam(':user_id', $user_id);
-            $stmt->bindParam(':document_name', $documentName);
-            $stmt->execute();
-        }
-    }
-
-    // Fetch user documents
-    $stmt = $conn->prepare("SELECT * FROM documents WHERE user_id = :user_id");
-    $stmt->bindParam(':user_id', $user_id);
-    $stmt->execute();
-    $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 } catch (PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
@@ -78,109 +58,104 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Mon profil</title>
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .btn {
-            border-radius: 20px;
-        }
-        .document-table {
-            margin-top: 20px;
-        }
-        .document-table th, .document-table td {
-            text-align: center;
-        }
-        .card-header {
-            background-color: #007bff;
-            color: white;
-        }
-    </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="card">
-        <div class="card-header text-center">
-            <h1>Votre profil</h1>
+<div class="container mt-5">
+    <h1 class="text-center text-white bg-primary p-3">Votre profil</h1>
+    <form method="POST" action="">
+        <div class="form-group">
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
         </div>
-        <div class="card-body">
-            <form method="POST" action="">
-                <div class="form-group">
-                    <label for="username">Nom d'utilisateur</label>
-                    <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
-                </div>
-                <div class="form-group">
-                    <label for="new_password">Nouveau mot de passe</label>
-                    <input type="password" class="form-control" id="new_password" name="new_password">
-                </div>
-                <div class="form-group">
-                    <label for="confirm_password">Confirmer le nouveau mot de passe</label>
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password">
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Modifier</button>
-            </form>
-            <a href="dashboard.php" class="btn btn-secondary btn-block mt-4">Retour au tableau de bord</a>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
         </div>
-    </div>
+        <div class="form-group">
+            <label for="new_password">Nouveau mot de passe</label>
+            <input type="password" class="form-control" id="new_password" name="new_password">
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirmer le nouveau mot de passe</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+        </div>
+        <button type="submit" class="btn btn-primary">Modifier</button>
+    </form>
 
-    <div class="card">
-        <div class="card-header">
-            <h3>Vos Documents</h3>
-        </div>
-        <div class="card-body">
-            <form method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="document">Télécharger un document</label>
-                    <input type="file" class="form-control-file" id="document" name="document">
-                </div>
-                <button type="submit" class="btn btn-success btn-block">Télécharger</button>
-            </form>
+    <!-- Button to return to the dashboard -->
+    <a href="dashboard.php" class="btn btn-secondary mt-4">Retour au tableau de bord</a>
 
-            <table class="table table-striped mt-4">
-    <thead>
-        <tr>
-            <th>Nom du Document</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($documents as $document): ?>
+    <!-- Documents Section -->
+    <h2 class="text-center mt-5">Vos Documents</h2>
+    <form action="upload_document.php" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="document">Télécharger un document</label>
+            <input type="file" class="form-control" id="document" name="document">
+        </div>
+        <button type="submit" class="btn btn-success">Télécharger</button>
+    </form>
+
+    <!-- List of uploaded documents -->
+    <h3 class="mt-4">Documents Actuels</h3>
+    <table class="table table-bordered">
+        <thead>
             <tr>
-                <td><?php echo htmlspecialchars($document['file_name']); ?></td>
-                <td>
-                    <a href="<?php echo $document['file_path']; ?>" class="btn btn-primary btn-sm" target="_blank">Voir</a>
-                    <form action="delete_document.php" method="POST" style="display:inline;">
-                        <input type="hidden" name="document_id" value="<?php echo $document['id']; ?>">
-                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-                    </form>
-                </td>
+                <th>Nom du Document</th>
+                <th>Action</th>
             </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <?php
+            // Fetch and display the user's documents
+            $stmt = $conn->prepare("SELECT * FROM documents WHERE user_id = :user_id");
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->execute();
+            $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($documents as $document) {
+                echo "<tr>";
+                echo "<td>" . htmlspecialchars($document['file_name']) . "</td>";
+                echo "<td><a href='" . htmlspecialchars($document['file_path']) . "' target='_blank' class='btn btn-primary'>Voir</a>";
+                echo " <a href='delete_document.php?doc_id=" . $document['id'] . "' class='btn btn-danger'>Supprimer</a></td>";
+                echo "</tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Succès</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Profil mis à jour avec succès!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Fermer</button>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $updateSuccess): ?>
+<script>
+    $(document).ready(function(){
+        $('#successModal').modal('show');
+    });
+</script>
+<?php endif; ?>
+
 </body>
 </html>
