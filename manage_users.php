@@ -71,6 +71,10 @@ try {
                         <a href="approve_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-success">Approuver</a>
                     <?php endif; ?>
                 </td>
+                <!-- Add "View Documents" button -->
+                <td>
+                    <a href="view_user_documents.php?user_id=<?php echo $user['id']; ?>" class="btn btn-info">Voir Documents</a>
+                </td>
                 <td>
                     <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
                     <a href="delete_user.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
