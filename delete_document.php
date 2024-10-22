@@ -49,3 +49,4 @@ if (isset($_GET['id'])) {
 } else {
     echo "ID de document non spécifié.";
 }
+?>
