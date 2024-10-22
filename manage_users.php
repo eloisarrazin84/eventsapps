@@ -34,6 +34,27 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des utilisateurs</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .action-buttons a {
+            margin-right: 5px;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .btn {
+            border-radius: 25px;
+        }
+        .container h1 {
+            margin-bottom: 30px;
+        }
+        .table th {
+            background-color: #f8f9fa;
+        }
+    </style>
 </head>
 <body>
 
@@ -41,9 +62,9 @@ try {
 <?php include 'menu.php'; ?>
 
 <div class="container">
-    <h1 class="mt-5">Gestion des utilisateurs</h1>
+    <h1 class="mt-5 text-center">Gestion des utilisateurs</h1>
     <a href="create_user.php" class="btn btn-success mb-3">Créer un nouvel utilisateur</a>
-    <table class="table table-bordered">
+    <table class="table table-bordered table-hover">
         <thead class="thead-light">
             <tr>
                 <th>Nom d'utilisateur</th>
@@ -66,16 +87,13 @@ try {
                 <td><?php echo htmlspecialchars($user['role']); ?></td>
                 <td>
                     <?php if ($user['is_approved']): ?>
-                        <span class="text-success">Oui</span>
+                        <span class="badge badge-success">Oui</span>
                     <?php else: ?>
                         <a href="approve_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-success">Approuver</a>
                     <?php endif; ?>
                 </td>
-                <!-- Add "View Documents" button -->
-                <td>
-                    <a href="view_user_documents.php?user_id=<?php echo $user['id']; ?>" class="btn btn-info">Voir Documents</a>
-                </td>
-                <td>
+                <td class="action-buttons">
+                    <a href="view_user_documents.php?user_id=<?php echo $user['id']; ?>" class="btn btn-info btn-sm">Voir Documents</a>
                     <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
                     <a href="delete_user.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
                 </td>
