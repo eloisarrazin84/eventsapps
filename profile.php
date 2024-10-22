@@ -2,7 +2,7 @@
 session_start();
 $user_id = $_SESSION['user_id'];
 
-// Connect to database
+// Connect to the database
 $servername = "localhost";
 $username_db = "root";  
 $password_db = "Lipton2019!";
@@ -45,10 +45,18 @@ try {
 
         echo "Profil mis à jour avec succès!";
     }
+
+    // Fetch user documents
+    $stmt = $conn->prepare("SELECT document_name, file_path FROM documents WHERE user_id = :user_id");
+    $stmt->bindParam(':user_id', $user_id);
+    $stmt->execute();
+    $userDocuments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 } catch (PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -60,8 +68,8 @@ try {
 <body>
 
 <div class="container mt-5">
-   <h1>Votre profil</h1>
-    <form method="POST" action="">
+    <h1>Votre profil</h1>
+    <form method="POST" action="profile.php">
         <div class="form-group">
             <label for="username">Nom d'utilisateur</label>
             <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
@@ -80,6 +88,35 @@ try {
         </div>
         <button type="submit" class="btn btn-primary">Modifier</button>
     </form>
+
+    <!-- Document Library Section -->
+    <h3 class="mt-5">Vos Documents</h3>
+    <form action="upload_document.php" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Télécharger un document</label>
+            <input type="file" name="file" id="file" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-success">Télécharger</button>
+    </form>
+
+    <h3 class="mt-5">Documents Actuels</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom du Document</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($userDocuments as $doc): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($doc['document_name']); ?></td>
+                    <td><a href="<?php echo htmlspecialchars($doc['file_path']); ?>" download>Télécharger</a></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
     <!-- Button to return to the dashboard -->
     <a href="dashboard.php" class="btn btn-secondary mt-4">Retour au tableau de bord</a>
 </div>
