@@ -123,8 +123,9 @@ try {
         vertical-align: middle;
     }
 </style>
+</head>
+<body>
 
-<!-- Page de profil -->
 <div class="container mt-5">
     <div class="profile-container">
         <div class="profile-header">
@@ -151,7 +152,6 @@ try {
             </div>
             <button type="submit" class="btn btn-primary btn-block">Modifier</button>
         </form>
-        <a href="dashboard.php" class="btn btn-secondary btn-block mt-3">Retour au tableau de bord</a>
     </div>
 
     <!-- Section Documents -->
@@ -189,21 +189,17 @@ try {
             </tbody>
         </table>
     </div>
+
+    <!-- Bouton de retour au tableau de bord en fin de page -->
+    <div class="mt-5 text-center">
+        <a href="dashboard.php" class="btn btn-secondary">Retour au tableau de bord</a>
+    </div>
 </div>
 
 <!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-<!-- Script pour afficher la notification -->
-<script>
-    $(document).ready(function() {
-        <?php if (isset($_POST['username'])): ?>
-            alert('Profil mis à jour avec succès!');
-        <?php endif; ?>
-    });
-</script>
 
 </body>
 </html>
