@@ -1,50 +1,51 @@
 <?php
 session_start();
 
-// Verify that the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Connect to database
-$servername = "localhost";
-$username_db = "root";  
-$password_db = "Lipton2019!";
-$dbname = "outdoorsec";
+if (isset($_GET['id'])) {
+    $document_id = $_GET['id'];
 
-try {
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Connexion à la base de données
+    $servername = "localhost";
+    $username_db = "root";  
+    $password_db = "Lipton2019!";
+    $dbname = "outdoorsec";
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $document_id = $_POST['document_id'];
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Fetch document info
-        $stmt = $conn->prepare("SELECT file_path FROM documents WHERE id = :document_id");
-        $stmt->bindParam(':document_id', $document_id);
+        // Récupérer le chemin du fichier à supprimer
+        $stmt = $conn->prepare("SELECT file_path FROM documents WHERE id = :id");
+        $stmt->bindParam(':id', $document_id);
         $stmt->execute();
         $document = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($document) {
-            // Delete document from filesystem
-            if (file_exists($document['file_path'])) {
-                unlink($document['file_path']);
+            // Supprimer le fichier du serveur
+            $file_path = $document['file_path'];
+            if (file_exists($file_path)) {
+                unlink($file_path); // Supprimer le fichier du serveur
             }
 
-            // Delete document from database
-            $stmt = $conn->prepare("DELETE FROM documents WHERE id = :document_id");
-            $stmt->bindParam(':document_id', $document_id);
+            // Supprimer l'entrée de la base de données
+            $stmt = $conn->prepare("DELETE FROM documents WHERE id = :id");
+            $stmt->bindParam(':id', $document_id);
             $stmt->execute();
 
-            // Redirect back to profile page
+            // Rediriger avec succès
             header("Location: profile.php");
             exit();
         } else {
-            echo "Document not found.";
+            echo "Document non trouvé.";
         }
+    } catch (PDOException $e) {
+        echo "Erreur : " . $e->getMessage();
     }
-} catch (PDOException $e) {
-    echo "Erreur : " . $e->getMessage();
+} else {
+    echo "ID de document non spécifié.";
 }
-?>
