@@ -152,22 +152,28 @@ try {
                 <button type="submit" class="btn btn-success btn-block">Télécharger</button>
             </form>
 
-            <table class="table table-bordered document-table mt-4">
-                <thead>
-                    <tr>
-                        <th>Nom du Document</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($documents as $document): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($document['document_name']); ?></td>
-                            <td><a href="uploads/<?php echo htmlspecialchars($document['document_name']); ?>" class="btn btn-primary btn-sm" target="_blank">Voir</a></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+            <table class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th>Nom du Document</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($documents as $document): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($document['file_name']); ?></td>
+                <td>
+                    <a href="<?php echo $document['file_path']; ?>" class="btn btn-primary btn-sm" target="_blank">Voir</a>
+                    <form action="delete_document.php" method="POST" style="display:inline;">
+                        <input type="hidden" name="document_id" value="<?php echo $document['id']; ?>">
+                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
         </div>
     </div>
 </div>
