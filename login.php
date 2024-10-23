@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
-                header("Location: dashboard.php");
+                header("Location: home.php");
                 exit();
             } else {
                 $error = "Votre compte n'a pas encore été validé par un administrateur.";
