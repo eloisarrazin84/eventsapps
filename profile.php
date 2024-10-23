@@ -203,7 +203,7 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
     <div class="card">
         <h3 class="text-center">Vos Documents</h3>
         <div class="document-upload">
-            <!-- Formulaire pour téléchargement des documents -->
+         <!-- Formulaire pour téléchargement des documents -->
 <form method="POST" enctype="multipart/form-data" action="upload_document.php">
     <div class="form-group">
         <label for="documents">Télécharger des documents</label>
