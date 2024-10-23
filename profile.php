@@ -157,17 +157,20 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
         <div class="profile-header">
             <h1>Votre profil</h1>
         </div>
+    <!-- Formulaire pour photo de profil -->
+        <form method="POST" enctype="multipart/form-data" action="upload_photo.php">
+        <div class="form-group">
+            <label for="profile_picture">Photo de profil</label>
+            <input type="file" class="form-control-file" id="profile_picture" name="profile_picture">
+            <?php if (!empty($user['profile_picture'])): ?>
+                <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="Photo de profil" class="img-thumbnail mt-2" style="max-width: 150px;">
+            <?php endif; ?>
+        </div>
+            <button type="submit" class="btn btn-primary">Modifier la photo</button>
+        </form>
 
         <!-- Formulaire pour modifier le profil -->
         <form method="POST" action="profile.php">
-    <div class="form-group">
-    <label for="profile_picture">Photo de profil</label><br>
-    <?php if (isset($user['profile_picture']) && !empty($user['profile_picture'])): ?>
-        <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="img-thumbnail mt-2" style="max-width: 150px;">
-    <?php endif; ?>
-    <input type="file" class="form-control-file mt-2" id="profile_picture" name="profile_picture">
-</div>
-
             <div class="form-group">
                 <label for="first_name">Prénom</label>
                 <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
