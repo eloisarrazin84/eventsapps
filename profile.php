@@ -158,6 +158,9 @@ try {
                 <input type="password" class="form-control" id="confirm_password" name="confirm_password">
             </div>
             <button type="submit" class="btn btn-primary btn-block">Modifier</button>
+            <div class="progress mt-4">
+    <div class="progress-bar" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80% complet</div>
+</div>
         </form>
     </div>
 
@@ -165,14 +168,14 @@ try {
     <div class="card">
         <h3 class="text-center">Vos Documents</h3>
         <div class="document-upload">
-            <form method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="document">Télécharger un document</label>
-                    <input type="file" class="form-control" id="document" name="document">
-                </div>
-                <button type="submit" class="btn btn-success btn-block">Télécharger</button>
-            </form>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="documents">Télécharger des documents</label>
+            <input type="file" class="form-control" id="documents" name="documents[]" multiple>
         </div>
+        <button type="submit" class="btn btn-success btn-block">Télécharger</button>
+    </form>
+</div>
 
         <!-- Liste des documents -->
         <h4>Documents Actuels</h4>
@@ -196,6 +199,15 @@ try {
             </tbody>
         </table>
     </div>
+    <div class="card mt-5">
+    <h3 class="text-center">Historique d'activité</h3>
+    <ul class="list-group">
+        <!-- Example activities (these should be fetched dynamically) -->
+        <li class="list-group-item">Profil mis à jour - 12 Oct 2024</li>
+        <li class="list-group-item">Document téléchargé - 10 Oct 2024</li>
+    </ul>
+</div>
+
 
     <!-- Bouton de retour au tableau de bord en fin de page -->
     <div class="mt-5 text-center">
