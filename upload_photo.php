@@ -11,22 +11,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['profile_picture'])) {
         mkdir($uploadDir, 0777, true);
     }
 
-    $filePath = $uploadDir . basename($file['name']);
-    if (move_uploaded_file($file['tmp_name'], $filePath)) {
-        // Mettre à jour la base de données avec le chemin de la photo
-        try {
-            $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
-            $stmt = $conn->prepare("UPDATE users SET profile_picture = :file_path WHERE id = :user_id");
-            $stmt->bindParam(':file_path', $filePath);
-            $stmt->bindParam(':user_id', $user_id);
-            $stmt->execute();
-            
-            header("Location: profile.php");
-            exit();
-        } catch (PDOException $e) {
-            echo "Erreur : " . $e->getMessage();
+    // Vérifier si le fichier est bien une image
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (in_array($file['type'], $allowedTypes)) {
+        $filePath = $uploadDir . basename($file['name']);
+        
+        // Vérifier si le fichier a bien été téléchargé
+        if (move_uploaded_file($file['tmp_name'], $filePath)) {
+            // Mettre à jour la base de données avec le chemin de la photo
+            try {
+                $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
+                $stmt = $conn->prepare("UPDATE users SET profile_picture = :file_path WHERE id = :user_id");
+                $stmt->bindParam(':file_path', $filePath);
+                $stmt->bindParam(':user_id', $user_id);
+                $stmt->execute();
+                
+                header("Location: profile.php");
+                exit();
+            } catch (PDOException $e) {
+                echo "Erreur : " . $e->getMessage();
+            }
+        } else {
+            echo "Erreur lors du téléchargement de la photo.";
         }
     } else {
-        echo "Erreur lors du téléchargement de la photo.";
+        echo "Le fichier n'est pas une image valide.";
     }
 }
+?>
