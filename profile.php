@@ -1,6 +1,11 @@
 <?php
 session_start();
-$user_id = $_SESSION['user_id'];
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+if (!$user_id) {
+    echo "Erreur : utilisateur non connecté.";
+    exit();
+}
 
 // Connexion à la base de données
 $servername = "localhost";
