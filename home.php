@@ -18,42 +18,43 @@ if (!isset($_SESSION['user_id'])) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <title>Mes Applications</title>
     <style>
-        .app-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 50px;
-        }
+       .app-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    justify-items: center;
+    margin-top: 50px;
+}
 
-        .app-icon {
-            width: 150px;
-            height: 150px;
-            border: 2px solid #007bff;
-            border-radius: 10px;
-            margin: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-        }
+.app-icon {
+    width: 180px;
+    height: 180px;
+    background: linear-gradient(135deg, #007bff, #00d4ff);
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+}
 
-        .app-icon:hover {
-            transform: scale(1.1);
-            cursor: pointer;
-        }
+.app-icon:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
 
-        .app-icon i {
-            font-size: 3rem;
-            color: #007bff;
-        }
+.app-icon img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+}
 
-        .app-name {
-            margin-top: 10px;
-            font-size: 1.2rem;
-            color: #007bff;
-            text-align: center;
-        }
+.app-name {
+    font-size: 1.2rem;
+    color: white;
+}
     </style>
 </head>
 <body>
