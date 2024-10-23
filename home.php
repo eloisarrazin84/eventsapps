@@ -14,6 +14,8 @@ if (!isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <title>Mes Applications</title>
     <style>
         .app-container {
@@ -41,9 +43,9 @@ if (!isset($_SESSION['user_id'])) {
             cursor: pointer;
         }
 
-        .app-icon img {
-            width: 70px;
-            height: 70px;
+        .app-icon i {
+            font-size: 3rem;
+            color: #007bff;
         }
 
         .app-name {
@@ -62,13 +64,13 @@ if (!isset($_SESSION['user_id'])) {
 
         <!-- Application 1: Dashboard -->
         <div class="app-icon" onclick="window.location.href='dashboard.php'">
-            <img src="icons/dashboard-icon.png" alt="Dashboard">
+            <i class="bi bi-speedometer2"></i>
             <div class="app-name">Dashboard</div>
         </div>
 
         <!-- Application 2: Future Application -->
         <div class="app-icon" onclick="window.location.href='#'">
-            <img src="icons/future-app-icon.png" alt="Future App">
+            <i class="bi bi-app"></i>
             <div class="app-name">Future App</div>
         </div>
 
