@@ -31,11 +31,11 @@
                     <a class="btn btn-info btn-sm ml-2 text-white" style="border-radius: 50px;" href="profile.php"><i class="fas fa-user"></i> Mon profil</a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-danger btn-sm ml-2" href="logout.php"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                    <a class="btn btn-danger btn-sm ml-2" style="border-radius: 50px;" href="logout.php"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                 </li>
             <?php else: ?>
                 <li class="nav-item">
-                    <a class="btn btn-primary btn-sm ml-2" href="login.php"><i class="fas fa-sign-in-alt"></i> Connexion</a>
+                    <a class="btn btn-primary btn-sm ml-2" style="border-radius: 50px;" href="login.php"><i class="fas fa-sign-in-alt"></i> Connexion</a>
                 </li>
             <?php endif; ?>
         </ul>
