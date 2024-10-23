@@ -35,8 +35,8 @@ try {
                     $_SESSION['username'] = $user['username'];
                     $_SESSION['role'] = $user['role'];
 
-                    // Rediriger vers le tableau de bord
-                    header("Location: dashboard.php");
+                    // Rediriger vers la liste des applications
+                    header("Location: home.php");
                     exit();
                 } else {
                     $error = "Mot de passe incorrect.";
