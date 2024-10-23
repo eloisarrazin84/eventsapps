@@ -63,6 +63,17 @@ if (!isset($_SESSION['user_id'])) {
             color: #333;
         }
 
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .logo-container img {
+            width: 100px;
+            height: auto;
+        }
+
         /* Mobile responsiveness */
         @media (max-width: 768px) {
             .app-icon {
@@ -77,10 +88,20 @@ if (!isset($_SESSION['user_id'])) {
             h1 {
                 font-size: 2rem;
             }
+
+            .logo-container img {
+                width: 80px;
+            }
         }
     </style>
 </head>
 <body>
+
+<div class="logo-container">
+    <a href="home.php">
+        <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1.png" alt="Logo Outdoor Secours">
+    </a>
+</div>
 
 <div class="container">
     <h1 class="text-center mt-5">Mes Applications</h1>
