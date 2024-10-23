@@ -7,31 +7,71 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
-            <!-- Autres liens du menu -->
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-tools"></i> Administration
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="adminDropdown">
+                        <a class="dropdown-item" href="manage_events.php"><i class="fas fa-calendar-alt"></i> Gestion des événements</a>
+                        <a class="dropdown-item" href="manage_users.php"><i class="fas fa-users"></i> Gestion des utilisateurs</a>
+                    </div>
+                </li>
+            <?php endif; ?>
+            <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+            </li>
+            <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'home.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="home.php"><i class="fas fa-th-large"></i> Mes applications</a>
+            </li>
         </ul>
         <ul class="navbar-nav ml-auto">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <?php if (isset($user['profile_picture'])): ?>
-                            <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
-                        <?php else: ?>
-                            <span>Photo de profil</span>
-                        <?php endif; ?>
+                        <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px;">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
-                        <a class="dropdown-item" href="profile.php">Voir mon profil</a>
-                        <a class="dropdown-item" href="logout.php">Déconnexion</a>
+                        <a class="dropdown-item" href="profile.php"><i class="fas fa-user"></i> Mon profil</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                     </div>
+                </li>
+            <?php else: ?>
+                <li class="nav-item">
+                    <a class="btn btn-primary btn-sm ml-2" style="border-radius: 50px;" href="login.php"><i class="fas fa-sign-in-alt"></i> Connexion</a>
                 </li>
             <?php endif; ?>
         </ul>
     </div>
 </nav>
 
-<!-- CSS direct dans le fichier menu.php -->
+<!-- CSS Directement dans le menu.php -->
 <style>
+    .navbar {
+        background-color: #f8f9fa;
+    }
+    .nav-link {
+        color: #007bff;
+    }
+    .nav-link:hover {
+        color: #0056b3;
+    }
+    .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
     .rounded-circle {
-        border-radius: 50%;
+        border: 2px solid #007bff;
+    }
+    .dropdown-menu {
+        background-color: #f8f9fa;
+    }
+    .dropdown-item:hover {
+        background-color: #e9ecef;
     }
 </style>
