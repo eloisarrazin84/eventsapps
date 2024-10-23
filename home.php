@@ -62,10 +62,10 @@ if (!isset($_SESSION['user_id'])) {
     <h1 class="text-center mt-5">Mes Applications</h1>
     <div class="app-container">
 
-        <!-- Application 1: Dashboard -->
+        <!-- Application 1: Mes événements -->
         <div class="app-icon" onclick="window.location.href='dashboard.php'">
-            <i class="bi bi-speedometer2"></i>
-            <div class="app-name">Dashboard</div>
+            <i class="bi bi-calendar-event"></i>
+            <div class="app-name">Mes événements</div>
         </div>
 
         <!-- Application 2: Future Application -->
