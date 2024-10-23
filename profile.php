@@ -133,14 +133,15 @@ try {
         </div>
 
         <!-- Formulaire pour modifier le profil -->
-        <form method="POST" action="">
-            <div class="form-group">
-                <label for="profile_picture">Photo de profil</label>
-                <input type="file" class="form-control-file" id="profile_picture" name="profile_picture">
-                <?php if (isset($user['profile_picture'])): ?>
-                    <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="img-thumbnail mt-2" style="max-width: 150px;">
-                <?php endif; ?>
-            </div>
+       <form method="POST" action="" enctype="multipart/form-data">
+    <!-- Profile Picture -->
+    <div class="form-group">
+        <label for="profile_picture">Photo de profil</label>
+        <input type="file" class="form-control-file" id="profile_picture" name="profile_picture">
+        <?php if (isset($user['profile_picture']) && !empty($user['profile_picture'])): ?>
+            <img src="uploads/<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="img-thumbnail mt-2" style="max-width: 150px;">
+        <?php endif; ?>
+    </div>
             <div class="form-group">
                 <label for="username">Nom d'utilisateur</label>
                 <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
