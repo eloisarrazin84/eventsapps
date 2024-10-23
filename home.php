@@ -115,8 +115,8 @@ if (!isset($_SESSION['user_id'])) {
 
         <!-- Application 2: Future Application -->
         <div class="app-icon" onclick="window.location.href='#'">
-            <i class="bi bi-app-indicator"></i>
-            <div class="app-name">Future App</div>
+            <i class="bi bi-receipt"></i>
+            <div class="app-name">Notes de Frais</div>
         </div>
 
     </div>
