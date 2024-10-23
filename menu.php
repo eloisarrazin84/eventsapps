@@ -29,7 +29,7 @@
             <?php if (isset($_SESSION['user_id'])): ?>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px;">
+                        <img src="<?php echo $user['profile_pictures']; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px;">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
                         <a class="dropdown-item" href="profile.php"><i class="fas fa-user"></i> Mon profil</a>
