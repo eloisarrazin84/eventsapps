@@ -202,16 +202,13 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
     <!-- Section Documents -->
     <div class="card">
         <h3 class="text-center">Vos Documents</h3>
-        <div class="document-upload">
-    <form method="POST" enctype="multipart/form-data" action="upload_document.php">
+       <div class="document-upload">
+    <form method="POST" enctype="multipart/form-data" action="upload_documents.php">
         <div class="form-group">
             <label for="documents">Télécharger des documents</label>
             <input type="file" class="form-control" id="documents" name="documents[]" multiple>
         </div>
-        <div class="form-group">
-            <label for="document_name">Nom du document</label>
-            <input type="text" class="form-control" id="document_name" name="document_name" placeholder="Entrez le nom du document">
-        </div>
+        <div id="document-names"></div> <!-- Conteneur pour les champs de nom des fichiers -->
         <button type="submit" class="btn btn-success btn-block">Télécharger</button>
     </form>
 </div>
@@ -250,6 +247,24 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+// Ajouter des champs de texte pour renommer les documents
+document.getElementById('documents').addEventListener('change', function () {
+    const fileList = this.files;
+    const container = document.getElementById('document-names');
+    container.innerHTML = '';  // Vider les anciens champs
+
+    for (let i = 0; i < fileList.length; i++) {
+        const file = fileList[i];
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control mt-2';
+        input.name = 'document_names[]';  // Nom du champ
+        input.placeholder = `Nom pour ${file.name}`;
+        container.appendChild(input);
+    }
+});
+</script>
 
 </body>
 </html>
