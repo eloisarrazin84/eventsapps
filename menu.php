@@ -28,7 +28,7 @@
         <ul class="navbar-nav ml-auto">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <li class="nav-item">
-                    <a class="nav-link" href="profile.php"><i class="fas fa-user"></i> Mon profil</a>
+                    <a class="btn btn-info btn-sm ml-2 text-white" style="border-radius: 50px;" href="profile.php"><i class="fas fa-user"></i> Mon profil</a>
                 </li>
                 <li class="nav-item">
                     <a class="btn btn-danger btn-sm ml-2" href="logout.php"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
