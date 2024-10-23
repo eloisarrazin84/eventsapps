@@ -1,3 +1,14 @@
+<?php
+// Ajoutez cette partie au début pour récupérer les données utilisateur
+session_start();
+$user_id = $_SESSION['user_id'];
+$conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
+$stmt = $conn->prepare("SELECT profile_picture FROM users WHERE id = :user_id");
+$stmt->bindParam(':user_id', $user_id);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+?>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
     <a class="navbar-brand" href="#">
         <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png" alt="Logo" style="width: 50px;">
@@ -29,7 +40,7 @@
             <?php if (isset($_SESSION['user_id'])): ?>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="<?php echo $user['profile_pictures']; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px;">
+                        <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px;">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
                         <a class="dropdown-item" href="profile.php"><i class="fas fa-user"></i> Mon profil</a>
