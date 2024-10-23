@@ -1,15 +1,10 @@
 <?php
 session_start();
-$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-
-if (!$user_id) {
-    echo "Erreur : utilisateur non connecté.";
-    exit();
-}
+$user_id = $_SESSION['user_id'];
 
 // Connexion à la base de données
 $servername = "localhost";
-$username_db = "root";
+$username_db = "root";  
 $password_db = "Lipton2019!";
 $dbname = "outdoorsec";
 
@@ -17,39 +12,50 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Gestion de l'upload de documents
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file'])) {
-        $file = $_FILES['file'];
-        $uploadDir = 'uploads/';
+    // Récupérer les informations utilisateur
+    $stmt = $conn->prepare("SELECT * FROM users WHERE id = :user_id");
+    $stmt->bindParam(':user_id', $user_id);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Vérifier si le répertoire existe, sinon le créer
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
+    // Gestion de la mise à jour du profil
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $username = htmlspecialchars($_POST['username']);
+        $email = htmlspecialchars($_POST['email']);
+        $first_name = htmlspecialchars($_POST['first_name']);
+        $last_name = htmlspecialchars($_POST['last_name']);
+        $new_password = $_POST['new_password'];
+        $confirm_password = $_POST['confirm_password'];
 
-        $filePath = $uploadDir . basename($file['name']);
-        $documentName = htmlspecialchars(basename($file['name']));
-
-        // Vérification du succès de l'upload
-        if ($file['error'] === UPLOAD_ERR_OK && move_uploaded_file($file['tmp_name'], $filePath)) {
-            // Enregistrer le document dans la base de données
-            $stmt = $conn->prepare("INSERT INTO documents (user_id, document_name, file_path) VALUES (:user_id, :document_name, :file_path)");
-            $stmt->bindParam(':user_id', $user_id);
-            $stmt->bindParam(':document_name', $documentName);
-            $stmt->bindParam(':file_path', $filePath);
-            $stmt->execute();
-            echo "Fichier téléchargé avec succès.";
+        if (!empty($new_password)) {
+            if ($new_password === $confirm_password) {
+                $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
+                $updateStmt = $conn->prepare("UPDATE users SET username = :username, email = :email, first_name = :first_name, last_name = :last_name, password = :password WHERE id = :user_id");
+                $updateStmt->bindParam(':password', $hashed_password);
+            } else {
+                echo "<script>alert('Les mots de passe ne correspondent pas.');</script>";
+                exit();
+            }
         } else {
-            echo "Erreur lors du téléchargement du fichier.";
+            $updateStmt = $conn->prepare("UPDATE users SET username = :username, email = :email, first_name = :first_name, last_name = :last_name WHERE id = :user_id");
         }
+
+        $updateStmt->bindParam(':username', $username);
+        $updateStmt->bindParam(':email', $email);
+        $updateStmt->bindParam(':first_name', $first_name);
+        $updateStmt->bindParam(':last_name', $last_name);
+        $updateStmt->bindParam(':user_id', $user_id);
+        $updateStmt->execute();
+
+        echo "<script>alert('Profil mis à jour avec succès!');</script>";
     }
 
-    // Récupérer les documents actuels de l'utilisateur
+    // Récupérer les documents actuels
     $stmt = $conn->prepare("SELECT * FROM documents WHERE user_id = :user_id");
     $stmt->bindParam(':user_id', $user_id);
     $stmt->execute();
     $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    
 } catch (PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
@@ -62,56 +68,65 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Mon profil</title>
-    <style>
-        .profile-container {
-            background-color: #f7f9fc;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-        .profile-header {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            border-radius: 10px 10px 0 0;
-            text-align: center;
-        }
-        .form-control, .btn {
-            border-radius: 50px;
-            padding: 12px;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border: none;
-            transition: background-color 0.3s ease;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-        }
-        .card {
-            margin-top: 20px;
-            padding: 20px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        .document-upload {
-            padding: 20px;
-            background-color: #e9f1ff;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-        .table td, .table th {
-            vertical-align: middle;
-        }
-    </style>
+   <style>
+    .profile-container {
+        background-color: #f7f9fc;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .profile-header {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border-radius: 10px 10px 0 0;
+        text-align: center;
+    }
+
+    .form-control, .btn {
+        border-radius: 50px;
+        padding: 12px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+
+    .card {
+        margin-top: 20px;
+        padding: 20px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
+
+    .document-upload {
+        padding: 20px;
+        background-color: #e9f1ff;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
 </head>
 <body>
 
@@ -121,12 +136,44 @@ try {
             <h1>Votre profil</h1>
         </div>
 
-        <!-- Formulaire pour télécharger des documents -->
+        <!-- Formulaire pour modifier le profil -->
+        <form method="POST" action="profile.php">
+            <div class="form-group">
+                <label for="first_name">Prénom</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="last_name">Nom</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password">Nouveau mot de passe</label>
+                <input type="password" class="form-control" id="new_password" name="new_password">
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirmer le nouveau mot de passe</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Modifier</button>
+        </form>
+    </div>
+
+    <!-- Section Documents -->
+    <div class="card">
+        <h3 class="text-center">Vos Documents</h3>
         <div class="document-upload">
             <form method="POST" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="file">Télécharger un document</label>
-                    <input type="file" class="form-control" id="file" name="file" required>
+                    <label for="documents">Télécharger des documents</label>
+                    <input type="file" class="form-control" id="documents" name="documents[]" multiple>
                 </div>
                 <button type="submit" class="btn btn-success btn-block">Télécharger</button>
             </form>
@@ -144,7 +191,7 @@ try {
             <tbody>
                 <?php foreach ($documents as $doc): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($doc['document_name']); ?></td>
+                        <td><?php echo htmlspecialchars($doc['file_name']); ?></td>
                         <td>
                             <a href="view_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-info btn-sm">Voir</a>
                             <a href="delete_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?');">Supprimer</a>
