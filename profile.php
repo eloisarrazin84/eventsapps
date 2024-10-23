@@ -49,6 +49,28 @@ try {
 
         echo "<script>alert('Profil mis à jour avec succès!');</script>";
     }
+    // Gestion de l'upload de la photo de profil
+if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
+    $target_dir = "uploads/profile_pictures/";
+    
+    // Créer le répertoire si non existant
+    if (!file_exists($target_dir)) {
+        mkdir($target_dir, 0777, true);
+    }
+
+    $target_file = $target_dir . basename($_FILES["profile_picture"]["name"]);
+    
+    if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
+        // Mettre à jour la photo dans la base de données
+        $stmt = $conn->prepare("UPDATE users SET profile_picture = :profile_picture WHERE id = :user_id");
+        $stmt->bindParam(':profile_picture', $target_file);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
+    } else {
+        echo "<script>alert('Erreur lors du téléchargement de la photo de profil.');</script>";
+    }
+}
+
 
     // Récupérer les documents actuels
     $stmt = $conn->prepare("SELECT * FROM documents WHERE user_id = :user_id");
@@ -138,6 +160,14 @@ try {
 
         <!-- Formulaire pour modifier le profil -->
         <form method="POST" action="profile.php">
+    <div class="form-group">
+    <label for="profile_picture">Photo de profil</label><br>
+    <?php if (isset($user['profile_picture']) && !empty($user['profile_picture'])): ?>
+        <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="img-thumbnail mt-2" style="max-width: 150px;">
+    <?php endif; ?>
+    <input type="file" class="form-control-file mt-2" id="profile_picture" name="profile_picture">
+</div>
+
             <div class="form-group">
                 <label for="first_name">Prénom</label>
                 <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
