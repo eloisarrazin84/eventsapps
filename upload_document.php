@@ -1,3 +1,4 @@
+<?php
 session_start();
 $user_id = $_SESSION['user_id'];
 
@@ -39,3 +40,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     header('Location: profile.php');
     exit();
 }
+?>
