@@ -239,7 +239,7 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
 
     <!-- Bouton de retour au tableau de bord en fin de page -->
     <div class="mt-5 text-center">
-        <a href="dashboard.php" class="btn btn-secondary">Retour au tableau de bord</a>
+        <a href="home.php" class="btn btn-secondary">Retour aux applications</a>
     </div>
 </div>
 
