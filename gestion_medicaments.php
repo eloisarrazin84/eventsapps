@@ -41,6 +41,7 @@ $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <tr>
                         <th>Nom</th>
                         <th>Description</th>
+                        <th>N° de lot</th>
                         <th>Quantité</th>
                         <th>Date d'expiration</th>
                         <th>Type</th>
@@ -52,6 +53,7 @@ $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr>
                             <td><?php echo htmlspecialchars($medicament['nom']); ?></td>
                             <td><?php echo htmlspecialchars($medicament['description']); ?></td>
+                            <td><?php echo htmlspecialchars($medicament['numero_lot']); ?></td>
                             <td><?php echo htmlspecialchars($medicament['quantite']); ?></td>
                             <td><?php echo htmlspecialchars($medicament['date_expiration']); ?></td>
                             <td><?php echo htmlspecialchars($medicament['type_produit']); ?></td>
