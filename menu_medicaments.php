@@ -25,7 +25,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                     </a>
                     <div class="dropdown-menu" aria-labelledby="medicamentDropdown">
                         <a class="dropdown-item" href="gestion_medicaments.php"><i class="fas fa-pills"></i> Liste des Médicaments</a>
-                        <a class="nav-link" href="ajouter_medicaments.php"><i class="fas fa-pills"></i> Ajouter Médicaments</a>
+                        <a class="nav-link" href="ajouter_medicament.php"><i class="fas fa-pills"></i> Ajouter Médicaments</a>
                     </div>
                 </li>
             <?php endif; ?>
