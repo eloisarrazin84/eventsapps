@@ -1,3 +1,14 @@
+<?php
+// Connexion à la base de données
+$conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
+$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Récupérer les médicaments de la base de données
+$stmt = $conn->prepare("SELECT * FROM medicaments");
+$stmt->execute();
+$medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
