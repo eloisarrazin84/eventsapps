@@ -43,7 +43,7 @@ $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <th>Description</th>
                         <th>Quantité</th>
                         <th>Date d'expiration</th>
-                        <th>Catégorie</th>
+                        <th>Type</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -54,7 +54,7 @@ $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?php echo htmlspecialchars($medicament['description']); ?></td>
                             <td><?php echo htmlspecialchars($medicament['quantite']); ?></td>
                             <td><?php echo htmlspecialchars($medicament['date_expiration']); ?></td>
-                            <td><?php echo htmlspecialchars($medicament['categorie']); ?></td>
+                            <td><?php echo htmlspecialchars($medicament['type_produit']); ?></td>
                             <td>
                                 <!-- Bouton Modifier -->
                                 <a href="modifier_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-warning btn-sm">
