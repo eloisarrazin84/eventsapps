@@ -18,7 +18,7 @@ $categories = $conn->query("SELECT categorie, COUNT(*) as count FROM medicaments
     <title>Dashboard Médicaments</title>
 </head>
 <body>
-
+<?php include 'menu_medicaments.php'; ?>
 <div class="container mt-5">
     <h1 class="text-center">Dashboard des Médicaments</h1>
 
