@@ -62,11 +62,6 @@ $typeProduits = $conn->query("SELECT type_produit, COUNT(*) as count FROM medica
             </div>
         </div>
     </div>
-
-    <!-- Bouton retour au dashboard principal -->
-    <div class="text-center mt-5">
-        <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Retour au Dashboard Principal</a>
-    </div>
 </div>
 
 <!-- Scripts Bootstrap -->
