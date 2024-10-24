@@ -23,6 +23,10 @@
             <textarea class="form-control" id="description" name="description"></textarea>
         </div>
         <div class="form-group">
+            <label for="description">N° de lot</label>
+            <textarea class="form-control" id="numero_lot" name="numero_lot"></textarea>
+        </div>
+        <div class="form-group">
             <label for="quantite">Quantité</label>
             <input type="number" class="form-control" id="quantite" name="quantite" required>
         </div>
