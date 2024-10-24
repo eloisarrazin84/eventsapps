@@ -29,6 +29,9 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                     </div>
                 </li>
             <?php endif; ?>
+            <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard_medicaments.php' ? 'active' : ''; ?>">
+                <a class="nav-link" href="dashboard_medicaments.php"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+            </li>
             <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'home.php' ? 'active' : ''; ?>">
                 <a class="nav-link" href="home.php"><i class="fas fa-th-large"></i> Mes applications</a>
             </li>
