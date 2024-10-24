@@ -61,6 +61,9 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
+   <!-- Bouton de retour au tableau de bord -->
+        <div class="mt-4 text-center">
+            <a href="dashboard.php" class="btn btn-secondary">Retour au Tableau de Bord</a>
         </div>
     </div>
 </div>
