@@ -120,7 +120,7 @@ if (!isset($_SESSION['user_id'])) {
         </div>
 
         <!-- Application 3: Pharmacie -->
-        <div class="app-icon" onclick="window.location.href='#'">
+        <div class="app-icon" onclick="window.location.href='dashboard_medicaments.php'">
             <i class="bi bi-capsule-pill"></i>
             <div class="app-name">Gestion Pharmacie</div>
         </div>
