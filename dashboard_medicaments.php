@@ -15,15 +15,22 @@ $typeProduits = $conn->query("SELECT type_produit, COUNT(*) as count FROM medica
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <title>Dashboard Médicaments</title>
     <style>
-        .card {
-            margin-bottom: 20px;
-            border-radius: 15px;
+        .card h5 {
+            font-size: 1.2rem;
         }
-        .card-body ul {
-            padding-left: 20px;
+        .card-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .list-group-item {
+            background-color: transparent;
+            border: none;
+            padding-left: 0;
         }
     </style>
 </head>
@@ -34,28 +41,28 @@ $typeProduits = $conn->query("SELECT type_produit, COUNT(*) as count FROM medica
 
     <div class="row mt-4">
         <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3 shadow-sm">
+            <div class="card text-white bg-primary mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Total des Médicaments</h5>
-                    <p class="card-text display-4"><?php echo $totalMedicaments; ?></p>
+                    <h5 class="card-title"><i class="fas fa-capsules"></i> Total des Médicaments</h5>
+                    <p class="card-text"><?php echo $totalMedicaments; ?></p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-danger mb-3 shadow-sm">
+            <div class="card text-white bg-danger mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Médicaments Expirés</h5>
-                    <p class="card-text display-4"><?php echo $expiredMedicaments; ?></p>
+                    <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> Médicaments Expirés</h5>
+                    <p class="card-text"><?php echo $expiredMedicaments; ?></p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-success mb-3 shadow-sm">
+            <div class="card text-white bg-success mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Types de Médicaments</h5>
-                    <ul>
-                        <?php foreach ($typeProduits as $type): ?>
-                            <li><?php echo $type['type_produit']; ?>: <?php echo $type['count']; ?></li>
+                    <h5 class="card-title"><i class="fas fa-pills"></i> Types de Médicaments</h5>
+                    <ul class="list-group">
+                        <?php foreach ($typeProduits as $typeProduit): ?>
+                            <li class="list-group-item"><?php echo $typeProduit['type_produit']; ?> : <?php echo $typeProduit['count']; ?></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
@@ -64,8 +71,10 @@ $typeProduits = $conn->query("SELECT type_produit, COUNT(*) as count FROM medica
     </div>
 </div>
 
-<!-- Scripts Bootstrap -->
+<!-- Scripts Bootstrap, jQuery et Leaflet -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
