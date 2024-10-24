@@ -63,7 +63,7 @@
             </table>
    <!-- Bouton de retour au tableau de bord -->
         <div class="mt-4 text-center">
-            <a href="dashboard_médicaments.php" class="btn btn-secondary">Retour au Tableau de Bord</a>
+            <a href="dashboard_medicaments.php" class="btn btn-secondary">Retour au Tableau de Bord</a>
         </div>
     </div>
 </div>
