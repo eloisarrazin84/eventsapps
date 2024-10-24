@@ -44,7 +44,7 @@
             <textarea class="form-control" id="description" name="description"></textarea>
         </div>
         <button type="submit" class="btn btn-success">Ajouter</button>
-        <a href="dashboard.php" class="btn btn-secondary">Retour</a>
+        <a href="dashboard_medicaments.php" class="btn btn-secondary">Retour</a>
     </form>
 </div>
 </body>
