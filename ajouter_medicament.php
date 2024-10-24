@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Ajouter un Médicament</title>
+    <!-- Ajoutez la bibliothèque jQuery UI pour l'auto-suggestion -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </head>
 <body>
 <div class="container mt-5">
@@ -15,8 +19,8 @@
             <input type="text" class="form-control" id="medicament_nom" name="medicament_nom" required>
         </div>
         <div class="form-group">
-            <label for="lot">Numéro de lot</label>
-            <input type="text" class="form-control" id="lot" name="lot">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description"></textarea>
         </div>
         <div class="form-group">
             <label for="quantite">Quantité</label>
@@ -27,25 +31,32 @@
             <input type="date" class="form-control" id="date_expiration" name="date_expiration" required>
         </div>
         <div class="form-group">
-            <label for="zone">Zone</label>
-            <input type="text" class="form-control" id="zone" name="zone" required>
-        </div>
-        <div class="form-group">
-            <label for="type_produit">Type de produit</label>
-            <select class="form-control" id="type_produit" name="type_produit" required>
-                <option value="">Sélectionnez un type</option>
-                <option value="PER OS">PER OS</option>
-                <option value="Injectable">Injectable</option>
-                <option value="Inhalable">Inhalable</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea class="form-control" id="description" name="description"></textarea>
+            <label for="categorie">Catégorie</label>
+            <input type="text" class="form-control" id="categorie" name="categorie">
         </div>
         <button type="submit" class="btn btn-success">Ajouter</button>
         <a href="dashboard_medicaments.php" class="btn btn-secondary">Retour</a>
     </form>
 </div>
+
+<script>
+$(document).ready(function() {
+    $("#medicament_nom").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: "search_medicaments.php",
+                dataType: "json",
+                data: {
+                    term: request.term
+                },
+                success: function(data) {
+                    response(data);
+                }
+            });
+        },
+        minLength: 2 // Commence la suggestion après 2 caractères
+    });
+});
+</script>
 </body>
 </html>
