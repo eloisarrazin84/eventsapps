@@ -14,9 +14,10 @@ if (isset($_GET['id'])) {
 
         // Traitement du formulaire de modification
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $stmt = $conn->prepare("UPDATE medicaments SET nom = :nom, description = :description, quantite = :quantite, date_expiration = :date_expiration, type_produit = :type_produit WHERE id = :id");
+            $stmt = $conn->prepare("UPDATE medicaments SET nom = :nom, description = :description,numero_lot = :numero_lot, quantite = :quantite, date_expiration = :date_expiration, type_produit = :type_produit WHERE id = :id");
             $stmt->bindParam(':nom', $_POST['nom']);
             $stmt->bindParam(':description', $_POST['description']);
+            $stmt->bindParam(':numero_lot', $_POST['numero_lot']);
             $stmt->bindParam(':quantite', $_POST['quantite']);
             $stmt->bindParam(':date_expiration', $_POST['date_expiration']);
             $stmt->bindParam(':type_produit', $_POST['type_produit']);
@@ -54,6 +55,10 @@ if (isset($_GET['id'])) {
         <div class="form-group">
             <label for="description">Description</label>
             <textarea class="form-control" id="description" name="description"><?php echo htmlspecialchars($medicament['description']); ?></textarea>
+        </div>
+        <div class="form-group">
+            <label for="numero_lot">N° de lot</label>
+            <textarea class="form-control" id="numero_lot" name="numero_lot"><?php echo htmlspecialchars($medicament['numero_lot']); ?></textarea>
         </div>
         <div class="form-group">
             <label for="quantite">Quantité</label>
