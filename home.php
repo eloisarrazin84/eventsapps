@@ -119,6 +119,13 @@ if (!isset($_SESSION['user_id'])) {
             <div class="app-name">Notes de Frais</div>
         </div>
 
+        <!-- Application 3: Pharmacie -->
+        <div class="app-icon" onclick="window.location.href='#'">
+            <i class="bi bi-capsule-pill"></i>
+            <div class="app-name">Gestion Pharmacie</div>
+        </div>
+
+
     </div>
 </div>
 
