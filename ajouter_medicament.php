@@ -34,9 +34,13 @@
             <label for="date_expiration">Date d'expiration</label>
             <input type="date" class="form-control" id="date_expiration" name="date_expiration" required>
         </div>
-        <div class="form-group">
-            <label for="categorie">Catégorie</label>
-            <input type="text" class="form-control" id="categorie" name="categorie">
+       <div class="form-group">
+            <label for="type_produit">Type de Produit</label>
+            <select class="form-control" id="type_produit" name="type_produit">
+                <option value="PER OS" <?php if ($medicament['type_produit'] == 'PER OS') echo 'selected'; ?>>PER OS</option>
+                <option value="Injectable" <?php if ($medicament['type_produit'] == 'Injectable') echo 'selected'; ?>>Injectable</option>
+                <option value="Inhalable" <?php if ($medicament['type_produit'] == 'Inhalable') echo 'selected'; ?>>Inhalable</option>
+            </select>
         </div>
         <button type="submit" class="btn btn-success">Ajouter</button>
         <a href="dashboard_medicaments.php" class="btn btn-secondary">Retour</a>
