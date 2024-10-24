@@ -49,42 +49,39 @@
             Médicaments Disponibles
         </div>
         <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Description</th>
-                        <th>Quantité</th>
-                        <th>Date d'expiration</th>
-                        <th>Catégorie</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Ici vous devez ajouter la boucle pour afficher les médicaments -->
-                    <?php
-                    // Connexion à la base de données
-                    $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
-                    $stmt = $conn->prepare("SELECT * FROM medicaments");
-                    $stmt->execute();
-                    $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+           <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Quantité</th>
+            <th>Date d'expiration</th>
+            <th>Catégorie</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($medicaments as $medicament): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($medicament['nom']); ?></td>
+                <td><?php echo htmlspecialchars($medicament['description']); ?></td>
+                <td><?php echo htmlspecialchars($medicament['quantite']); ?></td>
+                <td><?php echo htmlspecialchars($medicament['date_expiration']); ?></td>
+                <td><?php echo htmlspecialchars($medicament['categorie']); ?></td>
+                <td>
+                    <!-- Bouton Modifier -->
+                    <a href="modifier_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
+                    
+                    <!-- Bouton Supprimer avec confirmation -->
+                    <a href="supprimer_medicament.php?id=<?php echo $medicament['id']; ?>" 
+                       class="btn btn-danger btn-sm" 
+                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce médicament ?');">Supprimer</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
 
-                    foreach ($medicaments as $med) {
-                        echo "<tr>
-                                <td>{$med['nom']}</td>
-                                <td>{$med['description']}</td>
-                                <td>{$med['quantite']}</td>
-                                <td>{$med['date_expiration']}</td>
-                                <td>{$med['categorie']}</td>
-                                <td>
-                                    <a href='modifier_medicament.php?id={$med['id']}' class='btn btn-info btn-sm'>Modifier</a>
-                                    <a href='supprimer_medicament.php?id={$med['id']}' class='btn btn-danger btn-sm' onclick=\"return confirm('Êtes-vous sûr de vouloir supprimer ce médicament ?');\">Supprimer</a>
-                                </td>
-                              </tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
         </div>
     </div>
 </div>
