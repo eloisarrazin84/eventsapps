@@ -155,12 +155,13 @@
     });
 
     <?php
-    // Charger les noms des médicaments depuis le fichier `CIS_bdpm.txt`
+    // Charger les noms des médicaments uniquement
     $medicamentNames = [];
     if (file_exists('CIS_bdpm.txt')) {
         $file = fopen('CIS_bdpm.txt', 'r');
         while (($line = fgets($file)) !== false) {
-            $medicamentNames[] = trim($line); // Enlever les espaces autour
+            $parts = explode("\t", $line); // Supposons que les données soient séparées par des tabulations
+            $medicamentNames[] = trim($parts[0]); // Récupérer uniquement le premier élément (nom du médicament)
         }
         fclose($file);
     }
