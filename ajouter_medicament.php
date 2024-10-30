@@ -9,9 +9,10 @@
     <style>
         .form-section {
             background-color: #f8f9fa;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .icon-label {
             display: flex;
@@ -26,20 +27,40 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
+            margin-top: 15px;
         }
         .progress-bar {
             width: 100%;
             background-color: #e9ecef;
             border-radius: 5px;
             overflow: hidden;
-            height: 8px;
+            height: 10px;
             margin-right: 10px;
         }
         .progress-bar-inner {
             height: 100%;
             background-color: #007bff;
             transition: width 0.3s;
+        }
+        .progress-bar-inner.low { background-color: #dc3545; }
+        .progress-bar-inner.medium { background-color: #ffc107; }
+        .progress-bar-inner.high { background-color: #28a745; }
+        .btn-submit {
+            background-color: #28a745;
+            border: none;
+            padding: 12px;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            border-radius: 50px;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+        .tooltip-icon {
+            cursor: pointer;
+            color: #6c757d;
+            margin-left: 5px;
         }
     </style>
 </head>
@@ -53,15 +74,22 @@
         <div class="form-section">
             <h4>Informations Générales</h4>
             <div class="form-group">
-                <label class="icon-label" for="medicament_nom"><i class="fas fa-pills"></i> Nom du médicament</label>
+                <label class="icon-label" for="medicament_nom">
+                    <i class="fas fa-pills"></i> Nom du médicament
+                    <span class="tooltip-icon" data-toggle="tooltip" title="Nom complet du médicament."><i class="fas fa-info-circle"></i></span>
+                </label>
                 <input type="text" class="form-control" id="medicament_nom" name="medicament_nom" required>
             </div>
             <div class="form-group">
-    <label class="icon-label" for="numero_lot"><i class="fas fa-barcode"></i> Numéro de lot</label>
-    <input type="text" class="form-control" id="numero_lot" name="numero_lot" required>
-</div>
+                <label class="icon-label" for="numero_lot">
+                    <i class="fas fa-barcode"></i> Numéro de lot
+                </label>
+                <input type="text" class="form-control" id="numero_lot" name="numero_lot" required>
+            </div>
             <div class="form-group">
-                <label class="icon-label" for="description"><i class="fas fa-align-left"></i> Description</label>
+                <label class="icon-label" for="description">
+                    <i class="fas fa-align-left"></i> Description
+                </label>
                 <textarea class="form-control" id="description" name="description"></textarea>
             </div>
         </div>
@@ -70,15 +98,21 @@
         <div class="form-section">
             <h4>Détails Supplémentaires</h4>
             <div class="form-group">
-                <label class="icon-label" for="quantite"><i class="fas fa-sort-numeric-up-alt"></i> Quantité</label>
+                <label class="icon-label" for="quantite">
+                    <i class="fas fa-sort-numeric-up-alt"></i> Quantité
+                </label>
                 <input type="number" class="form-control" id="quantite" name="quantite" required>
             </div>
             <div class="form-group">
-                <label class="icon-label" for="date_expiration"><i class="fas fa-calendar-alt"></i> Date d'expiration</label>
+                <label class="icon-label" for="date_expiration">
+                    <i class="fas fa-calendar-alt"></i> Date d'expiration
+                </label>
                 <input type="date" class="form-control" id="date_expiration" name="date_expiration" required>
             </div>
             <div class="form-group">
-                <label class="icon-label" for="type_produit"><i class="fas fa-vial"></i> Type de Produit</label>
+                <label class="icon-label" for="type_produit">
+                    <i class="fas fa-vial"></i> Type de Produit
+                </label>
                 <select class="form-control" id="type_produit" name="type_produit" required>
                     <option value="PER OS">PER OS</option>
                     <option value="Injectable">Injectable</option>
@@ -96,12 +130,20 @@
         </div>
 
         <!-- Bouton Ajouter -->
-        <button type="submit" class="btn btn-success btn-block mt-4">Ajouter</button>
+        <button type="submit" class="btn btn-submit btn-block mt-4">Ajouter</button>
     </form>
 </div>
 
 <!-- Scripts JavaScript -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Initialisation des tooltips
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    // Gestion de la barre de progression
     const form = document.getElementById('medicamentForm');
     const progress = document.getElementById('progress');
     const progressText = document.getElementById('progressText');
@@ -113,6 +155,14 @@
         
         progress.style.width = percentage + "%";
         progressText.innerText = percentage + "%";
+        
+        if (percentage <= 33) {
+            progress.className = 'progress-bar-inner low';
+        } else if (percentage <= 66) {
+            progress.className = 'progress-bar-inner medium';
+        } else {
+            progress.className = 'progress-bar-inner high';
+        }
     });
 </script>
 </body>
