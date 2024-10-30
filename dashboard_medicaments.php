@@ -30,13 +30,6 @@ $types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments G
         .text-center {
             margin-bottom: 20px;
         }
-        .stats-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        .stats-list li {
-            margin-bottom: 8px;
-        }
     </style>
 </head>
 <body>
@@ -62,11 +55,11 @@ $types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments G
                 </div>
             </div>
         </div>
-         <div class="col-md-4">
-       <div class="container mt-5">
-    <h2 class="text-center">Répartition des Médicaments par Type</h2>
-    <canvas id="typeChart"></canvas>
-</div>
+        <div class="col-md-4">
+            <div class="container mt-5">
+                <h2 class="text-center">Répartition des Médicaments par Type</h2>
+                <canvas id="typeChart"></canvas>
+            </div>
         </div>     
     </div>
 </div>
@@ -82,15 +75,15 @@ $types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments G
             type: 'pie',
             data: {
                 labels: [
-                    <?php foreach ($categories as $categorie): ?>
-                        "<?php echo $categorie['categorie']; ?>",
+                    <?php foreach ($types as $type): ?>
+                        "<?php echo $type['type_produit']; ?>",
                     <?php endforeach; ?>
                 ],
                 datasets: [{
-                    label: 'Médicaments par Catégorie',
+                    label: 'Médicaments par Type',
                     data: [
-                        <?php foreach ($categories as $categorie): ?>
-                            <?php echo $categorie['count']; ?>,
+                        <?php foreach ($types as $type): ?>
+                            <?php echo $type['count']; ?>,
                         <?php endforeach; ?>
                     ],
                     backgroundColor: [
