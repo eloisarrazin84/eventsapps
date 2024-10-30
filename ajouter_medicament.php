@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <title>Ajouter un Médicament</title>
     <style>
         .form-section {
@@ -57,26 +58,11 @@
             color: white;
             border: none;
         }
-        .btn-submit:hover {
-            background-color: #218838;
-            transform: translateY(-3px);
-            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
-        }
         .btn-cancel {
             background-color: #dc3545;
             color: white;
             border: none;
             margin-left: 15px;
-        }
-        .btn-cancel:hover {
-            background-color: #c82333;
-            transform: translateY(-3px);
-            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
-        }
-        .button-group {
-            text-align: center;
-            margin-top: 30px;
-            margin-bottom: 20px; /* Espace sous les boutons */
         }
     </style>
 </head>
@@ -94,18 +80,14 @@
                     <i class="fas fa-pills"></i> Nom du médicament
                     <span class="tooltip-icon" data-toggle="tooltip" title="Nom complet du médicament."><i class="fas fa-info-circle"></i></span>
                 </label>
-                <input type="text" class="form-control" id="medicament_nom" name="medicament_nom" required>
+                <input type="text" class="form-control" id="medicament_nom" name="medicament_nom" required autocomplete="off">
             </div>
             <div class="form-group">
-                <label class="icon-label" for="numero_lot">
-                    <i class="fas fa-barcode"></i> Numéro de lot
-                </label>
+                <label class="icon-label" for="numero_lot"><i class="fas fa-barcode"></i> Numéro de lot</label>
                 <input type="text" class="form-control" id="numero_lot" name="numero_lot" required>
             </div>
             <div class="form-group">
-                <label class="icon-label" for="description">
-                    <i class="fas fa-align-left"></i> Description
-                </label>
+                <label class="icon-label" for="description"><i class="fas fa-align-left"></i> Description</label>
                 <textarea class="form-control" id="description" name="description"></textarea>
             </div>
         </div>
@@ -114,35 +96,21 @@
         <div class="form-section">
             <h4>Détails Supplémentaires</h4>
             <div class="form-group">
-                <label class="icon-label" for="quantite">
-                    <i class="fas fa-sort-numeric-up-alt"></i> Quantité
-                </label>
+                <label class="icon-label" for="quantite"><i class="fas fa-sort-numeric-up-alt"></i> Quantité</label>
                 <input type="number" class="form-control" id="quantite" name="quantite" required>
             </div>
             <div class="form-group">
-                <label class="icon-label" for="date_expiration">
-                    <i class="fas fa-calendar-alt"></i> Date d'expiration
-                </label>
+                <label class="icon-label" for="date_expiration"><i class="fas fa-calendar-alt"></i> Date d'expiration</label>
                 <input type="date" class="form-control" id="date_expiration" name="date_expiration" required>
             </div>
             <div class="form-group">
-                <label class="icon-label" for="type_produit">
-                    <i class="fas fa-vial"></i> Type de Produit
-                </label>
+                <label class="icon-label" for="type_produit"><i class="fas fa-vial"></i> Type de Produit</label>
                 <select class="form-control" id="type_produit" name="type_produit" required>
                     <option value="PER OS">PER OS</option>
                     <option value="Injectable">Injectable</option>
                     <option value="Inhalable">Inhalable</option>
                 </select>
             </div>
-        </div>
-        
-        <!-- Barre de progression -->
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-bar-inner" id="progress"></div>
-            </div>
-            <span id="progressText">0%</span>
         </div>
 
         <!-- Boutons Ajouter et Annuler -->
@@ -156,6 +124,8 @@
 <!-- Scripts JavaScript -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
 <script>
     // Initialisation des tooltips
     $(function () {
@@ -182,6 +152,28 @@
         } else {
             progress.className = 'progress-bar-inner high';
         }
+    });
+
+    <?php
+    // Charger les noms des médicaments depuis le fichier `CIS_bdpm.txt`
+    $medicamentNames = [];
+    if (file_exists('CIS_bdpm.txt')) {
+        $file = fopen('CIS_bdpm.txt', 'r');
+        while (($line = fgets($file)) !== false) {
+            $medicamentNames[] = trim($line); // Enlever les espaces autour
+        }
+        fclose($file);
+    }
+    ?>
+
+    // Passer la liste des noms de médicaments à JavaScript
+    const medicamentNames = <?php echo json_encode($medicamentNames); ?>;
+
+    // Autocomplétion pour le champ "Nom du médicament"
+    $(document).ready(function () {
+        $("#medicament_nom").autocomplete({
+            source: medicamentNames
+        });
     });
 </script>
 </body>
