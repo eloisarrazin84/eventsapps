@@ -1,7 +1,9 @@
 <?php
-// Démarrage de la session et connexion à la base de données
+// Démarrer la session et récupérer les informations utilisateur
 session_start();
 $user_id = $_SESSION['user_id'];
+
+// Connexion unique à la base de données
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -11,7 +13,7 @@ $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Récupérer le nombre de notifications non lues
+// Récupérer les notifications non lues
 $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = :user_id AND is_read = 0");
 $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
@@ -35,7 +37,7 @@ $unreadNotifications = count($notifications);
                     </a>
                     <div class="dropdown-menu" aria-labelledby="medicamentDropdown">
                         <a class="dropdown-item" href="gestion_medicaments.php"><i class="fas fa-pills"></i> Liste des Médicaments</a>
-                        <a class="dropdown-item" href="ajouter_medicament.php"><i class="bi bi-plus-square"></i> Ajouter un Médicaments</a>
+                        <a class="dropdown-item" href="ajouter_medicament.php"><i class="bi bi-plus-square"></i> Ajouter un Médicament</a>
                     </div>
                 </li>
             <?php endif; ?>
@@ -48,28 +50,28 @@ $unreadNotifications = count($notifications);
         </ul>
         <ul class="navbar-nav ml-auto">
             <?php if (isset($_SESSION['user_id'])): ?>
-               <!-- Icône de notifications -->
-<li class="nav-item dropdown">
-    <a class="nav-link" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-bell"></i>
-        <?php if ($unreadNotifications > 0): ?>
-            <span class="badge badge-danger" id="notification-badge"><?php echo $unreadNotifications; ?></span>
-        <?php endif; ?>
-    </a>
-    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
-        <?php if (empty($notifications)): ?>
-            <p class="dropdown-item">Aucune notification</p>
-        <?php else: ?>
-            <?php foreach ($notifications as $notification): ?>
-                <div class="dropdown-item notification-item" data-id="<?php echo $notification['id']; ?>">
-                    <p><?php echo htmlspecialchars($notification['message']); ?></p>
-                    <button class="btn btn-sm btn-secondary mark-as-read">Marquer comme lu</button>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
-</li>
-                
+                <!-- Icône de notifications -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <?php if ($unreadNotifications > 0): ?>
+                            <span class="badge badge-danger" id="notification-badge"><?php echo $unreadNotifications; ?></span>
+                        <?php endif; ?>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
+                        <?php if (empty($notifications)): ?>
+                            <p class="dropdown-item">Aucune notification</p>
+                        <?php else: ?>
+                            <?php foreach ($notifications as $notification): ?>
+                                <div class="dropdown-item notification-item" data-id="<?php echo $notification['id']; ?>">
+                                    <p><?php echo htmlspecialchars($notification['message']); ?></p>
+                                    <button class="btn btn-sm btn-secondary mark-as-read">Marquer comme lu</button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </li>
+
                 <!-- Profil utilisateur -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -90,34 +92,7 @@ $unreadNotifications = count($notifications);
     </div>
 </nav>
 
-<!-- CSS pour les notifications -->
-<style>
-    .navbar {
-        background-color: #f8f9fa;
-    }
-    .nav-link {
-        color: #007bff;
-    }
-    .nav-link:hover {
-        color: #0056b3;
-    }
-    .badge-danger {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 0.8em;
-    }
-    .rounded-circle {
-        border: 2px solid #007bff;
-    }
-    .dropdown-menu {
-        background-color: #f8f9fa;
-    }
-    .dropdown-item:hover {
-        background-color: #e9ecef;
-    }
-</style>
-
+<!-- Script pour marquer les notifications comme lues -->
 <script>
 document.querySelectorAll('.mark-as-read').forEach(button => {
     button.addEventListener('click', function(event) {
@@ -148,3 +123,31 @@ document.querySelectorAll('.mark-as-read').forEach(button => {
     });
 });
 </script>
+
+<!-- CSS pour les notifications -->
+<style>
+    .navbar {
+        background-color: #f8f9fa;
+    }
+    .nav-link {
+        color: #007bff;
+    }
+    .nav-link:hover {
+        color: #0056b3;
+    }
+    .badge-danger {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.8em;
+    }
+    .rounded-circle {
+        border: 2px solid #007bff;
+    }
+    .dropdown-menu {
+        background-color: #f8f9fa;
+    }
+    .dropdown-item:hover {
+        background-color: #e9ecef;
+    }
+</style>
