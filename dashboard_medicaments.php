@@ -1,3 +1,18 @@
+<?php
+session_start();
+$conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
+$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Récupérer les statistiques
+$totalMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments")->fetchColumn();
+$expiredMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration < CURDATE()")->fetchColumn();
+$expiringMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH)")->fetchColumn();
+$typesProduits = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments GROUP BY type_produit")->fetchAll(PDO::FETCH_ASSOC);
+
+// Récupérer les médicaments expirant bientôt
+$medicamentsExpiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH)")->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
