@@ -34,10 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(':last_name', $lastName);
             $stmt->execute();
 
-            // Récupérer l'ID de l'utilisateur nouvellement créé
-            $userId = $conn->lastInsertId();
-
             // Gérer les fichiers joints (diplômes, cartes professionnelles, etc.)
+            $userId = $conn->lastInsertId();
             foreach ($_FILES['documents']['tmp_name'] as $key => $tmp_name) {
                 $file_name = $_FILES['documents']['name'][$key];
                 $file_tmp = $_FILES['documents']['tmp_name'][$key];
@@ -76,10 +74,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Inscription</title>
+    <style>
+        body {
+            background-color: #f7f9fc;
+        }
+        .container {
+            margin-top: 50px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            border-radius: 50px;
+        }
+        .form-control {
+            border-radius: 50px;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <h2 class="mt-5">Inscription</h2>
+    <h2 class="text-center">Inscription</h2>
 
     <!-- Message de succès ou d'erreur -->
     <?php if (!empty($success)): ?>
@@ -114,7 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label for="documents">Joindre des documents (diplômes, cartes professionnelles, etc.)</label>
             <input type="file" class="form-control-file" id="documents" name="documents[]" multiple>
         </div>
-        <button type="submit" class="btn btn-primary">S'inscrire</button>
+        <button type="submit" class="btn btn-primary btn-block">S'inscrire</button>
     </form>
 </div>
 
