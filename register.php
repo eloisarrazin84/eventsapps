@@ -5,11 +5,12 @@ $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Récupération des données du formulaire
-    $username = htmlspecialchars($_POST['username']);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     $firstName = htmlspecialchars($_POST['first_name']);
     $lastName = htmlspecialchars($_POST['last_name']);
+    $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    // Générer le nom d'utilisateur
+    $username = strtolower(substr($firstName, 0, 1) . $lastName); // 1ère lettre du prénom + nom de famille
 
     if (!$email) {
         $error = "Adresse email invalide.";
@@ -108,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form method="POST" action="" enctype="multipart/form-data">
         <div class="form-group">
             <label for="username">Nom d'utilisateur</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+            <input type="text" class="form-control" id="username" name="username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" readonly>
         </div>
         <div class="form-group">
             <label for="password">Mot de passe</label>
@@ -125,6 +126,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="form-group">
             <label for="last_name">Nom</label>
             <input type="text" class="form-control" id="last_name" name="last_name" required>
+        </div>
+        <div class="form-group">
+            <label for="address">Adresse</label>
+            <input type="text" class="form-control" id="address" name="address" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Numéro de téléphone</label>
+            <input type="tel" class="form-control" id="phone" name="phone" required>
         </div>
         <div class="form-group">
             <label for="documents">Joindre des documents (diplômes, cartes professionnelles, etc.)</label>
