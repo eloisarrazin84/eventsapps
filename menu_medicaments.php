@@ -47,6 +47,26 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                     </div>
+                    <li class="nav-item dropdown">
+    <a class="nav-link" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-bell"></i>
+        <?php if ($unreadNotifications > 0): ?>
+            <span class="badge badge-danger"><?php echo $unreadNotifications; ?></span>
+        <?php endif; ?>
+    </a>
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
+        <?php if (empty($notifications)): ?>
+            <p class="dropdown-item">Aucune notification</p>
+        <?php else: ?>
+            <?php foreach ($notifications as $notification): ?>
+                <div class="dropdown-item">
+                    <p><?php echo htmlspecialchars($notification['message']); ?></p>
+                    <a href="mark_as_read.php?id=<?php echo $notification['id']; ?>" class="btn btn-sm btn-secondary">Marquer comme lu</a>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</li>
                 </li>
             <?php else: ?>
                 <li class="nav-item">
