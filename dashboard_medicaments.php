@@ -25,7 +25,11 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
 <?php include 'menu_medicaments.php'; ?>
 <div class="container mt-5">
     <h1 class="text-center">Dashboard des Médicaments</h1>
-
+ <div class="text-center mt-3">
+        <a href="ajouter_medicament.php" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Ajouter un médicament
+        </a>
+    </div>
     <!-- Widgets de Statistiques -->
     <div class="row mt-4">
         <div class="col-md-4">
