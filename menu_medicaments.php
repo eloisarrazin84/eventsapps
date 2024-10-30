@@ -150,4 +150,14 @@ document.querySelectorAll('.mark-as-read').forEach(button => {
     .dropdown-item:hover {
         background-color: #e9ecef;
     }
+    /* Ajustement de la position du badge de notifications */
+    .nav-item .badge-danger {
+    position: absolute;
+    top: -5px; /* Ajustez cette valeur pour monter ou descendre le badge */
+    right: -10px; /* Ajustez cette valeur pour déplacer le badge à droite ou à gauche */
+    font-size: 0.8em;
+    padding: 5px 8px;
+    border-radius: 50%;
+}
+
 </style>
