@@ -59,6 +59,18 @@ try {
         .table th {
             background-color: #f8f9fa;
         }
+        /* Styles pour la responsivité */
+        @media (max-width: 768px) {
+            .table td, .table th {
+                font-size: 0.8rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .btn {
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
