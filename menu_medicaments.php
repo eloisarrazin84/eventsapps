@@ -1,24 +1,22 @@
 <?php
-// Ajoutez cette partie au début pour récupérer les données utilisateur
+// Démarrage de la session et connexion à la base de données
 session_start();
 $user_id = $_SESSION['user_id'];
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
+$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Récupérer la photo de profil de l'utilisateur
 $stmt = $conn->prepare("SELECT profile_picture FROM users WHERE id = :user_id");
 $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Connexion à la base de données
-$conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
-$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-// Récupérer les notifications non lues
+// Récupérer le nombre de notifications non lues
 $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = :user_id AND is_read = 0");
 $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $unreadNotifications = count($notifications);
-
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
@@ -50,6 +48,29 @@ $unreadNotifications = count($notifications);
         </ul>
         <ul class="navbar-nav ml-auto">
             <?php if (isset($_SESSION['user_id'])): ?>
+               <!-- Icône de notifications -->
+<li class="nav-item dropdown">
+    <a class="nav-link" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-bell"></i>
+        <?php if ($unreadNotifications > 0): ?>
+            <span class="badge badge-danger" id="notification-badge"><?php echo $unreadNotifications; ?></span>
+        <?php endif; ?>
+    </a>
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
+        <?php if (empty($notifications)): ?>
+            <p class="dropdown-item">Aucune notification</p>
+        <?php else: ?>
+            <?php foreach ($notifications as $notification): ?>
+                <div class="dropdown-item notification-item" data-id="<?php echo $notification['id']; ?>">
+                    <p><?php echo htmlspecialchars($notification['message']); ?></p>
+                    <button class="btn btn-sm btn-secondary mark-as-read">Marquer comme lu</button>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</li>
+                
+                <!-- Profil utilisateur -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px;">
@@ -59,26 +80,6 @@ $unreadNotifications = count($notifications);
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                     </div>
-                    <li class="nav-item dropdown">
-    <a class="nav-link" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-bell"></i>
-        <?php if ($unreadNotifications > 0): ?>
-            <span class="badge badge-danger"><?php echo $unreadNotifications; ?></span>
-        <?php endif; ?>
-    </a>
-    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
-        <?php if (empty($notifications)): ?>
-            <p class="dropdown-item">Aucune notification</p>
-        <?php else: ?>
-            <?php foreach ($notifications as $notification): ?>
-                <div class="dropdown-item">
-                    <p><?php echo htmlspecialchars($notification['message']); ?></p>
-                    <a href="mark_as_read.php?id=<?php echo $notification['id']; ?>" class="btn btn-sm btn-secondary">Marquer comme lu</a>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
-</li>
                 </li>
             <?php else: ?>
                 <li class="nav-item">
@@ -89,7 +90,7 @@ $unreadNotifications = count($notifications);
     </div>
 </nav>
 
-<!-- CSS Directement dans le menu.php -->
+<!-- CSS pour les notifications -->
 <style>
     .navbar {
         background-color: #f8f9fa;
@@ -100,13 +101,11 @@ $unreadNotifications = count($notifications);
     .nav-link:hover {
         color: #0056b3;
     }
-    .btn-info {
-        background-color: #17a2b8;
-        border-color: #17a2b8;
-    }
-    .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
+    .badge-danger {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.8em;
     }
     .rounded-circle {
         border: 2px solid #007bff;
@@ -118,3 +117,34 @@ $unreadNotifications = count($notifications);
         background-color: #e9ecef;
     }
 </style>
+
+<script>
+document.querySelectorAll('.mark-as-read').forEach(button => {
+    button.addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        // Récupération de l'ID de la notification
+        const notificationItem = this.closest('.notification-item');
+        const notificationId = notificationItem.getAttribute('data-id');
+
+        // Envoi de la requête AJAX
+        fetch('mark_as_read.php?id=' + notificationId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Marque la notification comme lue
+                    notificationItem.remove();
+                    
+                    // Mettre à jour le badge de notifications
+                    let badge = document.getElementById('notification-badge');
+                    let unreadCount = parseInt(badge.innerText);
+                    badge.innerText = unreadCount - 1;
+                    if (unreadCount - 1 <= 0) {
+                        badge.style.display = 'none';
+                    }
+                }
+            })
+            .catch(error => console.error('Erreur:', error));
+    });
+});
+</script>
