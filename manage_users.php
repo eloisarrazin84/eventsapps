@@ -76,7 +76,7 @@ try {
 <body>
 
 <!-- Inclusion du menu -->
-<?php include 'menu.php'; ?>
+<?php include 'menu_admin.php'; ?>
 
 <div class="container">
     <h1 class="mt-5 text-center">Gestion des utilisateurs</h1>
