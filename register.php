@@ -91,157 +91,166 @@ function isStrongPassword($password) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Inscription</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f7f9fc;
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
         }
-        .container {
-            margin-top: 50px;
-            background-color: white;
+        .form-container {
+            background: #ffffff;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
         }
-        .btn {
-            border-radius: 50px;
+        .section-title {
+            font-size: 1.2rem;
+            color: #007bff;
+            margin-top: 20px;
+            margin-bottom: 10px;
         }
-        .form-control {
-            border-radius: 50px;
+        .form-group label {
+            font-weight: bold;
         }
-        .text-danger {
-            color: red;
+        .form-control:required {
+            border: 2px solid #d9534f;
         }
-        .suggestions {
-            border: 1px solid #ccc;
-            background-color: #fff;
-            position: absolute;
-            z-index: 1000;
-            width: 100%;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
+        .form-control.valid {
+            border: 2px solid #5cb85c;
         }
-        .suggestions div {
-            padding: 8px;
+        .password-strength {
+            height: 6px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 25px;
+            transition: 0.3s;
+            cursor: not-allowed;
+        }
+        .btn-primary.active {
             cursor: pointer;
+            opacity: 1;
         }
-        .suggestions div:hover {
-            background-color: #e9e9e9;
+        .form-feedback {
+            color: #d9534f;
+            font-size: 0.9rem;
+        }
+        .asterisk {
+            color: #d9534f;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h2 class="text-center">Inscription</h2>
 
-    <?php if (!empty($success)): ?>
-        <div class="alert alert-success"><?php echo $success; ?></div>
-    <?php endif; ?>
-    <?php if (!empty($error)): ?>
-        <div class="alert alert-danger"><?php echo $error; ?></div>
-    <?php endif; ?>
-
-    <form method="POST" action="" enctype="multipart/form-data">
-        <!-- Section Identifiants -->
-        <fieldset class="border p-3 mb-3">
-            <legend class="w-auto">Identifiants</legend>
+<div class="container mt-5">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Inscription</h2>
+        
+        <!-- Section Informations personnelles -->
+        <div class="section-title">Informations personnelles</div>
+        <form method="POST" action="" enctype="multipart/form-data" id="registrationForm">
             <div class="form-group">
-                <label for="username">Nom d'utilisateur <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="username" name="username" readonly>
+                <label for="first_name">Prénom <span class="asterisk">*</span></label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
             </div>
             <div class="form-group">
-                <label for="password">Mot de passe <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" id="password" name="password" required>
+                <label for="last_name">Nom <span class="asterisk">*</span></label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
             </div>
             <div class="form-group">
-                <label for="confirm_password">Confirmer le mot de passe <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                <div class="password-feedback" id="passwordFeedback"></div>
+                <label for="address">Adresse <span class="asterisk">*</span></label>
+                <input type="text" class="form-control" id="address" name="address" required>
             </div>
-        </fieldset>
-
-        <!-- Section Informations Personnelles -->
-        <fieldset class="border p-3 mb-3">
-            <legend class="w-auto">Informations Personnelles</legend>
             <div class="form-group">
-                <label for="email">Email <span class="text-danger">*</span></label>
+                <label for="email">Email <span class="asterisk">*</span></label>
                 <input type="email" class="form-control" id="email" name="email" required>
+                <small class="form-feedback" id="emailFeedback"></small>
+            </div>
+            
+            <!-- Section Informations de connexion -->
+            <div class="section-title">Informations de connexion</div>
+            <div class="form-group">
+                <label for="password">Mot de passe <span class="asterisk">*</span></label>
+                <input type="password" class="form-control" id="password" name="password" required>
+                <div class="password-strength bg-danger mt-2" id="passwordStrength"></div>
+                <small class="form-feedback" id="passwordFeedback"></small>
             </div>
             <div class="form-group">
-                <label for="first_name">Prénom <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="first_name" name="first_name" oninput="updateUsername()" required>
+                <label for="confirm_password">Confirmer le mot de passe <span class="asterisk">*</span></label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                <small class="form-feedback" id="confirmPasswordFeedback"></small>
             </div>
+            
+            <!-- Section Téléchargement de photo -->
+            <div class="section-title">Téléchargement de photo</div>
             <div class="form-group">
-                <label for="last_name">Nom <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="last_name" name="last_name" oninput="updateUsername()" required>
+                <label for="profile_picture">Photo de profil</label>
+                <input type="file" class="form-control-file" id="profile_picture" name="profile_picture">
             </div>
-            <div class="form-group">
-                <label for="address">Adresse <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="address" name="address" required autocomplete="off">
-                <div id="suggestions" class="suggestions"></div>
-            </div>
-            <div class="form-group">
-                <label for="phone">Numéro de téléphone <span class="text-danger">*</span></label>
-                <input type="tel" class="form-control" id="phone" name="phone" required>
-            </div>
-        </fieldset>
-
-        <button type="submit" class="btn btn-primary" id="submitBtn">S'inscrire</button>
-    </form>
+            
+            <!-- Bouton d'inscription -->
+            <button type="submit" class="btn btn-primary mt-4" id="submitButton" disabled>S'inscrire</button>
+        </form>
+    </div>
 </div>
 
+<!-- Scripts JavaScript -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
-    function updateUsername() {
-        const firstName = document.getElementById('first_name').value;
-        const lastName = document.getElementById('last_name').value;
-        const usernameField = document.getElementById('username');
-        if (firstName && lastName) {
-            const username = firstName.charAt(0).toLowerCase() + lastName.toLowerCase();
-            usernameField.value = username;
-        }
-    }
-
-    const passwordField = document.getElementById('password');
-    const confirmPasswordField = document.getElementById('confirm_password');
-    const feedback = document.getElementById('passwordFeedback');
-    const submitBtn = document.getElementById('submitBtn');
-
-    confirmPasswordField.addEventListener('input', function () {
-        if (confirmPasswordField.value !== passwordField.value) {
-            feedback.textContent = "Les mots de passe ne correspondent pas.";
-            feedback.style.color = 'red';
-            submitBtn.disabled = true;
-        } else {
-            feedback.textContent = "";
-            submitBtn.disabled = false;
-        }
-    });
-
-    $("#address").on("input", function () {
-        const query = $(this).val();
-        if (query.length > 3) {
-            $.ajax({
-                url: `https://api-adresse.data.gouv.fr/search/?q=${query}&limit=5`,
-                method: "GET",
-                success: function (data) {
-                    let suggestions = data.features.map(feature => feature.properties.label);
-                    $("#suggestions").empty().show();
-                    suggestions.forEach(address => {
-                        $("#suggestions").append(`<div>${address}</div>`);
-                    });
-                }
+    $(document).ready(function() {
+        // Vérification live des champs obligatoires
+        let requiredFields = ['first_name', 'last_name', 'email', 'password', 'confirm_password'];
+        requiredFields.forEach(field => {
+            $('#' + field).on('input', function() {
+                checkFormCompletion();
             });
+        });
+
+        // Force du mot de passe
+        $('#password').on('input', function() {
+            let strength = checkPasswordStrength($(this).val());
+            let strengthColors = ['bg-danger', 'bg-warning', 'bg-info', 'bg-success'];
+            $('#passwordStrength').removeClass().addClass('password-strength ' + strengthColors[strength.level]);
+            $('#passwordFeedback').text(strength.feedback);
+        });
+
+        // Vérification des mots de passe identiques
+        $('#confirm_password').on('input', function() {
+            let match = $(this).val() === $('#password').val();
+            $('#confirmPasswordFeedback').text(match ? '' : 'Les mots de passe ne correspondent pas');
+        });
+
+        // Vérification complète du formulaire
+        function checkFormCompletion() {
+            let allFilled = requiredFields.every(field => $('#' + field).val().trim() !== '');
+            let passwordsMatch = $('#password').val() === $('#confirm_password').val();
+            $('#submitButton').prop('disabled', !(allFilled && passwordsMatch)).toggleClass('active', allFilled && passwordsMatch);
         }
     });
 
-    $("#suggestions").on("click", "div", function () {
-        $("#address").val($(this).text());
-        $("#suggestions").hide();
-    });
+    function checkPasswordStrength(password) {
+        let strength = { level: 0, feedback: '' };
+        if (password.length < 8) {
+            strength.feedback = 'Minimum 8 caractères';
+        } else {
+            if (/[A-Z]/.test(password)) strength.level++;
+            if (/[a-z]/.test(password)) strength.level++;
+            if (/[0-9]/.test(password)) strength.level++;
+            if (/[^A-Za-z0-9]/.test(password)) strength.level++;
+            if (strength.level < 2) strength.feedback = 'Ajoutez des lettres majuscules et chiffres';
+            else if (strength.level < 4) strength.feedback = 'Mot de passe fort';
+        }
+        return strength;
+    }
 </script>
 </body>
 </html>
