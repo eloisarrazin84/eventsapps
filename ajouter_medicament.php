@@ -45,22 +45,28 @@
         .progress-bar-inner.low { background-color: #dc3545; }
         .progress-bar-inner.medium { background-color: #ffc107; }
         .progress-bar-inner.high { background-color: #28a745; }
+        .btn-submit, .btn-cancel {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            border-radius: 50px;
+        }
         .btn-submit {
             background-color: #28a745;
             border: none;
-            padding: 12px;
-            font-size: 1.2em;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            border-radius: 50px;
         }
         .btn-submit:hover {
             background-color: #218838;
             transform: scale(1.05);
         }
-        .tooltip-icon {
-            cursor: pointer;
-            color: #6c757d;
-            margin-left: 5px;
+        .btn-cancel {
+            background-color: #dc3545;
+            border: none;
+            margin-left: 10px;
+        }
+        .btn-cancel:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
         }
     </style>
 </head>
@@ -129,8 +135,11 @@
             <span id="progressText">0%</span>
         </div>
 
-        <!-- Bouton Ajouter -->
-        <button type="submit" class="btn btn-submit btn-block mt-4">Ajouter</button>
+        <!-- Boutons Ajouter et Annuler -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-submit">Ajouter</button>
+            <a href="dashboard_medicaments.php" class="btn btn-cancel">Annuler</a>
+        </div>
     </form>
 </div>
 
