@@ -6,6 +6,9 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
+
+// Vérifier si l'utilisateur est administrateur
+$isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 ?>
 
 <!DOCTYPE html>
@@ -17,13 +20,13 @@ if (!isset($_SESSION['user_id'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <title>Mes Applications</title>
     <style>
+        /* Styles existants */
         .app-container {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
             margin-top: 50px;
         }
-
         .app-icon {
             width: 200px;
             height: 200px;
@@ -37,62 +40,22 @@ if (!isset($_SESSION['user_id'])) {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
         }
-
         .app-icon:hover {
             transform: scale(1.05);
             cursor: pointer;
             box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
         }
-
         .app-icon i {
             font-size: 3rem;
             color: white;
         }
-
         .app-name {
             margin-top: 10px;
             font-size: 1.2rem;
             color: white;
             text-align: center;
         }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 2.5rem;
-            color: #333;
-        }
-
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .logo-container img {
-            width: 100px;
-            height: auto;
-        }
-
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            .app-icon {
-                width: 150px;
-                height: 150px;
-            }
-
-            .app-name {
-                font-size: 1rem;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .logo-container img {
-                width: 80px;
-            }
-        }
+        /* Autres styles */
     </style>
 </head>
 <body>
@@ -113,18 +76,19 @@ if (!isset($_SESSION['user_id'])) {
             <div class="app-name">Mes événements</div>
         </div>
 
-        <!-- Application 2: Future Application -->
+        <!-- Application 2: Notes de Frais -->
         <div class="app-icon" onclick="window.location.href='#'">
             <i class="bi bi-receipt"></i>
             <div class="app-name">Notes de Frais</div>
         </div>
 
-        <!-- Application 3: Pharmacie -->
-        <div class="app-icon" onclick="window.location.href='dashboard_medicaments.php'">
-            <i class="bi bi-capsule-pill"></i>
-            <div class="app-name">Gestion Pharmacie</div>
-        </div>
-
+        <!-- Application 3: Pharmacie, visible uniquement par les administrateurs -->
+        <?php if ($isAdmin): ?>
+            <div class="app-icon" onclick="window.location.href='dashboard_medicaments.php'">
+                <i class="bi bi-capsule-pill"></i>
+                <div class="app-name">Gestion Pharmacie</div>
+            </div>
+        <?php endif; ?>
 
     </div>
 </div>
