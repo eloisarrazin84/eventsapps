@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'sendEmail.php'; // Inclusion de la fonction d'envoi d'email
+require_once 'sendEmail.php';
 
 $error = "";
 $success = "";
@@ -66,10 +66,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->bindParam(':phone', $phone);
                 $stmt->execute();
 
-                // Envoi de l'email de confirmation
-                $emailBody = "<h1>Bienvenue sur Outdoor Secours</h1>
-                              <p>Bonjour {$firstName},</p>
-                              <p>Votre inscription a bien été prise en compte. Elle sera validée par un administrateur sous peu.</p>";
+                // Charger et personnaliser le template de l'email
+                $templatePath = 'email_templates/confirmation_registration.html';
+                $emailBody = file_get_contents($templatePath);
+                $emailBody = str_replace('{{first_name}}', $firstName, $emailBody);
+
                 if (sendEmail($email, "Confirmation d'inscription", $emailBody)) {
                     $success = "Votre compte a été créé. Un email de confirmation vous a été envoyé.";
                 } else {
@@ -88,6 +89,7 @@ function isStrongPassword($password) {
     return preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password);
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">
