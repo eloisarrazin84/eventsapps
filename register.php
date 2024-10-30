@@ -10,6 +10,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirm_password'];
+    $address = htmlspecialchars($_POST['address']);
+    $phone = htmlspecialchars($_POST['phone']);
 
     // Vérifier si les mots de passe correspondent
     if ($password !== $confirmPassword) {
@@ -61,14 +63,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 // Insertion de l'utilisateur en attente de validation
-                $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, profile_picture, is_approved) 
-                                        VALUES (:username, :password, :email, :first_name, :last_name, :profile_picture, FALSE)");
+                $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, profile_picture, address, phone, is_approved) 
+                                        VALUES (:username, :password, :email, :first_name, :last_name, :profile_picture, :address, :phone, FALSE)");
                 $stmt->bindParam(':username', $username);
                 $stmt->bindParam(':password', $hashedPassword);
                 $stmt->bindParam(':email', $email);
                 $stmt->bindParam(':first_name', $firstName);
                 $stmt->bindParam(':last_name', $lastName);
                 $stmt->bindParam(':profile_picture', $profilePicturePath);
+                $stmt->bindParam(':address', $address);
+                $stmt->bindParam(':phone', $phone);
                 $stmt->execute();
 
                 $success = "Votre compte a été créé. Il doit être validé par un administrateur.";
@@ -93,6 +97,7 @@ function isStrongPassword($password) {
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Inscription</title>
     <style>
+        /* Styles personnalisés */
         body {
             background-color: #f7f9fc;
             font-family: 'Arial', sans-serif;
@@ -109,13 +114,6 @@ function isStrongPassword($password) {
         }
         .form-control {
             border-radius: 50px;
-        }
-        .password-feedback {
-            color: red; /* Couleur pour le message d'erreur */
-            font-size: 0.9rem;
-        }
-        .form-group label {
-            font-weight: bold;
         }
         .text-danger {
             color: red; /* Couleur pour les champs obligatoires */
@@ -146,7 +144,7 @@ function isStrongPassword($password) {
             <legend class="w-auto">Identifiants</legend>
             <div class="form-group">
                 <label for="username">Nom d'utilisateur <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="username" name="username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" readonly>
+                <input type="text" class="form-control" id="username" name="username" readonly>
             </div>
             <div class="form-group">
                 <label for="password">Mot de passe <span class="text-danger">*</span></label>
@@ -184,13 +182,7 @@ function isStrongPassword($password) {
             </div>
         </fieldset>
 
-        <!-- Section Documents -->
-        <div class="form-group">
-            <label for="documents">Joindre des documents (diplômes, cartes professionnelles, etc.)</label>
-            <input type="file" class="form-control-file" id="documents" name="documents[]" multiple>
-        </div>
-
-        <button type="submit" class="btn btn-primary">S'inscrire</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn">S'inscrire</button>
     </form>
 </div>
 
@@ -217,6 +209,7 @@ function isStrongPassword($password) {
     confirmPasswordField.addEventListener('input', function () {
         if (confirmPasswordField.value !== passwordField.value) {
             feedback.textContent = "Les mots de passe ne correspondent pas.";
+            feedback.style.color = 'red';
             submitBtn.disabled = true; // Désactiver le bouton si les mots de passe ne correspondent pas
         } else {
             feedback.textContent = ""; // Clear feedback if passwords match
