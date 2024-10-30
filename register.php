@@ -15,8 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirm_password'];
-    $address = htmlspecialchars($_POST['address']);
-    $phone = htmlspecialchars($_POST['phone']);
+    $address = isset($_POST['address']) ? htmlspecialchars($_POST['address']) : '';
+    $phone = isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : '';
 
     if ($password !== $confirmPassword) {
         $error = "Les mots de passe ne correspondent pas.";
