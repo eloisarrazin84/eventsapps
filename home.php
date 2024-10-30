@@ -20,7 +20,6 @@ $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <title>Mes Applications</title>
     <style>
-        /* Styles existants */
         .app-container {
             display: flex;
             justify-content: center;
@@ -55,7 +54,37 @@ $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
             color: white;
             text-align: center;
         }
-        /* Autres styles */
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            color: #333;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .logo-container img {
+            max-width: 100px; /* Limite la taille du logo */
+            height: auto;
+        }
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .app-icon {
+                width: 150px;
+                height: 150px;
+            }
+            .app-name {
+                font-size: 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .logo-container img {
+                max-width: 80px; /* Ajustement pour les petits écrans */
+            }
+        }
     </style>
 </head>
 <body>
