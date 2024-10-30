@@ -88,6 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <style>
         body {
             background-color: #f7f9fc;
+            font-family: 'Arial', sans-serif;
         }
         .container {
             margin-top: 50px;
@@ -105,6 +106,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .password-feedback {
             color: red; /* Couleur pour le message d'erreur */
             font-size: 0.9rem;
+        }
+        .form-group label {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -188,7 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password !== confirmPassword) {
             feedback.textContent = "Les mots de passe ne correspondent pas.";
         } else {
-            feedback.textContent = "";
+            feedback.textContent = ""; // Clear feedback if passwords match
         }
     });
 </script>
