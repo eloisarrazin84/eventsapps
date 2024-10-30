@@ -119,6 +119,14 @@ $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
             </div>
         <?php endif; ?>
 
+        <!-- Application 4: Gestion Users, visible uniquement par les administrateurs -->
+        <?php if ($isAdmin): ?>
+            <div class="app-icon" onclick="window.location.href='manage_users.php'">
+                <i class="bi bi-people-fill"></i>
+                <div class="app-name">Gestion utilisateurs</div>
+            </div>
+        <?php endif; ?>
+
     </div>
 </div>
 
