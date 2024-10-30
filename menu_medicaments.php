@@ -7,6 +7,18 @@ $stmt = $conn->prepare("SELECT profile_picture FROM users WHERE id = :user_id");
 $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Connexion à la base de données
+$conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
+$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Récupérer les notifications non lues
+$stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = :user_id AND is_read = 0");
+$stmt->bindParam(':user_id', $user_id);
+$stmt->execute();
+$notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$unreadNotifications = count($notifications);
+
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
