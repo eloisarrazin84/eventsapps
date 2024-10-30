@@ -49,10 +49,38 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Documents de l'utilisateur</title>
+    <style>
+        .profile-container {
+            background-color: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .profile-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+        
+        .btn {
+            border-radius: 25px;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h1>Documents pour l'utilisateur : <?php echo htmlspecialchars($user['username']); ?></h1>
+<div class="container mt-5 profile-container">
+    <div class="profile-header">
+        <h1>Documents pour l'utilisateur : <?php echo htmlspecialchars($user['username']); ?></h1>
+    </div>
 
     <!-- Table des documents -->
     <?php if (!empty($userDocuments)): ?>
@@ -67,7 +95,7 @@ try {
                 <?php foreach ($userDocuments as $doc): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($doc['document_name']); ?></td>
-                        <td><a href="<?php echo htmlspecialchars($doc['file_path']); ?>" download>Télécharger</a></td>
+                        <td><a href="<?php echo htmlspecialchars($doc['file_path']); ?>" download class="btn btn-info btn-sm">Télécharger</a></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
