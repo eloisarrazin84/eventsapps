@@ -22,6 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $role = $_POST['role'];
     $approved = isset($_POST['approved']) ? 1 : 0;
+    $applications = isset($_POST['applications']) ? $_POST['applications'] : []; // Applications assignées
 
     // Hachage du mot de passe pour plus de sécurité
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -41,6 +42,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(':role', $role);
         $stmt->bindParam(':approved', $approved);
         $stmt->execute();
+
+        // Récupérer l'ID de l'utilisateur nouvellement créé
+        $userId = $conn->lastInsertId();
+
+        // Assigner des applications à l'utilisateur
+        foreach ($applications as $app) {
+            $stmt = $conn->prepare("INSERT INTO user_applications (user_id, application_name) VALUES (:user_id, :application_name)");
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->bindParam(':application_name', $app);
+            $stmt->execute();
+        }
 
         header("Location: manage_users.php");
         exit();
@@ -95,6 +107,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label for="approved">Approuvé</label>
             <input type="checkbox" id="approved" name="approved">
         </div>
+        
+        <div class="form-group">
+            <label for="applications">Applications assignées</label>
+            <select multiple class="form-control" id="applications" name="applications[]">
+                <option value="gestion_pharmacie">Gestion Pharmacie</option>
+                <option value="notes_de_frais">Notes de Frais</option>
+                <option value="autre_application">Autre Application</option>
+            </select>
+            <small class="form-text text-muted">Sélectionnez les applications auxquelles l'utilisateur aura accès.</small>
+        </div>
+
         <button type="submit" class="btn btn-primary">Ajouter</button>
         <a href="manage_users.php" class="btn btn-secondary">Retour</a>
     </form>
