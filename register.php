@@ -28,7 +28,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
             $target_dir = "uploads/profile_pictures/";
 
-            // Créer le répertoire si non existant
             if (!file_exists($target_dir)) {
                 mkdir($target_dir, 0777, true);
             }
@@ -36,11 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $target_file = $target_dir . basename($_FILES["profile_picture"]["name"]);
             $file_type = mime_content_type($_FILES["profile_picture"]["tmp_name"]);
             
-            // Vérification du type de fichier
             if (in_array($file_type, ['image/jpeg', 'image/png', 'image/gif'])) {
-                // Déplacer le fichier téléchargé
                 if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
-                    $profilePicturePath = $target_file; // Chemin de la photo de profil
+                    $profilePicturePath = $target_file;
                 } else {
                     $error = "Erreur lors du téléchargement de la photo de profil.";
                 }
@@ -97,7 +94,6 @@ function isStrongPassword($password) {
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Inscription</title>
     <style>
-        /* Styles personnalisés */
         body {
             background-color: #f7f9fc;
             font-family: 'Arial', sans-serif;
@@ -116,7 +112,24 @@ function isStrongPassword($password) {
             border-radius: 50px;
         }
         .text-danger {
-            color: red; /* Couleur pour les champs obligatoires */
+            color: red;
+        }
+        .suggestions {
+            border: 1px solid #ccc;
+            background-color: #fff;
+            position: absolute;
+            z-index: 1000;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+        }
+        .suggestions div {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .suggestions div:hover {
+            background-color: #e9e9e9;
         }
     </style>
 </head>
@@ -124,7 +137,6 @@ function isStrongPassword($password) {
 <div class="container">
     <h2 class="text-center">Inscription</h2>
 
-    <!-- Message de succès ou d'erreur -->
     <?php if (!empty($success)): ?>
         <div class="alert alert-success"><?php echo $success; ?></div>
     <?php endif; ?>
@@ -133,12 +145,6 @@ function isStrongPassword($password) {
     <?php endif; ?>
 
     <form method="POST" action="" enctype="multipart/form-data">
-        <!-- Section Photo de Profil -->
-        <div class="form-group">
-            <label for="profile_picture">Photo de profil <span class="text-danger">*</span></label>
-            <input type="file" class="form-control-file" id="profile_picture" name="profile_picture" required>
-        </div>
-
         <!-- Section Identifiants -->
         <fieldset class="border p-3 mb-3">
             <legend class="w-auto">Identifiants</legend>
@@ -174,7 +180,8 @@ function isStrongPassword($password) {
             </div>
             <div class="form-group">
                 <label for="address">Adresse <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="address" name="address" required>
+                <input type="text" class="form-control" id="address" name="address" required autocomplete="off">
+                <div id="suggestions" class="suggestions"></div>
             </div>
             <div class="form-group">
                 <label for="phone">Numéro de téléphone <span class="text-danger">*</span></label>
@@ -188,19 +195,16 @@ function isStrongPassword($password) {
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
-    // Mise à jour automatique du nom d'utilisateur
     function updateUsername() {
         const firstName = document.getElementById('first_name').value;
         const lastName = document.getElementById('last_name').value;
         const usernameField = document.getElementById('username');
-
         if (firstName && lastName) {
             const username = firstName.charAt(0).toLowerCase() + lastName.toLowerCase();
             usernameField.value = username;
         }
     }
 
-    // Vérification des mots de passe
     const passwordField = document.getElementById('password');
     const confirmPasswordField = document.getElementById('confirm_password');
     const feedback = document.getElementById('passwordFeedback');
@@ -210,11 +214,33 @@ function isStrongPassword($password) {
         if (confirmPasswordField.value !== passwordField.value) {
             feedback.textContent = "Les mots de passe ne correspondent pas.";
             feedback.style.color = 'red';
-            submitBtn.disabled = true; // Désactiver le bouton si les mots de passe ne correspondent pas
+            submitBtn.disabled = true;
         } else {
-            feedback.textContent = ""; // Clear feedback if passwords match
-            submitBtn.disabled = false; // Activer le bouton si les mots de passe correspondent
+            feedback.textContent = "";
+            submitBtn.disabled = false;
         }
+    });
+
+    $("#address").on("input", function () {
+        const query = $(this).val();
+        if (query.length > 3) {
+            $.ajax({
+                url: `https://api-adresse.data.gouv.fr/search/?q=${query}&limit=5`,
+                method: "GET",
+                success: function (data) {
+                    let suggestions = data.features.map(feature => feature.properties.label);
+                    $("#suggestions").empty().show();
+                    suggestions.forEach(address => {
+                        $("#suggestions").append(`<div>${address}</div>`);
+                    });
+                }
+            });
+        }
+    });
+
+    $("#suggestions").on("click", "div", function () {
+        $("#address").val($(this).text());
+        $("#suggestions").hide();
     });
 </script>
 </body>
