@@ -102,6 +102,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .form-control {
             border-radius: 50px;
         }
+        .password-feedback {
+            color: red; /* Couleur pour le message d'erreur */
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -132,6 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="form-group">
             <label for="confirm_password">Confirmer le mot de passe</label>
             <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+            <div class="password-feedback" id="passwordFeedback"></div>
         </div>
         <div class="form-group">
             <label for="email">Email</label>
@@ -173,6 +178,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         const username = (firstName.charAt(0).toLowerCase() + lastName.toLowerCase()).replace(/\s+/g, ''); // 1ère lettre du prénom + nom en minuscules
         document.getElementById('username').value = username; // Mettre à jour le champ du nom d'utilisateur
     }
+
+    // Vérification des mots de passe
+    document.getElementById('confirm_password').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+        const feedback = document.getElementById('passwordFeedback');
+
+        if (password !== confirmPassword) {
+            feedback.textContent = "Les mots de passe ne correspondent pas.";
+        } else {
+            feedback.textContent = "";
+        }
+    });
 </script>
 </body>
 </html>
