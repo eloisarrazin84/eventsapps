@@ -14,6 +14,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Vérifier si les mots de passe correspondent
     if ($password !== $confirmPassword) {
         $error = "Les mots de passe ne correspondent pas.";
+    } elseif (!isStrongPassword($password)) {
+        $error = "Le mot de passe doit contenir au moins 8 caractères, incluant des lettres, des chiffres et des caractères spéciaux.";
     } else {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         // Générer le nom d'utilisateur
@@ -76,6 +78,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
+// Fonction pour vérifier la force du mot de passe
+function isStrongPassword($password) {
+    return preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password);
+}
 ?>
 
 <!DOCTYPE html>
@@ -109,6 +116,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .form-group label {
             font-weight: bold;
+        }
+        .text-danger {
+            color: red; /* Couleur pour les champs obligatoires */
         }
     </style>
 </head>
@@ -180,16 +190,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="file" class="form-control-file" id="documents" name="documents[]" multiple>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block" id="submitBtn" disabled>S'inscrire</button>
+        <button type="submit" class="btn btn-primary">S'inscrire</button>
     </form>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
-    // Fonction pour mettre à jour le nom d'utilisateur
+    // Mise à jour automatique du nom d'utilisateur
     function updateUsername() {
         const firstName = document.getElementById('first_name').value;
         const lastName = document.getElementById('last_name').value;
