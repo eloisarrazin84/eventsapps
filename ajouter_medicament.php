@@ -1,3 +1,17 @@
+<?php
+// Lire le fichier CIS_bdpm.txt et extraire les noms des médicaments
+$medicamentNames = [];
+$file = fopen("CIS_bdpm.txt", "r");
+
+while (($line = fgets($file)) !== false) {
+    $fields = explode("\t", $line); // Supposons que les champs soient séparés par des tabulations
+    if (isset($fields[1])) { // Le nom du médicament est dans le deuxième champ
+        $medicamentNames[] = trim($fields[1]);
+    }
+}
+fclose($file);
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -154,23 +168,10 @@
         }
     });
 
-    <?php
-    // Charger les noms des médicaments uniquement
-    $medicamentNames = [];
-    if (file_exists('CIS_bdpm.txt')) {
-        $file = fopen('CIS_bdpm.txt', 'r');
-        while (($line = fgets($file)) !== false) {
-            $parts = explode("\t", $line); // Supposons que les données soient séparées par des tabulations
-            $medicamentNames[] = trim($parts[0]); // Récupérer uniquement le premier élément (nom du médicament)
-        }
-        fclose($file);
-    }
-    ?>
-
-    // Passer la liste des noms de médicaments à JavaScript
+    // Passer la liste des noms de médicaments à JavaScript pour l'autocomplétion
     const medicamentNames = <?php echo json_encode($medicamentNames); ?>;
-
-    // Autocomplétion pour le champ "Nom du médicament"
+    
+    // Activer l'autocomplétion pour le champ "Nom du médicament"
     $(document).ready(function () {
         $("#medicament_nom").autocomplete({
             source: medicamentNames
