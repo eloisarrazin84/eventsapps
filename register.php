@@ -8,61 +8,71 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $firstName = htmlspecialchars($_POST['first_name']);
     $lastName = htmlspecialchars($_POST['last_name']);
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    // Générer le nom d'utilisateur
-    $username = strtolower(substr($firstName, 0, 1) . $lastName); // 1ère lettre du prénom + nom de famille
+    $password = $_POST['password'];
+    $confirmPassword = $_POST['confirm_password'];
 
-    if (!$email) {
-        $error = "Adresse email invalide.";
+    // Vérifier si les mots de passe correspondent
+    if ($password !== $confirmPassword) {
+        $error = "Les mots de passe ne correspondent pas.";
     } else {
-        // Connexion à la base de données
-        $servername = "localhost";
-        $username_db = "root";
-        $password_db = "Lipton2019!";
-        $dbname = "outdoorsec";
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        // Générer le nom d'utilisateur
+        $username = strtolower(substr($firstName, 0, 1) . $lastName); // 1ère lettre du prénom + nom de famille
 
-        try {
-            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // Vérification de l'upload de la photo de profil
+        $profilePicturePath = '';
+        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
+            $target_dir = "uploads/profile_pictures/";
 
-            // Insertion de l'utilisateur en attente de validation
-            $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, is_approved) 
-                                    VALUES (:username, :password, :email, :first_name, :last_name, FALSE)");
-            $stmt->bindParam(':username', $username);
-            $stmt->bindParam(':password', $password);
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':first_name', $firstName);
-            $stmt->bindParam(':last_name', $lastName);
-            $stmt->execute();
-
-            // Gérer les fichiers joints (diplômes, cartes professionnelles, etc.)
-            $userId = $conn->lastInsertId();
-            foreach ($_FILES['documents']['tmp_name'] as $key => $tmp_name) {
-                $file_name = $_FILES['documents']['name'][$key];
-                $file_tmp = $_FILES['documents']['tmp_name'][$key];
-                $file_type = mime_content_type($file_tmp);
-                $file_size = $_FILES['documents']['size'][$key];
-                $file_path = "uploads/" . basename($file_name);
-
-                // Vérifier le type et la taille du fichier
-                if ($file_size > 5000000 || !in_array($file_type, ['application/pdf', 'image/jpeg', 'image/png'])) {
-                    $error = "Fichier invalide ou trop volumineux.";
-                } else {
-                    // Téléverser le fichier dans le dossier uploads
-                    if (move_uploaded_file($file_tmp, $file_path)) {
-                        // Insérer les informations du document dans la base de données
-                        $stmt = $conn->prepare("INSERT INTO documents (user_id, file_name, file_path) VALUES (:user_id, :file_name, :file_path)");
-                        $stmt->bindParam(':user_id', $userId);
-                        $stmt->bindParam(':file_name', $file_name);
-                        $stmt->bindParam(':file_path', $file_path);
-                        $stmt->execute();
-                    }
-                }
+            // Créer le répertoire si non existant
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
             }
 
-            $success = "Votre compte a été créé. Il doit être validé par un administrateur.";
-        } catch (PDOException $e) {
-            $error = "Erreur : " . $e->getMessage();
+            $target_file = $target_dir . basename($_FILES["profile_picture"]["name"]);
+            $file_type = mime_content_type($_FILES["profile_picture"]["tmp_name"]);
+            
+            // Vérification du type de fichier
+            if (in_array($file_type, ['image/jpeg', 'image/png', 'image/gif'])) {
+                // Déplacer le fichier téléchargé
+                if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
+                    $profilePicturePath = $target_file; // Chemin de la photo de profil
+                } else {
+                    $error = "Erreur lors du téléchargement de la photo de profil.";
+                }
+            } else {
+                $error = "Type de fichier non autorisé pour la photo de profil.";
+            }
+        }
+
+        if (!$email) {
+            $error = "Adresse email invalide.";
+        } else {
+            // Connexion à la base de données
+            $servername = "localhost";
+            $username_db = "root";
+            $password_db = "Lipton2019!";
+            $dbname = "outdoorsec";
+
+            try {
+                $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                // Insertion de l'utilisateur en attente de validation
+                $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, profile_picture, is_approved) 
+                                        VALUES (:username, :password, :email, :first_name, :last_name, :profile_picture, FALSE)");
+                $stmt->bindParam(':username', $username);
+                $stmt->bindParam(':password', $hashedPassword);
+                $stmt->bindParam(':email', $email);
+                $stmt->bindParam(':first_name', $firstName);
+                $stmt->bindParam(':last_name', $lastName);
+                $stmt->bindParam(':profile_picture', $profilePicturePath);
+                $stmt->execute();
+
+                $success = "Votre compte a été créé. Il doit être validé par un administrateur.";
+            } catch (PDOException $e) {
+                $error = "Erreur : " . $e->getMessage();
+            }
         }
     }
 }
@@ -108,12 +118,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <form method="POST" action="" enctype="multipart/form-data">
         <div class="form-group">
+            <label for="profile_picture">Photo de profil</label>
+            <input type="file" class="form-control-file" id="profile_picture" name="profile_picture" required>
+        </div>
+        <div class="form-group">
             <label for="username">Nom d'utilisateur</label>
             <input type="text" class="form-control" id="username" name="username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" readonly>
         </div>
         <div class="form-group">
             <label for="password">Mot de passe</label>
             <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirmer le mot de passe</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
         </div>
         <div class="form-group">
             <label for="email">Email</label>
