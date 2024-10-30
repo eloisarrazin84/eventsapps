@@ -17,8 +17,12 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // Appliquer les filtres si une recherche est soumise
+    $search = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '%';
+
     // Récupérer les utilisateurs
-    $stmt = $conn->prepare("SELECT * FROM users");
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username LIKE :search OR email LIKE :search");
+    $stmt->bindParam(':search', $search);
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -34,8 +38,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des utilisateurs</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .action-buttons a {
             margin-right: 5px;
@@ -65,6 +68,10 @@ try {
 
 <div class="container">
     <h1 class="mt-5 text-center">Gestion des utilisateurs</h1>
+    <form method="GET" class="form-inline justify-content-center mb-3">
+        <input type="text" class="form-control mr-2" name="search" placeholder="Rechercher un utilisateur..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+        <button type="submit" class="btn btn-primary">Rechercher</button>
+    </form>
     <a href="create_user.php" class="btn btn-success mb-3">Créer un nouvel utilisateur</a>
     <table class="table table-bordered table-hover">
         <thead class="thead-light">
@@ -114,6 +121,5 @@ try {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
