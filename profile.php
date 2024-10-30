@@ -24,6 +24,8 @@ try {
         $email = htmlspecialchars($_POST['email']);
         $first_name = htmlspecialchars($_POST['first_name']);
         $last_name = htmlspecialchars($_POST['last_name']);
+        $phone_number = htmlspecialchars($_POST['phone_number']);
+        $address = htmlspecialchars($_POST['address']);
         $new_password = $_POST['new_password'];
         $confirm_password = $_POST['confirm_password'];
 
@@ -31,7 +33,7 @@ try {
         if (!empty($new_password)) {
             if ($new_password === $confirm_password) {
                 $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-                $updateStmt = $conn->prepare("UPDATE users SET username = :username, email = :email, first_name = :first_name, last_name = :last_name, password = :password WHERE id = :user_id");
+                $updateStmt = $conn->prepare("UPDATE users SET username = :username, email = :email, first_name = :first_name, last_name = :last_name, phone_number = :phone_number, address = :address, password = :password WHERE id = :user_id");
                 $updateStmt->bindParam(':password', $hashed_password);
             } else {
                 echo "<script>alert('Les mots de passe ne correspondent pas.');</script>";
@@ -39,13 +41,15 @@ try {
             }
         } else {
             // Mise à jour sans changer le mot de passe
-            $updateStmt = $conn->prepare("UPDATE users SET username = :username, email = :email, first_name = :first_name, last_name = :last_name WHERE id = :user_id");
+            $updateStmt = $conn->prepare("UPDATE users SET username = :username, email = :email, first_name = :first_name, last_name = :last_name, phone_number = :phone_number, address = :address WHERE id = :user_id");
         }
 
         $updateStmt->bindParam(':username', $username);
         $updateStmt->bindParam(':email', $email);
         $updateStmt->bindParam(':first_name', $first_name);
         $updateStmt->bindParam(':last_name', $last_name);
+        $updateStmt->bindParam(':phone_number', $phone_number);
+        $updateStmt->bindParam(':address', $address);
         $updateStmt->bindParam(':user_id', $user_id);
         $updateStmt->execute();
 
@@ -178,6 +182,14 @@ try {
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="phone_number">Numéro de téléphone</label>
+                <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($user['phone_number']); ?>">
+            </div>
+            <div class="form-group">
+                <label for="address">Adresse</label>
+                <input type="text" class="form-control" id="address" name="address" value="<?php echo htmlspecialchars($user['address']); ?>">
             </div>
             <div class="form-group">
                 <label for="new_password">Nouveau mot de passe</label>
