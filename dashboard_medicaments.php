@@ -22,11 +22,13 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
     <title>Dashboard Médicaments</title>
     <style>
         .card-stats {
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
         .card-stats:hover {
             transform: scale(1.05);
+            box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
         }
         .card-body ul {
             padding-left: 0;
@@ -34,6 +36,13 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
         }
         .card-body ul li {
             font-size: 0.9rem;
+        }
+        .search-form {
+            max-width: 600px;
+            margin: auto;
+        }
+        .highlight-warning {
+            background-color: #fff3cd;
         }
     </style>
 </head>
@@ -52,7 +61,7 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
         <div class="col-md-4">
             <div class="card card-stats text-white bg-primary mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Total des Médicaments</h5>
+                    <h5 class="card-title"><i class="fas fa-pills"></i> Total des Médicaments</h5>
                     <p class="card-text display-4"><?php echo $totalMedicaments; ?></p>
                 </div>
             </div>
@@ -60,7 +69,7 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
         <div class="col-md-4">
             <div class="card card-stats text-white bg-danger mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Médicaments Expirés</h5>
+                    <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> Médicaments Expirés</h5>
                     <p class="card-text display-4"><?php echo $expiredMedicaments; ?></p>
                 </div>
             </div>
@@ -68,10 +77,10 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
         <div class="col-md-4">
             <div class="card card-stats text-white bg-success mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Types de Médicaments</h5>
+                    <h5 class="card-title"><i class="fas fa-tags"></i> Types de Médicaments</h5>
                     <ul>
                         <?php foreach ($categories as $categorie): ?>
-                            <li><strong><?php echo $categorie['type_produit']; ?>:</strong> <?php echo $categorie['count']; ?></li>
+                            <li><strong><?php echo htmlspecialchars($categorie['type_produit']); ?>:</strong> <?php echo $categorie['count']; ?></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
@@ -82,8 +91,8 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
     <!-- Widget de Recherche -->
     <div class="row mb-4">
         <div class="col-md-12">
-            <form method="GET" action="recherche_medicament.php" class="form-inline justify-content-center">
-                <input type="text" class="form-control mr-2" name="search" placeholder="Rechercher un médicament...">
+            <form method="GET" action="recherche_medicament.php" class="form-inline justify-content-center search-form">
+                <input type="text" class="form-control mr-2" name="search" placeholder="Rechercher un médicament..." style="width:70%;">
                 <button type="submit" class="btn btn-outline-primary"><i class="fas fa-search"></i> Rechercher</button>
             </form>
         </div>
@@ -107,7 +116,7 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
                     </thead>
                     <tbody>
                         <?php foreach ($expiringSoon as $med): ?>
-                            <tr>
+                            <tr class="<?php echo (strtotime($med['date_expiration']) - time() <= 7 * 86400) ? 'highlight-warning' : ''; ?>">
                                 <td><?php echo htmlspecialchars($med['nom']); ?></td>
                                 <td><?php echo htmlspecialchars($med['quantite']); ?></td>
                                 <td><?php echo htmlspecialchars($med['date_expiration']); ?></td>
