@@ -32,6 +32,12 @@ try {
             exit();
         }
 
+        // Récupérer les applications assignées à l'utilisateur
+        $stmt = $conn->prepare("SELECT application_name FROM user_applications WHERE user_id = :user_id");
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->execute();
+        $assignedApplications = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
         // Traitement du formulaire lors de la soumission
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $username = $_POST['username'];
@@ -39,6 +45,7 @@ try {
             $firstName = $_POST['first_name'];
             $lastName = $_POST['last_name'];
             $role = $_POST['role'];
+            $applications = isset($_POST['applications']) ? $_POST['applications'] : [];
 
             // Vérifier si un nouveau mot de passe est défini
             if (!empty($_POST['password'])) {
@@ -56,6 +63,19 @@ try {
             $stmt->bindParam(':role', $role);
             $stmt->bindParam(':id', $userId);
             $stmt->execute();
+
+            // Réinitialiser les applications de l'utilisateur
+            $stmt = $conn->prepare("DELETE FROM user_applications WHERE user_id = :user_id");
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
+
+            // Assigner de nouvelles applications
+            foreach ($applications as $app) {
+                $stmt = $conn->prepare("INSERT INTO user_applications (user_id, application_name) VALUES (:user_id, :application_name)");
+                $stmt->bindParam(':user_id', $userId);
+                $stmt->bindParam(':application_name', $app);
+                $stmt->execute();
+            }
 
             header("Location: manage_users.php");
             exit();
@@ -109,6 +129,24 @@ try {
                 <option value="admin" <?php if ($user['role'] == 'admin') echo 'selected'; ?>>Administrateur</option>
             </select>
         </div>
+
+        <div class="form-group">
+            <label>Applications assignées</label><br>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="gestion_pharmacie" name="applications[]" value="gestion_pharmacie" <?php echo in_array('gestion_pharmacie', $assignedApplications) ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="gestion_pharmacie">Gestion Pharmacie</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="notes_de_frais" name="applications[]" value="notes_de_frais" <?php echo in_array('notes_de_frais', $assignedApplications) ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="notes_de_frais">Notes de Frais</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="autre_application" name="applications[]" value="autre_application" <?php echo in_array('autre_application', $assignedApplications) ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="autre_application">Autre Application</label>
+            </div>
+            <small class="form-text text-muted">Sélectionnez les applications auxquelles l'utilisateur aura accès.</small>
+        </div>
+
         <button type="submit" class="btn btn-primary">Modifier</button>
         <a href="manage_users.php" class="btn btn-secondary">Retour</a>
     </form>
