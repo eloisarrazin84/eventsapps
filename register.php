@@ -90,6 +90,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 function isStrongPassword($password) {
     return preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password);
 }
+
+$mail->SMTPDebug = 2; // Affichera les détails du processus SMTP
+
 ?>
 
 
