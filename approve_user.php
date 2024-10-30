@@ -1,4 +1,6 @@
 <?php
+
+$mail->SMTPDebug = 2; // Affichera les détails du processus SMTP
 session_start();
 
 require_once 'email/sendEmail.php'; // Inclusion de la fonction d'envoi d'email
