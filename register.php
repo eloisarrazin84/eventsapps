@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'email/sendEmail.php'; // Inclusion de la fonction d'envoi d'email
 $error = "";
 $success = "";
 
