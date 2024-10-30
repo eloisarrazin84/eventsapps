@@ -1,7 +1,5 @@
 <?php
 session_start();
-$mail->SMTPDebug = 2; // Affichera les détails du processus SMTP
-
 require_once 'email/sendEmail.php'; // Inclusion de la fonction d'envoi d'email
 
 // Vérifier si l'utilisateur est un administrateur
