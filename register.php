@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'email_helper.php'; // Inclusion de la fonction d'envoi d'email
+require_once 'sendEmail.php'; // Inclusion de la fonction d'envoi d'email
 
 $error = "";
 $success = "";
