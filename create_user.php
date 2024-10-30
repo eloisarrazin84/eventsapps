@@ -104,6 +104,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+
+<!-- Inclusion du menu -->
+<?php include 'menu.php'; ?>
+
 <div class="container">
     <h1>Ajouter un utilisateur</h1>
 
@@ -141,12 +145,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         
         <div class="form-group">
-            <label for="applications">Applications assignées</label>
-            <select multiple class="form-control" id="applications" name="applications[]">
-                <option value="gestion_pharmacie">Gestion Pharmacie</option>
-                <option value="notes_de_frais">Notes de Frais</option>
-                <option value="autre_application">Autre Application</option>
-            </select>
+            <label>Applications assignées</label><br>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="gestion_pharmacie" name="applications[]" value="gestion_pharmacie">
+                <label class="form-check-label" for="gestion_pharmacie">Gestion Pharmacie</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="notes_de_frais" name="applications[]" value="notes_de_frais">
+                <label class="form-check-label" for="notes_de_frais">Notes de Frais</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="autre_application" name="applications[]" value="autre_application">
+                <label class="form-check-label" for="autre_application">Autre Application</label>
+            </div>
             <small class="form-text text-muted">Sélectionnez les applications auxquelles l'utilisateur aura accès.</small>
         </div>
 
