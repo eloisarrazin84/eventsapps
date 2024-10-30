@@ -85,4 +85,10 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     .dropdown-item:hover {
         background-color: #e9ecef;
     }
+    .nav-link .badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 0.8rem;
+}
 </style>
