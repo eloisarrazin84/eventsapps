@@ -91,7 +91,7 @@ function isStrongPassword($password) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription</title>
+    <title>Inscription Moderne</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
@@ -115,12 +115,6 @@ function isStrongPassword($password) {
         }
         .form-group label {
             font-weight: bold;
-        }
-        .form-control:required {
-            border: 2px solid #d9534f;
-        }
-        .form-control.valid {
-            border: 2px solid #5cb85c;
         }
         .password-strength {
             height: 6px;
@@ -167,6 +161,10 @@ function isStrongPassword($password) {
                 <input type="text" class="form-control" id="last_name" name="last_name" required>
             </div>
             <div class="form-group">
+                <label for="username">Nom d'utilisateur <span class="asterisk">*</span></label>
+                <input type="text" class="form-control" id="username" name="username" readonly>
+            </div>
+            <div class="form-group">
                 <label for="address">Adresse <span class="asterisk">*</span></label>
                 <input type="text" class="form-control" id="address" name="address" required>
             </div>
@@ -209,10 +207,17 @@ function isStrongPassword($password) {
     $(document).ready(function() {
         // Vérification live des champs obligatoires
         let requiredFields = ['first_name', 'last_name', 'email', 'password', 'confirm_password'];
-        requiredFields.forEach(field => {
-            $('#' + field).on('input', function() {
-                checkFormCompletion();
-            });
+        
+        // Génération automatique du nom d'utilisateur
+        $('#first_name, #last_name').on('input', function() {
+            let firstName = $('#first_name').val();
+            let lastName = $('#last_name').val();
+            if (firstName && lastName) {
+                $('#username').val(firstName.charAt(0).toLowerCase() + lastName.toLowerCase());
+            } else {
+                $('#username').val('');
+            }
+            checkFormCompletion();
         });
 
         // Force du mot de passe
