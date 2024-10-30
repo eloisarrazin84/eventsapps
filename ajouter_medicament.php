@@ -47,26 +47,36 @@
         .progress-bar-inner.high { background-color: #28a745; }
         .btn-submit, .btn-cancel {
             font-size: 1.2em;
-            padding: 10px 20px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            border-radius: 50px;
+            padding: 12px 24px;
+            transition: all 0.3s ease;
+            border-radius: 30px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
         .btn-submit {
             background-color: #28a745;
+            color: white;
             border: none;
         }
         .btn-submit:hover {
             background-color: #218838;
-            transform: scale(1.05);
+            transform: translateY(-3px);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
         }
         .btn-cancel {
             background-color: #dc3545;
+            color: white;
             border: none;
-            margin-left: 10px;
+            margin-left: 15px;
         }
         .btn-cancel:hover {
             background-color: #c82333;
-            transform: scale(1.05);
+            transform: translateY(-3px);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 20px; /* Espace sous les boutons */
         }
     </style>
 </head>
@@ -136,7 +146,7 @@
         </div>
 
         <!-- Boutons Ajouter et Annuler -->
-        <div class="text-center mt-4">
+        <div class="button-group">
             <button type="submit" class="btn btn-submit">Ajouter</button>
             <a href="dashboard_medicaments.php" class="btn btn-cancel">Annuler</a>
         </div>
