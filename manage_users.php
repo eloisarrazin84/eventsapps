@@ -115,6 +115,7 @@ try {
                 </td>
                 <td class="action-buttons">
                     <a href="view_user_documents.php?user_id=<?php echo $user['id']; ?>" class="btn btn-info btn-sm">Voir Documents</a>
+                    <a href="view_user_profile.php?user_id=<?php echo $user['id']; ?>" class="btn btn-success btn-sm">Voir Profil</a>
                     <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
                     <a href="delete_user.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
                 </td>
