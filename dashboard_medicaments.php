@@ -3,28 +3,11 @@ session_start();
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Récupérer les statistiques des médicaments
+// Récupérer les statistiques
 $totalMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments")->fetchColumn();
 $expiredMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration < CURDATE()")->fetchColumn();
-$categories = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments GROUP BY type_produit")->fetchAll(PDO::FETCH_ASSOC);
-
-// Médicaments proches de la date de péremption (dans un mois)
-$soonToExpire = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH)")->fetchColumn();
-
-// Exportation des médicaments expirant bientôt
-if (isset($_GET['export'])) {
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment; filename="rapport_peremption.csv"');
-    $output = fopen('php://output', 'w');
-    fputcsv($output, ['Nom', 'Description', 'Quantité', 'Date d\'expiration', 'Type de Produit']);
-
-    $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH)");
-    foreach ($expiringSoon as $row) {
-        fputcsv($output, [$row['nom'], $row['description'], $row['quantite'], $row['date_expiration'], $row['type_produit']]);
-    }
-    fclose($output);
-    exit;
-}
+$soonExpiringMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH)")->fetchColumn();
+$types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments GROUP BY type_produit")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -35,8 +18,7 @@ if (isset($_GET['export'])) {
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Dashboard Médicaments</title>
     <style>
-        .bg-warning { background-color: #ffa500 !important; }
-        .bg-danger { background-color: #dc3545 !important; }
+        .bg-soon-expiring { background-color: orange; color: white; }
     </style>
 </head>
 <body>
@@ -62,20 +44,20 @@ if (isset($_GET['export'])) {
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
+            <div class="card text-white bg-soon-expiring mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Proches de la Péremption</h5>
-                    <p class="card-text"><?php echo $soonToExpire; ?></p>
+                    <h5 class="card-title">Expirant Bientôt</h5>
+                    <p class="card-text"><?php echo $soonExpiringMedicaments; ?></p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card text-white bg-success mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Type de Médicaments</h5>
+                    <h5 class="card-title">Types de Produits</h5>
                     <ul>
-                        <?php foreach ($categories as $categorie): ?>
-                            <li><?php echo $categorie['type_produit']; ?>: <?php echo $categorie['count']; ?></li>
+                        <?php foreach ($types as $type): ?>
+                            <li><?php echo $type['type_produit']; ?>: <?php echo $type['count']; ?></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
@@ -83,13 +65,28 @@ if (isset($_GET['export'])) {
         </div>
     </div>
 
-    <!-- Bouton d'exportation de rapport -->
-    <div class="text-right mt-3">
-        <a href="dashboard_medicaments.php?export=1" class="btn btn-outline-info">Exporter le Rapport de Péremption</a>
+    <!-- Section de tri et filtrage -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <form method="GET" action="dashboard_medicaments.php" class="form-inline">
+                <label for="filter_date" class="mr-2">Voir les médicaments expirant dans :</label>
+                <select name="filter_date" class="form-control mr-2">
+                    <option value="1">1 mois</option>
+                    <option value="3">3 mois</option>
+                    <option value="6">6 mois</option>
+                    <option value="12">1 an</option>
+                </select>
+                <button type="submit" class="btn btn-info">Filtrer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bouton d'exportation du rapport -->
+    <div class="mt-4 text-center">
+        <a href="export_report.php" class="btn btn-outline-primary">Exporter le Rapport de Péremption</a>
     </div>
 </div>
 
-<!-- Scripts Bootstrap et jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
