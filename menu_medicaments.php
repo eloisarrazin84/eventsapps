@@ -126,38 +126,43 @@ document.querySelectorAll('.mark-as-read').forEach(button => {
 
 <!-- CSS pour les notifications -->
 <style>
-    .navbar {
-        background-color: #f8f9fa;
-    }
-    .nav-link {
-        color: #007bff;
-    }
-    .nav-link:hover {
-        color: #0056b3;
-    }
-    .badge-danger {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 0.8em;
-    }
-    .rounded-circle {
-        border: 2px solid #007bff;
-    }
-    .dropdown-menu {
-        background-color: #f8f9fa;
-    }
-    .dropdown-item:hover {
-        background-color: #e9ecef;
-    }
-    /* Ajustement de la position du badge de notifications */
-    .nav-item .badge-danger {
+.navbar {
+    background-color: #f8f9fa;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .nav-link {
+    color: #007bff;
+    font-weight: bold;
+    padding: 10px 15px;
+}
+
+.navbar .nav-link:hover {
+    color: #0056b3;
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 5px;
+}
+
+.badge-danger {
     position: absolute;
-    top: -5px; /* Ajustez cette valeur pour monter ou descendre le badge */
-    right: -10px; /* Ajustez cette valeur pour déplacer le badge à droite ou à gauche */
+    top: -5px;
+    right: -10px;
     font-size: 0.8em;
     padding: 5px 8px;
     border-radius: 50%;
+    background-color: #dc3545;
+    color: white;
 }
+
+.dropdown-menu {
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-item:hover {
+    background-color: #e9ecef;
+}
+
 
 </style>
