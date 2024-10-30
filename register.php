@@ -4,7 +4,6 @@ $error = "";
 $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupération des données du formulaire
     $firstName = htmlspecialchars($_POST['first_name']);
     $lastName = htmlspecialchars($_POST['last_name']);
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
@@ -13,28 +12,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $address = htmlspecialchars($_POST['address']);
     $phone = htmlspecialchars($_POST['phone']);
 
-    // Vérifier si les mots de passe correspondent
     if ($password !== $confirmPassword) {
         $error = "Les mots de passe ne correspondent pas.";
     } elseif (!isStrongPassword($password)) {
         $error = "Le mot de passe doit contenir au moins 8 caractères, incluant des lettres, des chiffres et des caractères spéciaux.";
     } else {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        // Générer le nom d'utilisateur
-        $username = strtolower(substr($firstName, 0, 1) . $lastName); // 1ère lettre du prénom + nom de famille
+        $username = strtolower(substr($firstName, 0, 1) . $lastName);
 
-        // Vérification de l'upload de la photo de profil
         $profilePicturePath = '';
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
             $target_dir = "uploads/profile_pictures/";
-
             if (!file_exists($target_dir)) {
                 mkdir($target_dir, 0777, true);
             }
 
             $target_file = $target_dir . basename($_FILES["profile_picture"]["name"]);
             $file_type = mime_content_type($_FILES["profile_picture"]["tmp_name"]);
-            
             if (in_array($file_type, ['image/jpeg', 'image/png', 'image/gif'])) {
                 if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
                     $profilePicturePath = $target_file;
@@ -49,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!$email) {
             $error = "Adresse email invalide.";
         } else {
-            // Connexion à la base de données
             $servername = "localhost";
             $username_db = "root";
             $password_db = "Lipton2019!";
@@ -59,7 +52,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                // Insertion de l'utilisateur en attente de validation
                 $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, profile_picture, address, phone, is_approved) 
                                         VALUES (:username, :password, :email, :first_name, :last_name, :profile_picture, :address, :phone, FALSE)");
                 $stmt->bindParam(':username', $username);
@@ -80,7 +72,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Fonction pour vérifier la force du mot de passe
 function isStrongPassword($password) {
     return preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password);
 }
@@ -96,8 +87,8 @@ function isStrongPassword($password) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
         }
         .form-container {
             background: #ffffff;
@@ -116,10 +107,8 @@ function isStrongPassword($password) {
         .form-group label {
             font-weight: bold;
         }
-        .password-strength {
-            height: 6px;
-            border-radius: 4px;
-            margin-top: 5px;
+        .asterisk {
+            color: #d9534f;
         }
         .btn-primary {
             background-color: #007bff;
@@ -138,8 +127,10 @@ function isStrongPassword($password) {
             color: #d9534f;
             font-size: 0.9rem;
         }
-        .asterisk {
-            color: #d9534f;
+        .password-strength {
+            height: 6px;
+            border-radius: 4px;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -149,9 +140,16 @@ function isStrongPassword($password) {
     <div class="form-container">
         <h2 class="text-center mb-4">Inscription</h2>
         
-        <!-- Section Informations personnelles -->
-        <div class="section-title">Informations personnelles</div>
+        <!-- Afficher les messages d'erreur ou de succès -->
+        <?php if ($error): ?>
+            <div class="alert alert-danger"><?php echo $error; ?></div>
+        <?php elseif ($success): ?>
+            <div class="alert alert-success"><?php echo $success; ?></div>
+        <?php endif; ?>
+
+        <!-- Formulaire d'inscription -->
         <form method="POST" action="" enctype="multipart/form-data" id="registrationForm">
+            <div class="section-title">Informations personnelles</div>
             <div class="form-group">
                 <label for="first_name">Prénom <span class="asterisk">*</span></label>
                 <input type="text" class="form-control" id="first_name" name="first_name" required>
@@ -161,7 +159,7 @@ function isStrongPassword($password) {
                 <input type="text" class="form-control" id="last_name" name="last_name" required>
             </div>
             <div class="form-group">
-                <label for="username">Nom d'utilisateur <span class="asterisk">*</span></label>
+                <label for="username">Nom d'utilisateur</label>
                 <input type="text" class="form-control" id="username" name="username" readonly>
             </div>
             <div class="form-group">
@@ -174,7 +172,6 @@ function isStrongPassword($password) {
                 <small class="form-feedback" id="emailFeedback"></small>
             </div>
             
-            <!-- Section Informations de connexion -->
             <div class="section-title">Informations de connexion</div>
             <div class="form-group">
                 <label for="password">Mot de passe <span class="asterisk">*</span></label>
@@ -188,14 +185,12 @@ function isStrongPassword($password) {
                 <small class="form-feedback" id="confirmPasswordFeedback"></small>
             </div>
             
-            <!-- Section Téléchargement de photo -->
             <div class="section-title">Téléchargement de photo</div>
             <div class="form-group">
                 <label for="profile_picture">Photo de profil</label>
                 <input type="file" class="form-control-file" id="profile_picture" name="profile_picture">
             </div>
             
-            <!-- Bouton d'inscription -->
             <button type="submit" class="btn btn-primary mt-4" id="submitButton" disabled>S'inscrire</button>
         </form>
     </div>
@@ -205,36 +200,27 @@ function isStrongPassword($password) {
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Vérification live des champs obligatoires
         let requiredFields = ['first_name', 'last_name', 'email', 'password', 'confirm_password'];
-        
-        // Génération automatique du nom d'utilisateur
+
         $('#first_name, #last_name').on('input', function() {
             let firstName = $('#first_name').val();
             let lastName = $('#last_name').val();
-            if (firstName && lastName) {
-                $('#username').val(firstName.charAt(0).toLowerCase() + lastName.toLowerCase());
-            } else {
-                $('#username').val('');
-            }
+            $('#username').val(firstName.charAt(0).toLowerCase() + lastName.toLowerCase());
             checkFormCompletion();
         });
 
-        // Force du mot de passe
         $('#password').on('input', function() {
             let strength = checkPasswordStrength($(this).val());
-            let strengthColors = ['bg-danger', 'bg-warning', 'bg-info', 'bg-success'];
-            $('#passwordStrength').removeClass().addClass('password-strength ' + strengthColors[strength.level]);
+            $('#passwordStrength').removeClass().addClass('password-strength ' + ['bg-danger', 'bg-warning', 'bg-info', 'bg-success'][strength.level]);
             $('#passwordFeedback').text(strength.feedback);
         });
 
-        // Vérification des mots de passe identiques
         $('#confirm_password').on('input', function() {
             let match = $(this).val() === $('#password').val();
             $('#confirmPasswordFeedback').text(match ? '' : 'Les mots de passe ne correspondent pas');
+            checkFormCompletion();
         });
 
-        // Vérification complète du formulaire
         function checkFormCompletion() {
             let allFilled = requiredFields.every(field => $('#' + field).val().trim() !== '');
             let passwordsMatch = $('#password').val() === $('#confirm_password').val();
