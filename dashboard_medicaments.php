@@ -7,8 +7,6 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $totalMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments")->fetchColumn();
 $expiredMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration < CURDATE()")->fetchColumn();
 $typeProduits = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments GROUP BY type_produit")->fetchAll(PDO::FETCH_ASSOC);
-
-// Récupérer les médicaments périmant dans moins de 30 jours
 $soonToExpireMedicaments = $conn->query("SELECT nom, date_expiration FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -32,7 +30,7 @@ $soonToExpireMedicaments = $conn->query("SELECT nom, date_expiration FROM medica
             <div class="card text-white bg-primary mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Total des Médicaments</h5>
-                    <p class="card-text"><?php echo $totalMedicaments; ?></p>
+                    <p class="card-text display-4"><?php echo $totalMedicaments; ?></p>
                 </div>
             </div>
         </div>
@@ -40,21 +38,20 @@ $soonToExpireMedicaments = $conn->query("SELECT nom, date_expiration FROM medica
             <div class="card text-white bg-danger mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Médicaments Expirés</h5>
-                    <p class="card-text"><?php echo $expiredMedicaments; ?></p>
+                    <p class="card-text display-4"><?php echo $expiredMedicaments; ?></p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card text-white bg-success mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Types de Produits</h5>
+                    <h5 class="card-title">Répartition par Type</h5>
                     <canvas id="typeProduitChart" width="100%" height="80"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Liste des médicaments périmant bientôt -->
     <div class="card mt-5">
         <div class="card-header bg-warning text-dark">
             Médicaments périmant dans moins de 30 jours
@@ -74,17 +71,14 @@ $soonToExpireMedicaments = $conn->query("SELECT nom, date_expiration FROM medica
         </div>
     </div>
 
-    <!-- Bouton pour ajouter un médicament -->
     <div class="text-center mt-4">
         <a href="ajouter_medicament.php" class="btn btn-primary"><i class="fas fa-plus"></i> Ajouter un médicament</a>
     </div>
 </div>
 
-<!-- Scripts Bootstrap et Chart.js -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Initialiser le graphique des types de produits
     var ctx = document.getElementById('typeProduitChart').getContext('2d');
     var typeProduitChart = new Chart(ctx, {
         type: 'pie',
