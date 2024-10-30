@@ -27,6 +27,7 @@ try {
         $new_password = $_POST['new_password'];
         $confirm_password = $_POST['confirm_password'];
 
+        // Validation des mots de passe
         if (!empty($new_password)) {
             if ($new_password === $confirm_password) {
                 $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
@@ -37,6 +38,7 @@ try {
                 exit();
             }
         } else {
+            // Mise à jour sans changer le mot de passe
             $updateStmt = $conn->prepare("UPDATE users SET username = :username, email = :email, first_name = :first_name, last_name = :last_name WHERE id = :user_id");
         }
 
@@ -49,35 +51,35 @@ try {
 
         echo "<script>alert('Profil mis à jour avec succès!');</script>";
     }
+
     // Gestion de l'upload de la photo de profil
-if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
-    $target_dir = "uploads/profile_pictures/";
-    
-    // Créer le répertoire si non existant
-    if (!file_exists($target_dir)) {
-        mkdir($target_dir, 0777, true);
-    }
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
+        $target_dir = "uploads/profile_pictures/";
 
-    $target_file = $target_dir . basename($_FILES["profile_picture"]["name"]);
-    
-    if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
-        // Mettre à jour la photo dans la base de données
-        $stmt = $conn->prepare("UPDATE users SET profile_picture = :profile_picture WHERE id = :user_id");
-        $stmt->bindParam(':profile_picture', $target_file);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->execute();
-    } else {
-        echo "<script>alert('Erreur lors du téléchargement de la photo de profil.');</script>";
-    }
-}
+        // Créer le répertoire si non existant
+        if (!file_exists($target_dir)) {
+            mkdir($target_dir, 0777, true);
+        }
 
+        $target_file = $target_dir . basename($_FILES["profile_picture"]["name"]);
+
+        if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
+            // Mettre à jour la photo dans la base de données
+            $stmt = $conn->prepare("UPDATE users SET profile_picture = :profile_picture WHERE id = :user_id");
+            $stmt->bindParam(':profile_picture', $target_file);
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->execute();
+        } else {
+            echo "<script>alert('Erreur lors du téléchargement de la photo de profil.');</script>";
+        }
+    }
 
     // Récupérer les documents actuels
     $stmt = $conn->prepare("SELECT * FROM documents WHERE user_id = :user_id");
     $stmt->bindParam(':user_id', $user_id);
     $stmt->execute();
     $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
 } catch (PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
@@ -90,65 +92,53 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Mon profil</title>
-   <style>
-    .profile-container {
-        background-color: #f7f9fc;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
-    }
-
-    .profile-header {
-        background-color: #007bff;
-        color: white;
-        padding: 10px;
-        border-radius: 10px 10px 0 0;
-        text-align: center;
-    }
-
-    .form-control, .btn {
-        border-radius: 50px;
-        padding: 12px;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border: none;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-    }
-
-    .card {
-        margin-top: 20px;
-        padding: 20px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-    }
-
-    .document-upload {
-        padding: 20px;
-        background-color: #e9f1ff;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .table td, .table th {
-        vertical-align: middle;
-    }
-</style>
+    <style>
+        .profile-container {
+            background-color: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .profile-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+        }
+        .form-control, .btn {
+            border-radius: 50px;
+            padding: 12px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .card {
+            margin-top: 20px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .document-upload {
+            padding: 20px;
+            background-color: #e9f1ff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .table td, .table th {
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body>
 
@@ -157,20 +147,20 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
         <div class="profile-header">
             <h1>Votre profil</h1>
         </div>
-    <!-- Formulaire pour photo de profil -->
-        <form method="POST" enctype="multipart/form-data" action="upload_photo.php">
-        <div class="form-group">
-            <label for="profile_picture">Photo de profil</label>
-            <input type="file" class="form-control-file" id="profile_picture" name="profile_picture">
-            <?php if (!empty($user['profile_picture'])): ?>
-                <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="Photo de profil" class="img-thumbnail mt-2" style="max-width: 150px;">
-            <?php endif; ?>
-        </div>
+        <!-- Formulaire pour photo de profil -->
+        <form method="POST" enctype="multipart/form-data" action="">
+            <div class="form-group">
+                <label for="profile_picture">Photo de profil</label>
+                <input type="file" class="form-control-file" id="profile_picture" name="profile_picture">
+                <?php if (!empty($user['profile_picture'])): ?>
+                    <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="Photo de profil" class="img-thumbnail mt-2" style="max-width: 150px;">
+                <?php endif; ?>
+            </div>
             <button type="submit" class="btn btn-primary">Modifier la photo</button>
         </form>
 
         <!-- Formulaire pour modifier le profil -->
-        <form method="POST" action="profile.php">
+        <form method="POST" action="">
             <div class="form-group">
                 <label for="first_name">Prénom</label>
                 <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
@@ -202,17 +192,16 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
     <!-- Section Documents -->
     <div class="card">
         <h3 class="text-center">Vos Documents</h3>
-       <div class="document-upload">
-    <form method="POST" enctype="multipart/form-data" action="upload_document.php">
-    <div class="form-group">
-        <label for="documents">Télécharger des documents</label>
-        <input type="file" class="form-control" id="documents" name="documents[]" multiple>
-    </div>
-    <div id="document-names"></div> <!-- Champ pour renommer les documents -->
-    <button type="submit" class="btn btn-success btn-block">Télécharger</button>
-</form>
-</div>
-
+        <div class="document-upload">
+            <form method="POST" enctype="multipart/form-data" action="upload_document.php">
+                <div class="form-group">
+                    <label for="documents">Télécharger des documents</label>
+                    <input type="file" class="form-control" id="documents" name="documents[]" multiple>
+                </div>
+                <div id="document-names"></div> <!-- Champ pour renommer les documents -->
+                <button type="submit" class="btn btn-success btn-block">Télécharger</button>
+            </form>
+        </div>
 
         <!-- Liste des documents -->
         <h4>Documents Actuels</h4>
