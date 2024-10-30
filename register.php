@@ -180,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="file" class="form-control-file" id="documents" name="documents[]" multiple>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">S'inscrire</button>
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn" disabled>S'inscrire</button>
     </form>
 </div>
 
@@ -193,20 +193,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     function updateUsername() {
         const firstName = document.getElementById('first_name').value;
         const lastName = document.getElementById('last_name').value;
-        const username = (firstName.charAt(0).toLowerCase() + lastName.toLowerCase());
-        document.getElementById('username').value = username;
+        const usernameField = document.getElementById('username');
+
+        if (firstName && lastName) {
+            const username = firstName.charAt(0).toLowerCase() + lastName.toLowerCase();
+            usernameField.value = username;
+        }
     }
 
     // Vérification des mots de passe
     const passwordField = document.getElementById('password');
     const confirmPasswordField = document.getElementById('confirm_password');
     const feedback = document.getElementById('passwordFeedback');
+    const submitBtn = document.getElementById('submitBtn');
 
     confirmPasswordField.addEventListener('input', function () {
         if (confirmPasswordField.value !== passwordField.value) {
             feedback.textContent = "Les mots de passe ne correspondent pas.";
+            submitBtn.disabled = true; // Désactiver le bouton si les mots de passe ne correspondent pas
         } else {
             feedback.textContent = ""; // Clear feedback if passwords match
+            submitBtn.disabled = false; // Activer le bouton si les mots de passe correspondent
         }
     });
 </script>
