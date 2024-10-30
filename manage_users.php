@@ -71,6 +71,19 @@ try {
                 font-size: 0.8rem;
             }
         }
+    .action-buttons .btn {
+    margin: 0 2px; /* Ajustez l'espacement entre les boutons */
+}
+
+.table td, .table th {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.table th {
+    background-color: #f8f9fa; /* Couleur de fond pour les en-têtes de tableau */
+}
+
     </style>
 </head>
 <body>
@@ -86,18 +99,18 @@ try {
     </form>
     <a href="create_user.php" class="btn btn-success mb-3">Créer un nouvel utilisateur</a>
     <table class="table table-bordered table-hover">
-        <thead class="thead-light">
-            <tr>
-                <th>Nom d'utilisateur</th>
-                <th>Email</th>
-                <th>Prénom</th>
-                <th>Nom</th>
-                <th>Rôle</th>
-                <th>Approuvé</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    <thead class="thead-light">
+        <tr>
+            <th>Nom d'utilisateur</th>
+            <th>Email</th>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Rôle</th>
+            <th>Approuvé</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
         <?php if (!empty($users)): ?>
             <?php foreach ($users as $user): ?>
             <tr>
@@ -114,10 +127,12 @@ try {
                     <?php endif; ?>
                 </td>
                 <td class="action-buttons">
-                    <a href="view_user_documents.php?user_id=<?php echo $user['id']; ?>" class="btn btn-info btn-sm">Voir Documents</a>
-                    <a href="view_user_profile.php?user_id=<?php echo $user['id']; ?>" class="btn btn-success btn-sm">Voir Profil</a>
-                    <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
-                    <a href="delete_user.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
+                    <div class="btn-group" role="group">
+                        <a href="view_user_documents.php?user_id=<?php echo $user['id']; ?>" class="btn btn-info btn-sm">Voir Documents</a>
+                        <a href="view_user_profile.php?user_id=<?php echo $user['id']; ?>" class="btn btn-success btn-sm">Voir Profil</a>
+                        <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
+                        <a href="delete_user.php?id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</a>
+                    </div>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -126,8 +141,8 @@ try {
                 <td colspan="7" class="text-center">Aucun utilisateur trouvé.</td>
             </tr>
         <?php endif; ?>
-        </tbody>
-    </table>
+    </tbody>
+</table>
 </div>
 
 <!-- Bootstrap JS -->
