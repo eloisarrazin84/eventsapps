@@ -16,7 +16,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirm_password'];
     $address = isset($_POST['address']) ? htmlspecialchars($_POST['address']) : '';
-    $phone = isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : '';
 
     if ($password !== $confirmPassword) {
         $error = "Les mots de passe ne correspondent pas.";
@@ -58,8 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, profile_picture, address, phone, is_approved) 
-                                        VALUES (:username, :password, :email, :first_name, :last_name, :profile_picture, :address, :phone, FALSE)");
+                $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, profile_picture, address, is_approved) 
+                                        VALUES (:username, :password, :email, :first_name, :last_name, :profile_picture, :address, FALSE)");
                 $stmt->bindParam(':username', $username);
                 $stmt->bindParam(':password', $hashedPassword);
                 $stmt->bindParam(':email', $email);
@@ -67,7 +66,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->bindParam(':last_name', $lastName);
                 $stmt->bindParam(':profile_picture', $profilePicturePath);
                 $stmt->bindParam(':address', $address);
-                $stmt->bindParam(':phone', $phone);
                 $stmt->execute();
 
                 // Charger et personnaliser le template de l'email
