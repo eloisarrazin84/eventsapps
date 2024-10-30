@@ -8,8 +8,12 @@ $totalMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments")->fetchColum
 $expiredMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration < CURDATE()")->fetchColumn();
 $categories = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments GROUP BY type_produit")->fetchAll(PDO::FETCH_ASSOC);
 
-// Récupérer les médicaments expirant dans moins de 30 jours
-$expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)")->fetchAll(PDO::FETCH_ASSOC);
+// Appliquer les filtres si une recherche est soumise
+$search = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '%';
+$expiringSoon = $conn->prepare("SELECT * FROM medicaments WHERE nom LIKE :search AND date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)");
+$expiringSoon->bindParam(':search', $search);
+$expiringSoon->execute();
+$expiringSoon = $expiringSoon->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -21,29 +25,12 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <title>Dashboard Médicaments</title>
     <style>
-        .card-stats {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .card-stats:hover {
-            transform: scale(1.05);
-            box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
-        }
-        .card-body ul {
-            padding-left: 0;
-            list-style: none;
-        }
-        .card-body ul li {
-            font-size: 0.9rem;
-        }
-        .search-form {
-            max-width: 600px;
-            margin: auto;
-        }
-        .highlight-warning {
-            background-color: #fff3cd;
-        }
+        .card-stats { transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); }
+        .card-stats:hover { transform: scale(1.05); box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2); }
+        .card-body ul { padding-left: 0; list-style: none; }
+        .card-body ul li { font-size: 0.9rem; }
+        .search-form { max-width: 600px; margin: auto; }
+        .highlight-warning { background-color: #fff3cd; }
     </style>
 </head>
 <body>
@@ -51,9 +38,7 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
 <div class="container mt-5">
     <h1 class="text-center mb-4">Dashboard des Médicaments</h1>
     <div class="text-center mt-3 mb-4">
-        <a href="ajouter_medicament.php" class="btn btn-primary">
-            <i class="fas fa-plus-circle"></i> Ajouter un médicament
-        </a>
+        <a href="ajouter_medicament.php" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Ajouter un médicament</a>
     </div>
     
     <!-- Widgets de Statistiques -->
@@ -88,11 +73,11 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
         </div>
     </div>
 
-    <!-- Widget de Recherche -->
+    <!-- Barre de recherche intégrée -->
     <div class="row mb-4">
         <div class="col-md-12">
-            <form method="GET" action="recherche_medicament.php" class="form-inline justify-content-center search-form">
-                <input type="text" class="form-control mr-2" name="search" placeholder="Rechercher un médicament..." style="width:70%;">
+            <form method="GET" class="form-inline justify-content-center search-form">
+                <input type="text" class="form-control mr-2" name="search" placeholder="Rechercher un médicament..." style="width:70%;" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
                 <button type="submit" class="btn btn-outline-primary"><i class="fas fa-search"></i> Rechercher</button>
             </form>
         </div>
