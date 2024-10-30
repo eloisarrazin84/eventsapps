@@ -25,7 +25,6 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                     </a>
                     <div class="dropdown-menu" aria-labelledby="adminDropdown">
                         <a class="dropdown-item" href="manage_events.php"><i class="fas fa-calendar-alt"></i> Gestion des événements</a>
-                        <a class="dropdown-item" href="manage_users.php"><i class="fas fa-users"></i> Gestion des utilisateurs</a>
                     </div>
                 </li>
             <?php endif; ?>
