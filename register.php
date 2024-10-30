@@ -125,47 +125,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php endif; ?>
 
     <form method="POST" action="" enctype="multipart/form-data">
+        <!-- Section Photo de Profil -->
         <div class="form-group">
-            <label for="profile_picture">Photo de profil</label>
+            <label for="profile_picture">Photo de profil <span class="text-danger">*</span></label>
             <input type="file" class="form-control-file" id="profile_picture" name="profile_picture" required>
         </div>
-        <div class="form-group">
-            <label for="username">Nom d'utilisateur</label>
-            <input type="text" class="form-control" id="username" name="username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" readonly>
-        </div>
-        <div class="form-group">
-            <label for="password">Mot de passe</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <div class="form-group">
-            <label for="confirm_password">Confirmer le mot de passe</label>
-            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-            <div class="password-feedback" id="passwordFeedback"></div>
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="first_name">Prénom</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" oninput="updateUsername()" required>
-        </div>
-        <div class="form-group">
-            <label for="last_name">Nom</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" oninput="updateUsername()" required>
-        </div>
-        <div class="form-group">
-            <label for="address">Adresse</label>
-            <input type="text" class="form-control" id="address" name="address" required>
-        </div>
-        <div class="form-group">
-            <label for="phone">Numéro de téléphone</label>
-            <input type="tel" class="form-control" id="phone" name="phone" required>
-        </div>
+
+        <!-- Section Identifiants -->
+        <fieldset class="border p-3 mb-3">
+            <legend class="w-auto">Identifiants</legend>
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="username" name="username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" readonly>
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirmer le mot de passe <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                <div class="password-feedback" id="passwordFeedback"></div>
+            </div>
+        </fieldset>
+
+        <!-- Section Informations Personnelles -->
+        <fieldset class="border p-3 mb-3">
+            <legend class="w-auto">Informations Personnelles</legend>
+            <div class="form-group">
+                <label for="email">Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="first_name">Prénom <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="first_name" name="first_name" oninput="updateUsername()" required>
+            </div>
+            <div class="form-group">
+                <label for="last_name">Nom <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="last_name" name="last_name" oninput="updateUsername()" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Adresse <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="address" name="address" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Numéro de téléphone <span class="text-danger">*</span></label>
+                <input type="tel" class="form-control" id="phone" name="phone" required>
+            </div>
+        </fieldset>
+
+        <!-- Section Documents -->
         <div class="form-group">
             <label for="documents">Joindre des documents (diplômes, cartes professionnelles, etc.)</label>
             <input type="file" class="form-control-file" id="documents" name="documents[]" multiple>
         </div>
+
         <button type="submit" class="btn btn-primary btn-block">S'inscrire</button>
     </form>
 </div>
@@ -179,17 +193,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     function updateUsername() {
         const firstName = document.getElementById('first_name').value;
         const lastName = document.getElementById('last_name').value;
-        const username = (firstName.charAt(0).toLowerCase() + lastName.toLowerCase()).replace(/\s+/g, ''); // 1ère lettre du prénom + nom en minuscules
-        document.getElementById('username').value = username; // Mettre à jour le champ du nom d'utilisateur
+        const username = (firstName.charAt(0).toLowerCase() + lastName.toLowerCase());
+        document.getElementById('username').value = username;
     }
 
     // Vérification des mots de passe
-    document.getElementById('confirm_password').addEventListener('input', function() {
-        const password = document.getElementById('password').value;
-        const confirmPassword = this.value;
-        const feedback = document.getElementById('passwordFeedback');
+    const passwordField = document.getElementById('password');
+    const confirmPasswordField = document.getElementById('confirm_password');
+    const feedback = document.getElementById('passwordFeedback');
 
-        if (password !== confirmPassword) {
+    confirmPasswordField.addEventListener('input', function () {
+        if (confirmPasswordField.value !== passwordField.value) {
             feedback.textContent = "Les mots de passe ne correspondent pas.";
         } else {
             feedback.textContent = ""; // Clear feedback if passwords match
