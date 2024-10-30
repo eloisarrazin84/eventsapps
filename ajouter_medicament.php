@@ -57,6 +57,10 @@
                 <input type="text" class="form-control" id="medicament_nom" name="medicament_nom" required>
             </div>
             <div class="form-group">
+    <label class="icon-label" for="numero_lot"><i class="fas fa-barcode"></i> Numéro de lot</label>
+    <input type="text" class="form-control" id="numero_lot" name="numero_lot" required>
+</div>
+            <div class="form-group">
                 <label class="icon-label" for="description"><i class="fas fa-align-left"></i> Description</label>
                 <textarea class="form-control" id="description" name="description"></textarea>
             </div>
