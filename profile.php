@@ -79,7 +79,7 @@ try {
     $stmt->bindParam(':user_id', $user_id);
     $stmt->execute();
     $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    
 } catch (PDOException $e) {
     echo "Erreur : " . $e->getMessage();
 }
@@ -118,18 +118,6 @@ try {
         }
         .btn-primary:hover {
             background-color: #0056b3;
-        }
-        .card {
-            margin-top: 20px;
-            padding: 20px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        .document-upload {
-            padding: 20px;
-            background-color: #e9f1ff;
-            border-radius: 10px;
-            margin-bottom: 20px;
         }
         .btn-danger {
             background-color: #dc3545;
@@ -190,7 +178,7 @@ try {
     </div>
 
     <!-- Section Documents -->
-    <div class="card">
+    <div class="card mt-4">
         <h3 class="text-center">Vos Documents</h3>
         <div class="document-upload">
             <form method="POST" enctype="multipart/form-data" action="upload_document.php">
@@ -215,7 +203,7 @@ try {
             <tbody>
                 <?php foreach ($documents as $doc): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($doc['file_name']); ?></td>
+                        <td><?php echo htmlspecialchars($doc['document_name']); ?></td>
                         <td>
                             <a href="view_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-info btn-sm">Voir</a>
                             <a href="delete_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?');">Supprimer</a>
