@@ -20,41 +20,58 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <title>Dashboard Médicaments</title>
+    <style>
+        .card-stats {
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .card-stats:hover {
+            transform: scale(1.05);
+        }
+        .card-body ul {
+            padding-left: 0;
+            list-style: none;
+        }
+        .card-body ul li {
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
 <?php include 'menu_medicaments.php'; ?>
 <div class="container mt-5">
-    <h1 class="text-center">Dashboard des Médicaments</h1>
- <div class="text-center mt-3">
+    <h1 class="text-center mb-4">Dashboard des Médicaments</h1>
+    <div class="text-center mt-3 mb-4">
         <a href="ajouter_medicament.php" class="btn btn-primary">
             <i class="fas fa-plus-circle"></i> Ajouter un médicament
         </a>
     </div>
+    
     <!-- Widgets de Statistiques -->
     <div class="row mt-4">
         <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3">
+            <div class="card card-stats text-white bg-primary mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Total des Médicaments</h5>
-                    <p class="card-text"><?php echo $totalMedicaments; ?></p>
+                    <p class="card-text display-4"><?php echo $totalMedicaments; ?></p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-danger mb-3">
+            <div class="card card-stats text-white bg-danger mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Médicaments Expirés</h5>
-                    <p class="card-text"><?php echo $expiredMedicaments; ?></p>
+                    <p class="card-text display-4"><?php echo $expiredMedicaments; ?></p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
+            <div class="card card-stats text-white bg-success mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Types de Médicaments</h5>
                     <ul>
                         <?php foreach ($categories as $categorie): ?>
-                            <li><?php echo $categorie['type_produit']; ?>: <?php echo $categorie['count']; ?></li>
+                            <li><strong><?php echo $categorie['type_produit']; ?>:</strong> <?php echo $categorie['count']; ?></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
@@ -65,9 +82,9 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
     <!-- Widget de Recherche -->
     <div class="row mb-4">
         <div class="col-md-12">
-            <form method="GET" action="recherche_medicament.php" class="form-inline">
+            <form method="GET" action="recherche_medicament.php" class="form-inline justify-content-center">
                 <input type="text" class="form-control mr-2" name="search" placeholder="Rechercher un médicament...">
-                <button type="submit" class="btn btn-outline-primary">Rechercher</button>
+                <button type="submit" class="btn btn-outline-primary"><i class="fas fa-search"></i> Rechercher</button>
             </form>
         </div>
     </div>
@@ -100,7 +117,7 @@ $expiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BE
                     </tbody>
                 </table>
             <?php else: ?>
-                <p>Aucun médicament n'expire dans les 30 prochains jours.</p>
+                <p class="text-muted">Aucun médicament n'expire dans les 30 prochains jours.</p>
             <?php endif; ?>
         </div>
     </div>
