@@ -62,23 +62,66 @@ $types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments G
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Types de Médicaments</h5>
-                    <ul class="stats-list">
-                        <?php foreach ($types as $type): ?>
-                            <li><?php echo $type['type_produit']; ?>: <?php echo $type['count']; ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
+         <div class="col-md-4">
+       <div class="container mt-5">
+    <h2 class="text-center">Répartition des Médicaments par Type</h2>
+    <canvas id="typeChart"></canvas>
+</div>
+        </div>     
     </div>
 </div>
 
 <!-- Scripts Bootstrap et jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('typeChart').getContext('2d');
+        const typeChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [
+                    <?php foreach ($categories as $categorie): ?>
+                        "<?php echo $categorie['categorie']; ?>",
+                    <?php endforeach; ?>
+                ],
+                datasets: [{
+                    label: 'Médicaments par Catégorie',
+                    data: [
+                        <?php foreach ($categories as $categorie): ?>
+                            <?php echo $categorie['count']; ?>,
+                        <?php endforeach; ?>
+                    ],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 206, 86, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+            },
+        });
+    });
+</script>    
 </body>
 </html>
