@@ -104,10 +104,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-
-<!-- Inclusion du menu -->
-<?php include 'menu.php'; ?>
-
 <div class="container">
     <h1>Ajouter un utilisateur</h1>
 
