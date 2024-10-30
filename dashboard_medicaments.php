@@ -6,8 +6,11 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 // Récupérer les statistiques
 $totalMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments")->fetchColumn();
 $expiredMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration < CURDATE()")->fetchColumn();
-$soonExpiringMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH)")->fetchColumn();
-$types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments GROUP BY type_produit")->fetchAll(PDO::FETCH_ASSOC);
+$expiringMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH)")->fetchColumn();
+$typesProduits = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments GROUP BY type_produit")->fetchAll(PDO::FETCH_ASSOC);
+
+// Récupérer les médicaments expirant bientôt
+$medicamentsExpiringSoon = $conn->query("SELECT * FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH)")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -17,15 +20,10 @@ $types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments G
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Dashboard Médicaments</title>
-    <style>
-        .bg-soon-expiring { background-color: orange; color: white; }
-    </style>
 </head>
 <body>
-<?php include 'menu_medicaments.php'; ?>
 <div class="container mt-5">
     <h1 class="text-center">Dashboard des Médicaments</h1>
-
     <div class="row mt-4">
         <div class="col-md-3">
             <div class="card text-white bg-primary mb-3">
@@ -44,10 +42,10 @@ $types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments G
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-white bg-soon-expiring mb-3">
+            <div class="card text-white bg-warning mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Expirant Bientôt</h5>
-                    <p class="card-text"><?php echo $soonExpiringMedicaments; ?></p>
+                    <p class="card-text"><?php echo $expiringMedicaments; ?></p>
                 </div>
             </div>
         </div>
@@ -56,8 +54,8 @@ $types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments G
                 <div class="card-body">
                     <h5 class="card-title">Types de Produits</h5>
                     <ul>
-                        <?php foreach ($types as $type): ?>
-                            <li><?php echo $type['type_produit']; ?>: <?php echo $type['count']; ?></li>
+                        <?php foreach ($typesProduits as $type): ?>
+                            <li><?php echo htmlspecialchars($type['type_produit']); ?>: <?php echo $type['count']; ?></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
@@ -65,28 +63,33 @@ $types = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments G
         </div>
     </div>
 
-    <!-- Section de tri et filtrage -->
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <form method="GET" action="dashboard_medicaments.php" class="form-inline">
-                <label for="filter_date" class="mr-2">Voir les médicaments expirant dans :</label>
-                <select name="filter_date" class="form-control mr-2">
-                    <option value="1">1 mois</option>
-                    <option value="3">3 mois</option>
-                    <option value="6">6 mois</option>
-                    <option value="12">1 an</option>
-                </select>
-                <button type="submit" class="btn btn-info">Filtrer</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Bouton d'exportation du rapport -->
-    <div class="mt-4 text-center">
-        <a href="export_report.php" class="btn btn-outline-primary">Exporter le Rapport de Péremption</a>
-    </div>
+    <!-- Liste des médicaments expirant bientôt -->
+    <h3 class="mt-5">Liste des Médicaments Expirant Bientôt</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Quantité</th>
+                <th>Date d'expiration</th>
+                <th>Type de Produit</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($medicamentsExpiringSoon as $medicament): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($medicament['nom']); ?></td>
+                    <td><?php echo htmlspecialchars($medicament['description']); ?></td>
+                    <td><?php echo htmlspecialchars($medicament['quantite']); ?></td>
+                    <td><?php echo htmlspecialchars($medicament['date_expiration']); ?></td>
+                    <td><?php echo htmlspecialchars($medicament['type_produit']); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 </div>
 
+<!-- Scripts Bootstrap -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
