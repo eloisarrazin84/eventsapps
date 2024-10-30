@@ -121,11 +121,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <div class="form-group">
             <label for="first_name">Prénom</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" required>
+            <input type="text" class="form-control" id="first_name" name="first_name" oninput="updateUsername()" required>
         </div>
         <div class="form-group">
             <label for="last_name">Nom</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" required>
+            <input type="text" class="form-control" id="last_name" name="last_name" oninput="updateUsername()" required>
         </div>
         <div class="form-group">
             <label for="address">Adresse</label>
@@ -147,5 +147,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Fonction pour mettre à jour le nom d'utilisateur
+    function updateUsername() {
+        const firstName = document.getElementById('first_name').value;
+        const lastName = document.getElementById('last_name').value;
+        const username = (firstName.charAt(0).toLowerCase() + lastName.toLowerCase()).replace(/\s+/g, ''); // 1ère lettre du prénom + nom en minuscules
+        document.getElementById('username').value = username; // Mettre à jour le champ du nom d'utilisateur
+    }
+</script>
 </body>
 </html>
