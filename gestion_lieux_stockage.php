@@ -36,18 +36,72 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <title>Gestion des lieux de stockage</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-weight: bold;
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-inline .form-control {
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-right: 10px;
+        }
+        .btn-primary, .btn-danger, .btn-secondary {
+            border-radius: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-back {
+            margin-bottom: 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5">
+
+<div class="container">
+    <!-- Bouton de retour au tableau de bord -->
+    <a href="dashboard_medicaments.php" class="btn btn-back mb-4"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
+
     <h2>Gestion des lieux de stockage</h2>
-    <form method="POST" class="form-inline mb-3">
+
+    <!-- Formulaire pour ajouter un lieu de stockage -->
+    <form method="POST" class="form-inline justify-content-center mb-4">
         <input type="text" name="location_name" class="form-control mr-2" placeholder="Nom du lieu de stockage" required>
         <input type="text" name="bag_name" class="form-control mr-2" placeholder="Nom du sac (facultatif)">
-        <button type="submit" name="add_location" class="btn btn-primary">Ajouter</button>
+        <button type="submit" name="add_location" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Ajouter</button>
     </form>
 
-    <table class="table table-bordered">
-        <thead>
+    <!-- Tableau des lieux de stockage -->
+    <table class="table table-hover table-bordered">
+        <thead class="thead-light">
             <tr>
                 <th>Lieu de stockage</th>
                 <th>Sac</th>
@@ -62,7 +116,9 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td>
                         <form method="POST" style="display:inline;">
                             <input type="hidden" name="location_id" value="<?php echo $location['id']; ?>">
-                            <button type="submit" name="delete_location" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce lieu de stockage ?');">Supprimer</button>
+                            <button type="submit" name="delete_location" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce lieu de stockage ?');">
+                                <i class="fas fa-trash-alt"></i> Supprimer
+                            </button>
                         </form>
                     </td>
                 </tr>
@@ -70,5 +126,9 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </tbody>
     </table>
 </div>
+
+<!-- Bootstrap et Font Awesome -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
