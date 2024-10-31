@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/mail/sendEmail.php'; // Utilisation du chemin correct pour inclure la fonction d'envoi d'email
 
-// Afficher les erreurs PHP pour déboguer
+// Afficher les erreurs PHP pour le débogage
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -64,11 +64,10 @@ if (isset($_GET['id'])) {
             $templateContent = loadTemplate("user_approved", $variables);
             try {
                 if (!sendEmail($email, $subject, $templateContent)) {
-                    echo "Erreur d'envoi d'email.";
+                    error_log("Erreur d'envoi d'email.");
                 }
             } catch (Exception $e) {
-                // Capture et affiche les erreurs d'envoi d'email
-                echo "Erreur lors de l'envoi de l'email : " . $e->getMessage();
+                error_log("Erreur lors de l'envoi de l'email : " . $e->getMessage());
             }
         }
 
@@ -76,6 +75,6 @@ if (isset($_GET['id'])) {
         header("Location: manage_users.php");
         exit();
     } catch (PDOException $e) {
-        echo "Erreur de base de données : " . $e->getMessage();
+        error_log("Erreur de base de données : " . $e->getMessage());
     }
 }
