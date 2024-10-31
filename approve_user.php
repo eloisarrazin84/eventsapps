@@ -81,7 +81,7 @@ if (isset($_GET['id'])) {
             // Charger le template et envoyer l'email
             $templateContent = loadTemplate($variables);
             try {
-                if (!sendEmail($email, $subject, $templateContent, 'notification@outdoorsecours.fr', 'Outdoor Secours', 'UTF-8')) {
+                if (!sendEmail($email, $subject, $templateContent, 'notification@outdoorsecours.fr', 'Outdoor Secours')) {
                     error_log("Erreur d'envoi d'email : envoi échoué pour $email");
                     echo "Erreur : envoi de l'email de confirmation échoué.";
                 } else {
@@ -95,7 +95,7 @@ if (isset($_GET['id'])) {
             echo "Erreur : Utilisateur introuvable.";
         }
 
-        // Redirection avec message de succès
+        // Journalisation avant la redirection
         echo "<script>
                 alert('Approbation réussie pour l\\'utilisateur ID $userId.');
                 window.location.href = 'manage_users.php';
