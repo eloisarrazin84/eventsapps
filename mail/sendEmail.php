@@ -8,7 +8,6 @@ function sendEmail($to, $subject, $template, $variables = [], $from = 'notificat
     $mail = new PHPMailer(true);
     $mail->SMTPDebug = 2; // Ajoutez cette ligne après `$mail = new PHPMailer(true);`
 
-    
     try {
         // Configuration SMTP
         $mail->isSMTP();
@@ -30,7 +29,13 @@ function sendEmail($to, $subject, $template, $variables = [], $from = 'notificat
         // Préparation du corps de l'email avec template
         $mail->isHTML(true);
         $mail->Subject = $subject;
-        $mail->Body = loadTemplate($template, $variables);
+
+        // Charger le contenu du template via une fonction séparée
+        if (function_exists('loadTemplate')) {
+            $mail->Body = loadTemplate($template, $variables);
+        } else {
+            throw new Exception("La fonction loadTemplate n'est pas définie.");
+        }
 
         // Envoi de l'email
         $mail->send();
@@ -39,19 +44,4 @@ function sendEmail($to, $subject, $template, $variables = [], $from = 'notificat
         error_log("Erreur d'envoi d'email : {$mail->ErrorInfo}");
         return false;
     }
-}
-
-// Fonction pour charger et personnaliser le template d'email
-function loadTemplate($templateName, $variables = []) {
-    $templatePath = "/var/www/html/outdoorsecevent/email_templates/$templateName.html";
-    if (file_exists($templatePath)) {
-        $content = file_get_contents($templatePath);
-        
-        // Remplacement des variables du template
-        foreach ($variables as $key => $value) {
-            $content = str_replace("{{ $key }}", $value, $content);
-        }
-        return $content;
-    }
-    return '';
 }
