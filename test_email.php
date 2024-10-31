@@ -8,14 +8,14 @@ $mail = new PHPMailer(true);
 try {
     $mail->SMTPDebug = 3; // Niveau de debug détaillé
     $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
+    $mail->Host = 'smtp.office365.com';
     $mail->SMTPAuth = true;
-    $mail->Username = 'eloi@bewitness.fr'; // Nom d'utilisateur entre guillemets
-    $mail->Password = 'kliy flmk mbff laob'; // Mot de passe entre guillemets
+    $mail->Username = 'notification@outdoorsecours.fr'; // Nom d'utilisateur entre guillemets
+    $mail->Password = 'Lipton2019!'; // Mot de passe entre guillemets
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = 587;
 
-    $mail->setFrom('eloi@bewitness.fr', 'Outdoor Secours');
+    $mail->setFrom('notification@outdoorsecours.fr', 'Outdoor Secours');
     $mail->addAddress('eloi@famillesarrazin.com'); // Adresse email corrigée
 
     $mail->isHTML(true);
