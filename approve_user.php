@@ -15,6 +15,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 function loadTemplate($templateName, $variables) {
     $templatePath = __DIR__ . "/email_templates/$templateName.html";
+    
+    // Debug temporaire pour afficher le chemin exact
+    error_log("Chemin du template : " . $templatePath);
+
     if (file_exists($templatePath)) {
         $templateContent = file_get_contents($templatePath);
         foreach ($variables as $key => $value) {
@@ -23,8 +27,7 @@ function loadTemplate($templateName, $variables) {
         return $templateContent;
     } else {
         error_log("Template non trouvé: $templatePath");
-        echo "Erreur : Template non trouvé: $templatePath";
-        return false;
+        throw new Exception("Template non trouvé: $templatePath");
     }
 }
 
