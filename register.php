@@ -1,14 +1,16 @@
 <?php
+session_start();
+require_once 'mail/EmailService.php'; // Assurez-vous que le chemin est correct
+
+// Affichage des erreurs pour le débogage
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
-require_once 'mail/sendEmail.php';
-
 $error = "";
 $success = "";
 
+// Traitement du formulaire d'inscription
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $firstName = htmlspecialchars($_POST['first_name']);
     $lastName = htmlspecialchars($_POST['last_name']);
@@ -17,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirmPassword = $_POST['confirm_password'];
     $address = isset($_POST['address']) ? htmlspecialchars($_POST['address']) : '';
 
+    // Vérification des mots de passe
     if ($password !== $confirmPassword) {
         $error = "Les mots de passe ne correspondent pas.";
     } elseif (!isStrongPassword($password)) {
@@ -25,6 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $username = strtolower(substr($firstName, 0, 1) . $lastName);
 
+        // Gestion de la photo de profil
         $profilePicturePath = '';
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
             $target_dir = "uploads/profile_pictures/";
@@ -45,9 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        if (!$email) {
+        if (!$error && !$email) {
             $error = "Adresse email invalide.";
         } else {
+            // Connexion à la base de données
             $servername = "localhost";
             $username_db = "root";
             $password_db = "Lipton2019!";
@@ -57,6 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+                // Insérer les informations de l'utilisateur
                 $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, profile_picture, address, is_approved) 
                                         VALUES (:username, :password, :email, :first_name, :last_name, :profile_picture, :address, FALSE)");
                 $stmt->bindParam(':username', $username);
@@ -68,12 +74,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->bindParam(':address', $address);
                 $stmt->execute();
 
-                // Charger et personnaliser le template de l'email
-                $templatePath = 'email_templates/confirmation_registration.html';
-                $emailBody = file_get_contents($templatePath);
-                $emailBody = str_replace('{{first_name}}', $firstName, $emailBody);
-
-                if (sendEmail($email, "Confirmation d'inscription", $emailBody)) {
+                // Envoi de l'email de confirmation d'inscription
+                $emailService = new EmailService();
+                $variables = [
+                    'first_name' => $firstName,
+                    'last_name' => $lastName
+                ];
+                if ($emailService->sendEmail($email, "Confirmation d'inscription", 'confirmation_registration', $variables)) {
                     $success = "Votre compte a été créé. Un email de confirmation vous a été envoyé.";
                 } else {
                     $success = "Votre compte a été créé, mais l'email de confirmation n'a pas pu être envoyé.";
@@ -86,13 +93,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Fonction pour vérifier la force du mot de passe
+// Fonction de vérification de la force du mot de passe
 function isStrongPassword($password) {
     return preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password);
 }
-
-$mail->SMTPDebug = 2; // Affichera les détails du processus SMTP
-
 ?>
 
 
@@ -101,7 +105,7 @@ $mail->SMTPDebug = 2; // Affichera les détails du processus SMTP
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription Moderne</title>
+    <title>Inscription</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
