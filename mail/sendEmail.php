@@ -10,6 +10,8 @@ $dotenv->load();
 
 function sendEmail($to, $subject, $template, $variables = [], $from = 'notification@outdoorsecours.fr', $fromName = 'Outdoor Secours') {
     $mail = new PHPMailer(true);
+    $mail->SMTPDebug = 2; // Ajoutez cette ligne après `$mail = new PHPMailer(true);`
+
     
     try {
         // Configuration SMTP
