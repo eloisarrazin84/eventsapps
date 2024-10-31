@@ -1,8 +1,9 @@
 <?php
 session_start();
-require_once 'mail/EmailService.php'; // Assurez-vous que le chemin est correct
+require_once __DIR__ . '/mail/EmailService.php'; // Classe pour envoyer les e-mails
+require_once __DIR__ . '/mail/EmailTemplate.php'; // Classe pour charger les templates
 
-// Affichage des erreurs pour le débogage
+// Activer les erreurs pour le débogage
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -10,7 +11,6 @@ error_reporting(E_ALL);
 $error = "";
 $success = "";
 
-// Traitement du formulaire d'inscription
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $firstName = htmlspecialchars($_POST['first_name']);
     $lastName = htmlspecialchars($_POST['last_name']);
@@ -19,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirmPassword = $_POST['confirm_password'];
     $address = isset($_POST['address']) ? htmlspecialchars($_POST['address']) : '';
 
-    // Vérification des mots de passe
     if ($password !== $confirmPassword) {
         $error = "Les mots de passe ne correspondent pas.";
     } elseif (!isStrongPassword($password)) {
@@ -28,7 +27,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $username = strtolower(substr($firstName, 0, 1) . $lastName);
 
-        // Gestion de la photo de profil
         $profilePicturePath = '';
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
             $target_dir = "uploads/profile_pictures/";
@@ -49,10 +47,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        if (!$error && !$email) {
+        if (!$email) {
             $error = "Adresse email invalide.";
         } else {
-            // Connexion à la base de données
             $servername = "localhost";
             $username_db = "root";
             $password_db = "Lipton2019!";
@@ -62,7 +59,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                // Insérer les informations de l'utilisateur
                 $stmt = $conn->prepare("INSERT INTO users (username, password, email, first_name, last_name, profile_picture, address, is_approved) 
                                         VALUES (:username, :password, :email, :first_name, :last_name, :profile_picture, :address, FALSE)");
                 $stmt->bindParam(':username', $username);
@@ -74,16 +70,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->bindParam(':address', $address);
                 $stmt->execute();
 
-                // Envoi de l'email de confirmation d'inscription
-                $emailService = new EmailService();
+                // Préparer les variables pour le template d'email
                 $variables = [
                     'first_name' => $firstName,
                     'last_name' => $lastName
                 ];
-                if ($emailService->sendEmail($email, "Confirmation d'inscription", 'confirmation_registration', $variables)) {
+                $subject = "Confirmation d'inscription";
+
+                // Envoyer l'email de confirmation avec le service d'email
+                $emailService = new EmailService();
+                if ($emailService->sendEmail($email, $subject, 'confirmation_registration', $variables)) {
                     $success = "Votre compte a été créé. Un email de confirmation vous a été envoyé.";
                 } else {
-                    $success = "Votre compte a été créé, mais l'email de confirmation n'a pas pu être envoyé.";
+                    $error = "Votre compte a été créé, mais l'email de confirmation n'a pas pu être envoyé.";
                 }
 
             } catch (PDOException $e) {
@@ -93,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Fonction de vérification de la force du mot de passe
+// Fonction pour vérifier la force du mot de passe
 function isStrongPassword($password) {
     return preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password);
 }
