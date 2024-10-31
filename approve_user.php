@@ -1,8 +1,9 @@
 <?php
 session_start();
-require_once __DIR__ . '/mail/sendEmail.php';
+require_once __DIR__ . '/EmailService.php'; // Classe pour envoyer les e-mails
+require_once __DIR__ . '/EmailTemplate.php'; // Classe pour charger les templates
 
-// Affichage des erreurs PHP pour le débogage
+// Activer les erreurs pour le débogage
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -11,42 +12,6 @@ error_reporting(E_ALL);
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
-}
-
-// Fonction de chargement du template avec le contenu intégré
-function loadTemplate(array $variables) {
-    if (!is_array($variables)) {
-        throw new TypeError("Les variables doivent être un tableau associatif.");
-    }
-
-    $templateContent = <<<HTML
-    <!DOCTYPE html>
-    <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body { font-family: Arial, sans-serif; }
-            .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-            h1 { color: #007bff; }
-            .button { display: inline-block; padding: 10px 15px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px; }
-            .footer { font-size: 12px; color: #777; text-align: center; margin-top: 20px; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Compte approuvé</h1>
-            <p>Bonjour {$variables['first_name']} {$variables['last_name']},</p>
-            <p>Félicitations ! Votre compte a été approuvé. Vous pouvez désormais vous connecter à notre plateforme en utilisant votre identifiant et votre mot de passe.</p>
-            <a href="https://event.outdoorsecours.fr/login.php" class="button">Se connecter</a>
-            <div class="footer">
-                <p>Outdoor Secours - 2024</p>
-            </div>
-        </div>
-    </body>
-    </html>
-    HTML;
-
-    return $templateContent;
 }
 
 // Connexion à la base de données
@@ -74,26 +39,21 @@ if (isset($_GET['id'])) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-            // Préparer les variables du template
+            // Préparer les variables pour le template
             $email = $user['email'];
             $subject = "Votre compte a été approuvé !";
             $variables = [
-                'first_name' => htmlspecialchars($user['first_name'], ENT_QUOTES, 'UTF-8'),
-                'last_name' => htmlspecialchars($user['last_name'], ENT_QUOTES, 'UTF-8')
+                'first_name' => $user['first_name'],
+                'last_name' => $user['last_name']
             ];
 
-            // Charger le template et envoyer l'email
-            $templateContent = loadTemplate($variables);
-            try {
-                if (!sendEmail($email, $subject, $templateContent)) {
-                    error_log("Erreur d'envoi d'email : envoi échoué pour $email");
-                    echo "<script>alert('Erreur lors de l\'envoi de l\'email de confirmation.');</script>";
-                } else {
-                    echo "<script>alert('Email de confirmation envoyé avec succès.');</script>";
-                }
-            } catch (Exception $e) {
-                error_log("Erreur lors de l'envoi de l'email : " . $e->getMessage());
-                echo "<script>alert('Erreur : " . $e->getMessage() . "');</script>";
+            // Envoyer l'email avec le service d'email
+            $emailService = new EmailService();
+            if ($emailService->sendEmail($email, $subject, 'user_approved', $variables)) {
+                echo "<script>alert('Email de confirmation envoyé avec succès.');</script>";
+            } else {
+                error_log("Erreur d'envoi d'email : envoi échoué pour $email");
+                echo "<script>alert('Erreur lors de l\'envoi de l\'email de confirmation.');</script>";
             }
         } else {
             echo "<script>alert('Erreur : Utilisateur introuvable.');</script>";
@@ -113,4 +73,3 @@ if (isset($_GET['id'])) {
     error_log("ID utilisateur manquant dans la requête");
     echo "<script>alert('Erreur : ID utilisateur manquant.');</script>";
 }
-?>
