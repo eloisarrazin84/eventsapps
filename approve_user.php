@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Fonction de chargement du template avec le contenu en ligne
+// Fonction de chargement du template avec le contenu intégré
 function loadTemplate(array $variables) {
     if (!is_array($variables)) {
         throw new TypeError("Les variables doivent être un tableau associatif.");
