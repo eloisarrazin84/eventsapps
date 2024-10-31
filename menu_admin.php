@@ -14,6 +14,9 @@ $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Définir l'URL de la photo de profil ou utiliser une image par défaut si la photo n'est pas disponible
+$profilePictureUrl = !empty($user['profile_picture']) ? $user['profile_picture'] : 'images/default_profile.png';
+
 // Récupérer les notifications non lues
 $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = :user_id AND is_read = 0");
 $stmt->bindParam(':user_id', $user_id);
@@ -58,14 +61,12 @@ if ($user_role === 'admin') {
                         <?php if (empty($notifications) && empty($approvalNotifications)): ?>
                             <p class="dropdown-item">Aucune notification</p>
                         <?php else: ?>
-                            <!-- Notifications existantes -->
                             <?php foreach ($notifications as $notification): ?>
                                 <div class="dropdown-item notification-item" data-id="<?php echo $notification['id']; ?>">
                                     <p><?php echo htmlspecialchars($notification['message']); ?></p>
                                     <button class="btn btn-sm btn-secondary mark-as-read">Marquer comme lu</button>
                                 </div>
                             <?php endforeach; ?>
-                            <!-- Notifications d'approbation des utilisateurs -->
                             <?php if ($user_role === 'admin' && !empty($approvalNotifications)): ?>
                                 <hr>
                                 <h6 class="dropdown-header">Utilisateurs en attente d'approbation</h6>
@@ -83,7 +84,7 @@ if ($user_role === 'admin') {
                 <!-- Profil utilisateur -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px;">
+                        <img src="<?php echo $profilePictureUrl; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px;">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
                         <a class="dropdown-item" href="profile.php"><i class="fas fa-user"></i> Mon profil</a>
@@ -99,6 +100,7 @@ if ($user_role === 'admin') {
         </ul>
     </div>
 </nav>
+
 
 <!-- Script pour marquer les notifications comme lues -->
 <script>
