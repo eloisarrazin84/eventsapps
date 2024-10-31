@@ -42,17 +42,17 @@ if ($user_role === 'admin') {
         </ul>
         <ul class="navbar-nav ml-auto">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <!-- Icône de notifications -->
+                <!-- Icône de notifications avec cloche et badge -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-bell"></i>
+                    <a class="nav-link notification-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-bell notification-bell"></i>
                         <?php if ($unreadNotifications > 0): ?>
-                            <span class="badge badge-danger" id="notification-badge"><?php echo $unreadNotifications; ?></span>
+                            <span class="badge badge-danger notification-badge"><?php echo $unreadNotifications; ?></span>
                         <?php endif; ?>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
+                    <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
                         <?php if (empty($notifications) && empty($approvalNotifications)): ?>
-                            <p class="dropdown-item">Aucune notification</p>
+                            <p class="dropdown-item text-muted">Aucune notification</p>
                         <?php else: ?>
                             <?php foreach ($notifications as $notification): ?>
                                 <div class="dropdown-item notification-item" data-id="<?php echo $notification['id']; ?>">
@@ -94,7 +94,6 @@ if ($user_role === 'admin') {
     </div>
 </nav>
 
-
 <!-- Script pour marquer les notifications comme lues -->
 <script>
 document.querySelectorAll('.mark-as-read').forEach(button => {
@@ -114,7 +113,7 @@ document.querySelectorAll('.mark-as-read').forEach(button => {
                     notificationItem.remove();
                     
                     // Mettre à jour le badge de notifications
-                    let badge = document.getElementById('notification-badge');
+                    let badge = document.querySelector('.notification-badge');
                     let unreadCount = parseInt(badge.innerText);
                     badge.innerText = unreadCount - 1;
                     if (unreadCount - 1 <= 0) {
@@ -127,7 +126,7 @@ document.querySelectorAll('.mark-as-read').forEach(button => {
 });
 </script>
 
-<!-- CSS pour les notifications -->
+<!-- CSS pour un menu de notifications moderne -->
 <style>
 .navbar {
     background-color: #f8f9fa;
@@ -146,24 +145,74 @@ document.querySelectorAll('.mark-as-read').forEach(button => {
     border-radius: 5px;
 }
 
-.badge-danger {
+.notification-toggle {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-bell {
+    font-size: 1.5em;
+}
+
+.notification-badge {
     position: absolute;
-    top: -5px;
-    right: -10px;
-    font-size: 0.8em;
-    padding: 5px 8px;
-    border-radius: 50%;
+    top: 0;
+    right: 0;
+    transform: translate(25%, -25%);
     background-color: #dc3545;
     color: white;
+    border-radius: 50%;
+    font-size: 0.8em;
+    padding: 5px 7px;
 }
 
 .dropdown-menu {
     background-color: #ffffff;
-    border-radius: 5px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    max-width: 300px;
+    padding: 0;
 }
 
-.dropdown-item:hover {
-    background-color: #e9ecef;
+.notification-dropdown .notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.notification-dropdown .notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-dropdown .notification-item p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.notification-dropdown .mark-as-read {
+    margin-top: 5px;
+    font-size: 12px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.notification-dropdown .mark-as-read:hover {
+    background-color: #5a6268;
+}
+
+.notification-dropdown .approval-notification p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.notification-dropdown .btn-primary {
+    font-size: 12px;
+    padding: 3px 8px;
+    margin-top: 5px;
 }
 </style>
