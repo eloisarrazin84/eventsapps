@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Fonction de chargement du template avec le contenu intégré
+// Template d'email intégré directement dans le code avec le contenu en ligne
 function loadTemplate($variables) {
     $templateContent = <<<HTML
     <!DOCTYPE html>
@@ -42,11 +42,6 @@ function loadTemplate($variables) {
     </html>
     HTML;
 
-    // Remplacement des variables
-    foreach ($variables as $key => $value) {
-        $templateContent = str_replace("{{ $key }}", htmlspecialchars($value, ENT_QUOTES, 'UTF-8'), $templateContent);
-    }
-
     return $templateContent;
 }
 
@@ -65,12 +60,12 @@ if (isset($_GET['id'])) {
 
         // Mettre à jour l'approbation de l'utilisateur
         $stmt = $conn->prepare("UPDATE users SET is_approved = 1 WHERE id = :id");
-        $stmt->bindParam(':id', $userId);
+        $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
         // Récupérer les informations de l'utilisateur approuvé
         $stmt = $conn->prepare("SELECT email, first_name, last_name FROM users WHERE id = :id");
-        $stmt->bindParam(':id', $userId);
+        $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -79,8 +74,8 @@ if (isset($_GET['id'])) {
             $email = $user['email'];
             $subject = "Votre compte a été approuvé !";
             $variables = [
-                'first_name' => $user['first_name'],
-                'last_name' => $user['last_name']
+                'first_name' => htmlspecialchars($user['first_name'], ENT_QUOTES, 'UTF-8'),
+                'last_name' => htmlspecialchars($user['last_name'], ENT_QUOTES, 'UTF-8')
             ];
 
             // Charger le template et envoyer l'email
@@ -89,6 +84,8 @@ if (isset($_GET['id'])) {
                 if (!sendEmail($email, $subject, $templateContent)) {
                     error_log("Erreur d'envoi d'email : envoi échoué pour $email");
                     echo "<script>alert('Erreur lors de l\'envoi de l\'email de confirmation.');</script>";
+                } else {
+                    echo "<script>alert('Email de confirmation envoyé avec succès.');</script>";
                 }
             } catch (Exception $e) {
                 error_log("Erreur lors de l'envoi de l'email : " . $e->getMessage());
