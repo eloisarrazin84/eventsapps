@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/mail/sendEmail.php'; // Inclusion de la fonction d'envoi d'email
+require_once __DIR__ . '/mail/sendEmail.php'; // Utilisation du chemin correct pour inclure la fonction d'envoi d'email
 
 // Afficher les erreurs PHP pour déboguer
 ini_set('display_errors', 1);
@@ -11,6 +11,20 @@ error_reporting(E_ALL);
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
+}
+
+// Fonction pour charger le contenu du template d'email
+function loadTemplate($templateName, $variables) {
+    $templatePath = __DIR__ . "/email_templates/$templateName.html";
+    if (file_exists($templatePath)) {
+        $templateContent = file_get_contents($templatePath);
+        foreach ($variables as $key => $value) {
+            $templateContent = str_replace("{{ $key }}", $value, $templateContent);
+        }
+        return $templateContent;
+    } else {
+        throw new Exception("Template not found: $templateName");
+    }
 }
 
 // Connexion à la base de données
