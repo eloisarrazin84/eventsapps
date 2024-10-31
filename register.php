@@ -1,9 +1,8 @@
 <?php
 session_start();
-require_once __DIR__ . '/mail/EmailService.php'; // Classe pour envoyer les e-mails
-require_once __DIR__ . '/mail/EmailTemplate.php'; // Classe pour charger les templates
+require_once __DIR__ . '/mail/EmailService.php';
+require_once __DIR__ . '/mail/EmailTemplate.php';
 
-// Activer les erreurs pour le débogage
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -70,20 +69,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->bindParam(':address', $address);
                 $stmt->execute();
 
-                // Préparer les variables pour le template d'email
-                $variables = [
-                    'first_name' => $firstName,
-                    'last_name' => $lastName
-                ];
+                // Email de confirmation pour l'utilisateur
+                $userVariables = ['first_name' => $firstName];
                 $subject = "Confirmation d'inscription";
-
-                // Envoyer l'email de confirmation avec le service d'email
                 $emailService = new EmailService();
-                if ($emailService->sendEmail($email, $subject, 'confirmation_registration', $variables)) {
-                    $success = "Votre compte a été créé. Un email de confirmation vous a été envoyé.";
-                } else {
-                    $error = "Votre compte a été créé, mais l'email de confirmation n'a pas pu être envoyé.";
+                $emailService->sendEmail($email, $subject, 'confirmation_registration', $userVariables);
+
+                // Récupérer les administrateurs pour les notifier
+                $stmt = $conn->prepare("SELECT email FROM users WHERE role = 'admin'");
+                $stmt->execute();
+                $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $adminVariables = [
+                    'user_name' => "$firstName $lastName",
+                    'user_email' => $email
+                ];
+
+                foreach ($admins as $admin) {
+                    $emailService->sendEmail(
+                        $admin['email'],
+                        "Nouvelle inscription en attente d'approbation",
+                        'new_registration_notification',
+                        $adminVariables
+                    );
                 }
+
+                // Redirection vers la page de connexion après inscription réussie
+                header("Location: login.php");
+                exit();
 
             } catch (PDOException $e) {
                 $error = "Erreur : " . $e->getMessage();
@@ -97,6 +110,8 @@ function isStrongPassword($password) {
     return preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password);
 }
 ?>
+
+
 
 
 <!DOCTYPE html>
