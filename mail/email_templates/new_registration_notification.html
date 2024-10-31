@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle inscription</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; color: #333; }
+        .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        h1 { color: #007bff; }
+        p { font-size: 16px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nouvelle inscription en attente d'approbation</h1>
+        <p>Bonjour Admin,</p>
+        <p>Un nouvel utilisateur, {{ user_name }} ({{ user_email }}), vient de s'inscrire sur la plateforme et attend votre approbation.</p>
+        <p>Veuillez vous connecter pour approuver ou refuser l'inscription.</p>
+        <p><a href="https://event.outdoorsecours.fr/manage_users.php" style="color: #007bff;">Accéder à la gestion des utilisateurs</a></p>
+    </div>
+</body>
+</html>
