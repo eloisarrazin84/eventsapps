@@ -9,6 +9,15 @@ $expiredMedicaments = $conn->query("SELECT COUNT(*) FROM medicaments WHERE date_
 $categories = $conn->query("SELECT type_produit, COUNT(*) as count FROM medicaments GROUP BY type_produit")->fetchAll(PDO::FETCH_ASSOC);
 $totalLocations = $conn->query("SELECT COUNT(DISTINCT stock_location_id) FROM medicaments")->fetchColumn();
 
+// Récupérer les médicaments expirant dans les 7 jours
+$expiringSoon7Days = $conn->prepare("SELECT medicaments.nom, medicaments.date_expiration, medicaments.numero_lot, stock_locations.location_name, stock_locations.bag_name 
+                                     FROM medicaments 
+                                     LEFT JOIN stock_locations ON medicaments.stock_location_id = stock_locations.id 
+                                     WHERE medicaments.date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+                                     ORDER BY medicaments.date_expiration ASC");
+$expiringSoon7Days->execute();
+$expiringSoonMeds7Days = $expiringSoon7Days->fetchAll(PDO::FETCH_ASSOC);
+
 // Appliquer les filtres si une recherche est soumise
 $search = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '%';
 $expiringSoon = $conn->prepare("SELECT medicaments.*, stock_locations.location_name, stock_locations.bag_name 
@@ -37,14 +46,35 @@ $expiringSoon = $expiringSoon->fetchAll(PDO::FETCH_ASSOC);
         .card-body ul { padding-left: 0; list-style: none; }
         .highlight-warning { background-color: #fff3cd; }
         .search-form { max-width: 600px; margin: auto; }
+        .reminder-section { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .reminder-section h4 { margin: 0 0 10px; }
     </style>
 </head>
 <body>
 <?php include 'menu_medicaments.php'; ?>
+
 <div class="container">
     <h1 class="mb-4">Dashboard des Médicaments</h1>
     <div class="text-center mt-3 mb-4">
         <a href="ajouter_medicament.php" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Ajouter un médicament</a>
+    </div>
+    
+    <!-- Section de Rappels pour Médicaments Expirant sous 7 Jours -->
+    <div class="reminder-section">
+        <h4><i class="fas fa-exclamation-circle"></i> Médicaments expirant dans les 7 jours</h4>
+        <?php if (count($expiringSoonMeds7Days) > 0): ?>
+            <ul>
+                <?php foreach ($expiringSoonMeds7Days as $med): ?>
+                    <li>
+                        <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lot: <?php echo htmlspecialchars($med['numero_lot']); ?>,
+                        Lieu: <?php echo htmlspecialchars($med['location_name'] . ($med['bag_name'] ? " - " . $med['bag_name'] : '')); ?>,
+                        Expire le : <?php echo htmlspecialchars($med['date_expiration']); ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p>Aucun médicament n'expire dans les 7 prochains jours.</p>
+        <?php endif; ?>
     </div>
     
     <!-- Widgets de Statistiques -->
