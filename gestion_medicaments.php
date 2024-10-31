@@ -61,41 +61,89 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Gestion des Médicaments</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-        .container {
-            max-width: 900px;
-            margin-top: 50px;
-            background-color: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            font-weight: bold;
-            color: #007bff;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .form-inline .form-control {
-            border-radius: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-right: 10px;
-        }
-        .btn-primary, .btn-secondary, .btn-warning, .btn-danger {
-            border-radius: 20px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-        .btn-secondary, .btn-warning, .btn-danger {
-            transition: all 0.3s ease;
-        }
-        .table th, .table td {
-            text-align: center;
-            vertical-align: middle;
-        }
-    </style>
+   <style>
+    .container {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 2em;
+        margin-bottom: 30px;
+        color: #007bff;
+        text-align: center;
+    }
+
+    .filter-form .form-control {
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        border-radius: 20px;
+        padding: 10px 20px;
+    }
+
+    .card-header {
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+        padding: 15px;
+        font-size: 1.2em;
+    }
+
+    .table {
+        margin-top: 15px;
+        font-size: 1em;
+        border-spacing: 0 10px;
+    }
+
+    .table th,
+    .table td {
+        vertical-align: middle;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .table tbody tr {
+        background-color: #f9f9f9;
+        border-radius: 10px;
+    }
+
+    .btn-warning,
+    .btn-danger {
+        border-radius: 15px;
+        padding: 5px 15px;
+        margin-right: 5px;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: #000;
+        border: none;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-warning:hover {
+        background-color: #ffca2c;
+    }
+
+    .btn-danger:hover {
+        background-color: #e02a32;
+    }
+</style>
+
 </head>
 <body>
 <div class="container mt-5">
