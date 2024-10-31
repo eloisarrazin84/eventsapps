@@ -13,7 +13,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Fonction de chargement du template
 function loadTemplate($templateName, $variables) {
     $templatePath = __DIR__ . "/email_templates/$templateName.html";
     if (file_exists($templatePath)) {
@@ -24,7 +23,8 @@ function loadTemplate($templateName, $variables) {
         return $templateContent;
     } else {
         error_log("Template non trouvé: $templatePath");
-        throw new Exception("Template non trouvé: $templatePath");
+        echo "Erreur : Template non trouvé: $templatePath";
+        return false;
     }
 }
 
