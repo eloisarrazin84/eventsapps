@@ -31,7 +31,7 @@ function loadTemplate($variables) {
     <body>
         <div class="container">
             <h1>Compte approuvé</h1>
-            <p>Bonjour {{ first_name }} {{ last_name }},</p>
+            <p>Bonjour {$variables['first_name']} {$variables['last_name']},</p>
             <p>Félicitations ! Votre compte a été approuvé. Vous pouvez désormais vous connecter à notre plateforme en utilisant votre identifiant et votre mot de passe.</p>
             <a href="https://event.outdoorsecours.fr/login.php" class="button">Se connecter</a>
             <div class="footer">
@@ -44,7 +44,7 @@ function loadTemplate($variables) {
 
     // Remplacement des variables
     foreach ($variables as $key => $value) {
-        $templateContent = str_replace("{{ $key }}", $value, $templateContent);
+        $templateContent = str_replace("{{ $key }}", htmlspecialchars($value, ENT_QUOTES, 'UTF-8'), $templateContent);
     }
 
     return $templateContent;
