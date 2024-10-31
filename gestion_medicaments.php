@@ -6,11 +6,15 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 // Récupérer les valeurs des filtres
 $filterNom = isset($_GET['filter_nom']) ? $_GET['filter_nom'] : '';
 $filterType = isset($_GET['filter_type']) ? $_GET['filter_type'] : '';
+$filterLocation = isset($_GET['filter_location']) ? $_GET['filter_location'] : '';
 $sortColumn = isset($_GET['sort']) ? $_GET['sort'] : 'nom';
 $sortOrder = isset($_GET['order']) && $_GET['order'] == 'desc' ? 'DESC' : 'ASC';
 
 // Construire la requête avec filtres et tri
-$query = "SELECT * FROM medicaments WHERE 1=1";
+$query = "SELECT medicaments.*, stock_locations.location_name, stock_locations.bag_name 
+          FROM medicaments 
+          LEFT JOIN stock_locations ON medicaments.stock_location_id = stock_locations.id 
+          WHERE 1=1";
 
 // Appliquer les filtres
 if (!empty($filterNom)) {
@@ -18,6 +22,9 @@ if (!empty($filterNom)) {
 }
 if (!empty($filterType)) {
     $query .= " AND type_produit = :filterType";
+}
+if (!empty($filterLocation)) {
+    $query .= " AND stock_location_id = :filterLocation";
 }
 
 // Ajouter le tri
@@ -33,9 +40,17 @@ if (!empty($filterNom)) {
 if (!empty($filterType)) {
     $stmt->bindValue(':filterType', $filterType);
 }
+if (!empty($filterLocation)) {
+    $stmt->bindValue(':filterLocation', $filterLocation);
+}
 
 $stmt->execute();
 $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Récupérer les lieux de stockage
+$stmt = $conn->prepare("SELECT * FROM stock_locations");
+$stmt->execute();
+$stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -92,10 +107,10 @@ $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Formulaire de Filtrage -->
     <form method="GET" class="filter-form mb-4">
         <div class="row">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <input type="text" name="filter_nom" class="form-control" placeholder="Filtrer par nom" value="<?php echo htmlspecialchars($filterNom); ?>">
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <select name="filter_type" class="form-control">
                     <option value="">Filtrer par type</option>
                     <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
@@ -103,7 +118,17 @@ $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
                 </select>
             </div>
-            <div class="col-md-4 text-center">
+            <div class="col-md-3 mb-3">
+                <select name="filter_location" class="form-control">
+                    <option value="">Filtrer par lieu de stockage</option>
+                    <?php foreach ($stockLocations as $location): ?>
+                        <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-3 text-center">
                 <button type="submit" class="btn btn-primary mr-2">Appliquer les filtres</button>
                 <a href="gestion_medicaments.php" class="btn btn-secondary">Réinitialiser</a>
             </div>
@@ -125,6 +150,7 @@ $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <th><a href="?sort=quantite&order=<?php echo $sortOrder == 'ASC' ? 'desc' : 'asc'; ?>">Quantité</a></th>
                         <th><a href="?sort=date_expiration&order=<?php echo $sortOrder == 'ASC' ? 'desc' : 'asc'; ?>">Date d'expiration</a></th>
                         <th><a href="?sort=type_produit&order=<?php echo $sortOrder == 'ASC' ? 'desc' : 'asc'; ?>">Type</a></th>
+                        <th>Lieu de Stockage</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -137,6 +163,7 @@ $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?php echo htmlspecialchars($medicament['quantite']); ?></td>
                             <td><?php echo htmlspecialchars($medicament['date_expiration']); ?></td>
                             <td><?php echo htmlspecialchars($medicament['type_produit']); ?></td>
+                            <td><?php echo htmlspecialchars($medicament['location_name'] . ($medicament['bag_name'] ? " - " . $medicament['bag_name'] : '')); ?></td>
                             <td>
                                 <a href="modifier_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
                                 <a href="supprimer_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce médicament ?');">Supprimer</a>
