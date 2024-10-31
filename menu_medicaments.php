@@ -60,6 +60,7 @@ $unreadNotifications = count($notifications);
                     </a>
                     <div class="dropdown-menu" aria-labelledby="medicamentDropdown">
                         <a class="dropdown-item" href="gestion_medicaments.php"><i class="fas fa-pills"></i> Liste des Médicaments</a>
+                        <a class="dropdown-item" href="gestion_lieux_stockage.php"><i class="bi bi-buildings-fill"></i> Lieux de stockage</a>
                     </div>
                 </li>
             <?php endif; ?>
