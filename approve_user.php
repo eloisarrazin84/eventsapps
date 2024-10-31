@@ -2,6 +2,11 @@
 session_start();
 require_once __DIR__ . '/mail/sendEmail.php'; // Inclusion de la fonction d'envoi d'email
 
+// Afficher les erreurs PHP pour déboguer
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Vérifier si l'utilisateur est un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
@@ -43,8 +48,13 @@ if (isset($_GET['id'])) {
 
             // Charger le contenu du template et envoyer l'email
             $templateContent = loadTemplate("user_approved", $variables);
-            if (!sendEmail($email, $subject, $templateContent)) {
-                echo "Erreur d'envoi d'email.";
+            try {
+                if (!sendEmail($email, $subject, $templateContent)) {
+                    echo "Erreur d'envoi d'email.";
+                }
+            } catch (Exception $e) {
+                // Capture et affiche les erreurs d'envoi d'email
+                echo "Erreur lors de l'envoi de l'email : " . $e->getMessage();
             }
         }
 
@@ -52,6 +62,6 @@ if (isset($_GET['id'])) {
         header("Location: manage_users.php");
         exit();
     } catch (PDOException $e) {
-        echo "Erreur : " . $e->getMessage();
+        echo "Erreur de base de données : " . $e->getMessage();
     }
 }
