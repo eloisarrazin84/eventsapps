@@ -14,11 +14,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 // Fonction de chargement du template avec le contenu en ligne
-function loadTemplate($variables) {
+function loadTemplate(array $variables) {
     if (!is_array($variables)) {
         throw new TypeError("Les variables doivent être un tableau associatif.");
     }
-    
+
     $templateContent = <<<HTML
     <!DOCTYPE html>
     <html lang="fr">
