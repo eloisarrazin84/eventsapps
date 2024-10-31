@@ -2,6 +2,7 @@
 // Démarrer la session et récupérer les informations utilisateur
 session_start();
 $user_id = $_SESSION['user_id'];
+$user_role = $_SESSION['role']; // Récupérer le rôle de l'utilisateur pour vérifier s'il est admin
 
 // Connexion unique à la base de données
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
@@ -19,6 +20,15 @@ $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $unreadNotifications = count($notifications);
+
+// Récupérer les utilisateurs en attente d'approbation pour les administrateurs uniquement
+$approvalNotifications = [];
+if ($user_role === 'admin') {
+    $stmt = $conn->prepare("SELECT id, first_name, last_name FROM users WHERE is_approved = 0");
+    $stmt->execute();
+    $approvalNotifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $unreadNotifications += count($approvalNotifications);
+}
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
@@ -45,15 +55,27 @@ $unreadNotifications = count($notifications);
                         <?php endif; ?>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown">
-                        <?php if (empty($notifications)): ?>
+                        <?php if (empty($notifications) && empty($approvalNotifications)): ?>
                             <p class="dropdown-item">Aucune notification</p>
                         <?php else: ?>
+                            <!-- Notifications existantes -->
                             <?php foreach ($notifications as $notification): ?>
                                 <div class="dropdown-item notification-item" data-id="<?php echo $notification['id']; ?>">
                                     <p><?php echo htmlspecialchars($notification['message']); ?></p>
                                     <button class="btn btn-sm btn-secondary mark-as-read">Marquer comme lu</button>
                                 </div>
                             <?php endforeach; ?>
+                            <!-- Notifications d'approbation des utilisateurs -->
+                            <?php if ($user_role === 'admin' && !empty($approvalNotifications)): ?>
+                                <hr>
+                                <h6 class="dropdown-header">Utilisateurs en attente d'approbation</h6>
+                                <?php foreach ($approvalNotifications as $user): ?>
+                                    <div class="dropdown-item approval-notification">
+                                        <p>L'utilisateur '<?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>' est en attente d'approbation.</p>
+                                        <a href="approve_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-primary">Approuver</a>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 </li>
