@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Template d'email intégré directement dans le code
+// Fonction de chargement du template avec le contenu intégré
 function loadTemplate($variables) {
     $templateContent = <<<HTML
     <!DOCTYPE html>
@@ -31,7 +31,7 @@ function loadTemplate($variables) {
     <body>
         <div class="container">
             <h1>Compte approuvé</h1>
-            <p>Bonjour {$variables['first_name']} {$variables['last_name']},</p>
+            <p>Bonjour {{ first_name }} {{ last_name }},</p>
             <p>Félicitations ! Votre compte a été approuvé. Vous pouvez désormais vous connecter à notre plateforme en utilisant votre identifiant et votre mot de passe.</p>
             <a href="https://event.outdoorsecours.fr/login.php" class="button">Se connecter</a>
             <div class="footer">
@@ -41,6 +41,11 @@ function loadTemplate($variables) {
     </body>
     </html>
     HTML;
+
+    // Remplacement des variables
+    foreach ($variables as $key => $value) {
+        $templateContent = str_replace("{{ $key }}", $value, $templateContent);
+    }
 
     return $templateContent;
 }
@@ -81,21 +86,19 @@ if (isset($_GET['id'])) {
             // Charger le template et envoyer l'email
             $templateContent = loadTemplate($variables);
             try {
-                if (!sendEmail($email, $subject, $templateContent, 'notification@outdoorsecours.fr', 'Outdoor Secours')) {
+                if (!sendEmail($email, $subject, $templateContent)) {
                     error_log("Erreur d'envoi d'email : envoi échoué pour $email");
-                    echo "Erreur : envoi de l'email de confirmation échoué.";
-                } else {
-                    echo "Email de confirmation envoyé avec succès.";
+                    echo "<script>alert('Erreur lors de l\'envoi de l\'email de confirmation.');</script>";
                 }
             } catch (Exception $e) {
                 error_log("Erreur lors de l'envoi de l'email : " . $e->getMessage());
-                echo "Erreur : " . $e->getMessage();
+                echo "<script>alert('Erreur : " . $e->getMessage() . "');</script>";
             }
         } else {
-            echo "Erreur : Utilisateur introuvable.";
+            echo "<script>alert('Erreur : Utilisateur introuvable.');</script>";
         }
 
-        // Journalisation avant la redirection
+        // Afficher le pop-up de confirmation et rediriger vers la page de gestion des utilisateurs
         echo "<script>
                 alert('Approbation réussie pour l\\'utilisateur ID $userId.');
                 window.location.href = 'manage_users.php';
@@ -103,10 +106,10 @@ if (isset($_GET['id'])) {
 
     } catch (PDOException $e) {
         error_log("Erreur de base de données : " . $e->getMessage());
-        echo "Erreur de base de données : " . $e->getMessage();
+        echo "<script>alert('Erreur de base de données : " . $e->getMessage() . "');</script>";
     }
 } else {
     error_log("ID utilisateur manquant dans la requête");
-    echo "Erreur : ID utilisateur manquant.";
+    echo "<script>alert('Erreur : ID utilisateur manquant.');</script>";
 }
 ?>
