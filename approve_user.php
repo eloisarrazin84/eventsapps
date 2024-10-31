@@ -23,8 +23,8 @@ function loadTemplate($templateName, $variables) {
         }
         return $templateContent;
     } else {
-        error_log("Template non trouvé: $templateName");
-        throw new Exception("Template non trouvé: $templateName");
+        error_log("Template non trouvé: $templatePath");
+        throw new Exception("Template non trouvé: $templatePath");
     }
 }
 
@@ -66,10 +66,16 @@ if (isset($_GET['id'])) {
             try {
                 if (!sendEmail($email, $subject, $templateContent)) {
                     error_log("Erreur d'envoi d'email : envoi échoué pour $email");
+                    echo "Erreur : envoi de l'email de confirmation échoué.";
+                } else {
+                    echo "Email de confirmation envoyé avec succès.";
                 }
             } catch (Exception $e) {
                 error_log("Erreur lors de l'envoi de l'email : " . $e->getMessage());
+                echo "Erreur : " . $e->getMessage();
             }
+        } else {
+            echo "Erreur : Utilisateur introuvable.";
         }
 
         // Journalisation avant la redirection
