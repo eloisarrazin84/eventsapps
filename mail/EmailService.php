@@ -1,8 +1,7 @@
-<?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '/var/www/html/outdoorsecevent/vendor/autoload.php'; // Chemin vers autoload.php de Composer
+require '/var/www/html/outdoorsecevent/vendor/autoload.php';
 
 class EmailService
 {
@@ -11,9 +10,9 @@ class EmailService
     public function __construct()
     {
         $this->mailer = new PHPMailer(true);
+        $this->mailer->CharSet = 'UTF-8'; // Encodage UTF-8 pour le support des accents
 
         try {
-            // Configuration SMTP
             $this->mailer->isSMTP();
             $this->mailer->Host = 'smtp.office365.com';
             $this->mailer->SMTPAuth = true;
@@ -32,14 +31,11 @@ class EmailService
     public function sendEmail($to, $subject, $templateName, $variables = [])
     {
         try {
-            $this->mailer->addAddress($to); // Destinataire
+            $this->mailer->addAddress($to);
             $this->mailer->isHTML(true);
             $this->mailer->Subject = $subject;
-
-            // Charger le contenu du template
             $this->mailer->Body = EmailTemplate::loadTemplate($templateName, $variables);
 
-            // Envoi de l'e-mail
             $this->mailer->send();
             return true;
         } catch (Exception $e) {
@@ -47,4 +43,6 @@ class EmailService
             return false;
         }
     }
+}
+
 }
