@@ -13,8 +13,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Template d'email intégré directement dans le code avec le contenu en ligne
+// Fonction de chargement du template avec le contenu en ligne
 function loadTemplate($variables) {
+    if (!is_array($variables)) {
+        throw new TypeError("Les variables doivent être un tableau associatif.");
+    }
+    
     $templateContent = <<<HTML
     <!DOCTYPE html>
     <html lang="fr">
