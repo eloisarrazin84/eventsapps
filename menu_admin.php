@@ -46,25 +46,19 @@ if ($user_role === 'admin') {
                 <!-- Icône de notifications avec cloche et badge -->
                 <li class="nav-item dropdown">
                     <a class="nav-link notification-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-bell notification-bell"></i>
+                        <i class="fas fa-bell"></i>
                         <?php if ($unreadNotifications > 0): ?>
                             <span class="badge badge-danger notification-badge"><?php echo $unreadNotifications; ?></span>
                         <?php endif; ?>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
-                        <?php if (empty($notifications) && empty($approvalNotifications)): ?>
-                            <p class="dropdown-item text-muted">Aucune notification</p>
-                        <?php else: ?>
-                            <?php if ($user_role === 'admin' && !empty($approvalNotifications)): ?>
-                                <div class="dropdown-header">Utilisateurs en attente d'approbation</div>
-                                <?php foreach ($approvalNotifications as $user): ?>
-                                    <div class="dropdown-item approval-notification">
-                                        <p>L'utilisateur '<?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>' est en attente d'approbation.</p>
-                                        <a href="approve_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-primary approve-btn">Approuver</a>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                        <div class="dropdown-header">Utilisateurs en attente d'approbation</div>
+                        <?php foreach ($approvalNotifications as $user): ?>
+                            <div class="dropdown-item approval-notification">
+                                <p class="notification-text">L'utilisateur '<?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>' est en attente d'approbation.</p>
+                                <a href="approve_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-primary approve-btn">Approuver</a>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </li>
 
@@ -101,12 +95,6 @@ if ($user_role === 'admin') {
     padding: 10px 15px;
 }
 
-.navbar .nav-link:hover {
-    color: #0056b3;
-    background-color: rgba(0, 123, 255, 0.1);
-    border-radius: 5px;
-}
-
 .notification-toggle {
     position: relative;
     display: inline-block;
@@ -123,7 +111,7 @@ if ($user_role === 'admin') {
     background-color: #dc3545;
     color: white;
     border-radius: 50%;
-    padding: 5px 8px;
+    padding: 4px 6px;
     font-size: 0.8em;
 }
 
@@ -131,20 +119,23 @@ if ($user_role === 'admin') {
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
-    max-width: 300px;
+    max-width: 320px;
+    min-width: 300px;
 }
 
 .notification-dropdown .dropdown-header {
     font-size: 0.9em;
     font-weight: bold;
     color: #333;
-    padding: 8px 15px;
+    padding: 10px 15px;
     border-bottom: 1px solid #f1f1f1;
-    background-color: #f8f8f8;
 }
 
 .notification-dropdown .approval-notification {
     padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     border-bottom: 1px solid #f1f1f1;
 }
 
@@ -152,15 +143,17 @@ if ($user_role === 'admin') {
     border-bottom: none;
 }
 
-.notification-dropdown .approval-notification p {
-    margin: 0;
+.notification-text {
+    flex: 1;
     font-size: 0.9em;
     color: #333;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.notification-dropdown .approve-btn {
-    margin-top: 8px;
-    display: inline-block;
+.approve-btn {
     font-size: 0.85em;
     color: #fff;
     background-color: #007bff;
@@ -171,7 +164,7 @@ if ($user_role === 'admin') {
     cursor: pointer;
 }
 
-.notification-dropdown .approve-btn:hover {
+.approve-btn:hover {
     background-color: #0056b3;
 }
 </style>
