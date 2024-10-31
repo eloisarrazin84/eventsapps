@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/EmailService.php'; // Classe pour envoyer les e-mails
-require_once __DIR__ . '/EmailTemplate.php'; // Classe pour charger les templates
+require_once __DIR__ . 'mail/EmailService.php'; // Classe pour envoyer les e-mails
+require_once __DIR__ . 'mail/EmailTemplate.php'; // Classe pour charger les templates
 
 // Activer les erreurs pour le débogage
 ini_set('display_errors', 1);
