@@ -18,15 +18,36 @@ $expiringSoon7Days = $conn->prepare("SELECT medicaments.nom, medicaments.date_ex
 $expiringSoon7Days->execute();
 $expiringSoonMeds7Days = $expiringSoon7Days->fetchAll(PDO::FETCH_ASSOC);
 
-// Appliquer les filtres si une recherche est soumise
-$search = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '%';
-$expiringSoon = $conn->prepare("SELECT medicaments.*, stock_locations.location_name, stock_locations.bag_name 
+// Récupérer les données pour les graphiques
+// 1. Graphique des types de médicaments
+$categoryData = ['labels' => [], 'data' => []];
+foreach ($categories as $categorie) {
+    $categoryData['labels'][] = $categorie['type_produit'];
+    $categoryData['data'][] = $categorie['count'];
+}
+
+// 2. Graphique des expirations par mois
+$expirationData = $conn->query("SELECT DATE_FORMAT(date_expiration, '%Y-%m') as month, COUNT(*) as count 
                                 FROM medicaments 
-                                LEFT JOIN stock_locations ON medicaments.stock_location_id = stock_locations.id 
-                                WHERE nom LIKE :search AND date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)");
-$expiringSoon->bindParam(':search', $search);
-$expiringSoon->execute();
-$expiringSoon = $expiringSoon->fetchAll(PDO::FETCH_ASSOC);
+                                WHERE date_expiration >= CURDATE()
+                                GROUP BY month 
+                                ORDER BY month ASC")->fetchAll(PDO::FETCH_ASSOC);
+$expirationGraphData = ['labels' => [], 'data' => []];
+foreach ($expirationData as $exp) {
+    $expirationGraphData['labels'][] = $exp['month'];
+    $expirationGraphData['data'][] = $exp['count'];
+}
+
+// 3. Graphique de stock par lieu de stockage
+$stockByLocation = $conn->query("SELECT stock_locations.location_name, COUNT(medicaments.id) as count
+                                FROM medicaments
+                                LEFT JOIN stock_locations ON medicaments.stock_location_id = stock_locations.id
+                                GROUP BY stock_locations.location_name")->fetchAll(PDO::FETCH_ASSOC);
+$locationGraphData = ['labels' => [], 'data' => []];
+foreach ($stockByLocation as $location) {
+    $locationGraphData['labels'][] = $location['location_name'] ?? 'Non spécifié';
+    $locationGraphData['data'][] = $location['count'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -36,6 +57,7 @@ $expiringSoon = $expiringSoon->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Dashboard Médicaments</title>
     <style>
         body { background-color: #f4f6f9; }
@@ -43,9 +65,8 @@ $expiringSoon = $expiringSoon->fetchAll(PDO::FETCH_ASSOC);
         h1 { color: #007bff; font-size: 2.5em; text-align: center; }
         .card-stats { transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); }
         .card-stats:hover { transform: scale(1.05); box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2); }
-        .card-body ul { padding-left: 0; list-style: none; }
+        .chart-container { margin-top: 30px; }
         .highlight-warning { background-color: #fff3cd; }
-        .search-form { max-width: 600px; margin: auto; }
         .reminder-section { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .reminder-section h4 { margin: 0 0 10px; }
     </style>
@@ -55,9 +76,6 @@ $expiringSoon = $expiringSoon->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container">
     <h1 class="mb-4">Dashboard des Médicaments</h1>
-    <div class="text-center mt-3 mb-4">
-        <a href="ajouter_medicament.php" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Ajouter un médicament</a>
-    </div>
     
     <!-- Section de Rappels pour Médicaments Expirant sous 7 Jours -->
     <div class="reminder-section">
@@ -117,53 +135,76 @@ $expiringSoon = $expiringSoon->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <!-- Barre de recherche intégrée -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <form method="GET" class="form-inline justify-content-center search-form">
-                <input type="text" class="form-control mr-2" name="search" placeholder="Rechercher un médicament..." style="width:70%;" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
-                <button type="submit" class="btn btn-outline-primary"><i class="fas fa-search"></i> Rechercher</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Médicaments Expirant dans 30 Jours -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-white">
-            Médicaments expirant dans moins de 30 jours
-        </div>
-        <div class="card-body">
-            <?php if (count($expiringSoon) > 0): ?>
-                <table class="table table-hover table-bordered">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Nom</th>
-                            <th>Lieu de Stockage</th>
-                            <th>Numéro de Lot</th>
-                            <th>Quantité</th>
-                            <th>Date d'expiration</th>
-                            <th>Type de Produit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($expiringSoon as $med): ?>
-                            <tr class="<?php echo (strtotime($med['date_expiration']) - time() <= 7 * 86400) ? 'highlight-warning' : ''; ?>">
-                                <td><?php echo htmlspecialchars($med['nom']); ?></td>
-                                <td><?php echo htmlspecialchars($med['location_name'] . ($med['bag_name'] ? " - " . $med['bag_name'] : '')); ?></td>
-                                <td><?php echo htmlspecialchars($med['numero_lot']); ?></td>
-                                <td><?php echo htmlspecialchars($med['quantite']); ?></td>
-                                <td><?php echo htmlspecialchars($med['date_expiration']); ?></td>
-                                <td><?php echo htmlspecialchars($med['type_produit']); ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <p class="text-muted">Aucun médicament n'expire dans les 30 prochains jours.</p>
-            <?php endif; ?>
+    <!-- Section des Graphiques -->
+    <div class="chart-container">
+        <div class="row">
+            <div class="col-md-4">
+                <canvas id="typeChart"></canvas>
+            </div>
+            <div class="col-md-4">
+                <canvas id="expirationChart"></canvas>
+            </div>
+            <div class="col-md-4">
+                <canvas id="locationChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Script pour les graphiques avec Chart.js -->
+<script>
+    const typeData = <?php echo json_encode($categoryData); ?>;
+    const expirationData = <?php echo json_encode($expirationGraphData); ?>;
+    const locationData = <?php echo json_encode($locationGraphData); ?>;
+
+    new Chart(document.getElementById('typeChart'), {
+        type: 'pie',
+        data: {
+            labels: typeData.labels,
+            datasets: [{
+                label: 'Types de Médicaments',
+                data: typeData.data,
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'top' } }
+        }
+    });
+
+    new Chart(document.getElementById('expirationChart'), {
+        type: 'bar',
+        data: {
+            labels: expirationData.labels,
+            datasets: [{
+                label: 'Médicaments Expirant par Mois',
+                data: expirationData.data,
+                backgroundColor: '#36A2EB'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    new Chart(document.getElementById('locationChart'), {
+        type: 'bar',
+        data: {
+            labels: locationData.labels,
+            datasets: [{
+                label: 'Stock par Lieu de Stockage',
+                data: locationData.data,
+                backgroundColor: '#FF6384'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
 
 <!-- Scripts Bootstrap -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
