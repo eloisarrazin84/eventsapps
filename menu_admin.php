@@ -30,7 +30,7 @@ if ($user_role === 'admin') {
 <!-- Menu de notifications -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
     <a class="navbar-brand" href="#">
-        <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png" alt="Logo" style="width: 50px;">
+        <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png" alt="Logo" style="width: 50px; margin-right: 10px;">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -46,7 +46,7 @@ if ($user_role === 'admin') {
                 <!-- Icône de notifications avec cloche et badge -->
                 <li class="nav-item dropdown">
                     <a class="nav-link notification-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-bell"></i>
+                        <i class="fas fa-bell notification-bell"></i>
                         <?php if ($unreadNotifications > 0): ?>
                             <span class="badge badge-danger notification-badge"><?php echo $unreadNotifications; ?></span>
                         <?php endif; ?>
@@ -63,11 +63,11 @@ if ($user_role === 'admin') {
                 </li>
 
                 <!-- Profil utilisateur -->
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown ml-3">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="<?php echo $profilePictureUrl; ?>" alt="Photo de profil" class="rounded-circle" style="width: 40px; height: 40px;">
+                        <img src="<?php echo $profilePictureUrl; ?>" alt="Photo de profil" class="rounded-circle profile-picture">
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                    <div class="dropdown-menu dropdown-menu-right profile-dropdown" aria-labelledby="profileDropdown">
                         <a class="dropdown-item" href="profile.php"><i class="fas fa-user"></i> Mon profil</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
@@ -82,7 +82,7 @@ if ($user_role === 'admin') {
     </div>
 </nav>
 
-<!-- CSS pour un menu de notifications moderne -->
+<!-- CSS pour le menu amélioré -->
 <style>
 .navbar {
     background-color: #f8f9fa;
@@ -93,26 +93,30 @@ if ($user_role === 'admin') {
     color: #007bff;
     font-weight: bold;
     padding: 10px 15px;
+    font-size: 1.1em;
 }
 
 .notification-toggle {
     position: relative;
     display: inline-block;
+    color: #007bff;
 }
 
 .notification-bell {
-    font-size: 1.5em;
+    font-size: 1.7em;
 }
 
 .notification-badge {
     position: absolute;
-    top: -5px;
-    right: -10px;
-    background-color: #dc3545;
+    top: -8px;
+    right: -8px;
+    background-color: #ff3e3e;
     color: white;
     border-radius: 50%;
-    padding: 4px 6px;
+    padding: 5px 8px;
     font-size: 0.8em;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .notification-dropdown {
@@ -139,12 +143,7 @@ if ($user_role === 'admin') {
     border-bottom: 1px solid #f1f1f1;
 }
 
-.notification-dropdown .approval-notification:last-child {
-    border-bottom: none;
-}
-
 .notification-text {
-    flex: 1;
     font-size: 0.9em;
     color: #333;
     margin-right: 10px;
@@ -162,6 +161,21 @@ if ($user_role === 'admin') {
     border-radius: 4px;
     text-decoration: none;
     cursor: pointer;
+}
+
+.profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #007bff;
+}
+
+.profile-dropdown {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    min-width: 200px;
 }
 
 .approve-btn:hover {
