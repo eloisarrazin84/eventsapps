@@ -4,10 +4,6 @@ use PHPMailer\PHPMailer\Exception;
 
 require '/var/www/html/outdoorsecevent/vendor/autoload.php'; // Chemin vers autoload.php de Composer
 
-// Charge le fichier .env avec les variables de configuration
-$dotenv = Dotenv\Dotenv::createImmutable('/var/www/html/outdoorsecevent/mail');
-$dotenv->load();
-
 function sendEmail($to, $subject, $template, $variables = [], $from = 'notification@outdoorsecours.fr', $fromName = 'Outdoor Secours') {
     $mail = new PHPMailer(true);
     $mail->SMTPDebug = 2; // Ajoutez cette ligne après `$mail = new PHPMailer(true);`
@@ -16,12 +12,12 @@ function sendEmail($to, $subject, $template, $variables = [], $from = 'notificat
     try {
         // Configuration SMTP
         $mail->isSMTP();
-        $mail->Host = getenv('SMTP_HOST');
+        $mail->Host = 'smtp.office365.com';
         $mail->SMTPAuth = true;
-        $mail->Username = getenv('SMTP_USERNAME');
-        $mail->Password = getenv('SMTP_PASSWORD');
+        $mail->Username = 'notification@outdoorsecours.fr';
+        $mail->Password = 'Lipton2019!';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = getenv('SMTP_PORT');
+        $mail->Port = 587;
 
         // Debug pour diagnostic
         $mail->SMTPDebug = 2; // 2 pour obtenir des informations sur le serveur
