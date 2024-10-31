@@ -42,8 +42,12 @@ if (isset($_GET['id'])) {
             ];
 
             // Envoyer l'email de confirmation d'approbation
-            sendEmail($email, $subject, "user_approved", $variables);
-        }
+         try {
+    sendEmail($email, $subject, "user_approved", $variables);
+} catch (Exception $e) {
+    echo "Erreur d'envoi d'email : " . $e->getMessage();
+}
+
 
         // Rediriger vers la page de gestion des utilisateurs avec un message de succès
         header("Location: manage_users.php");
