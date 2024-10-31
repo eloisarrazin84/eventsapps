@@ -1,5 +1,10 @@
 <?php
 session_start();
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php");
+    exit();
+}
+
 if (isset($_GET['id'])) {
     $medicament_id = $_GET['id'];
     try {
@@ -51,6 +56,22 @@ if (isset($_GET['id'])) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <title>Modifier le Médicament</title>
     <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-align: center;
+        }
         .form-section {
             background-color: #f8f9fa;
             padding: 20px;
@@ -58,45 +79,53 @@ if (isset($_GET['id'])) {
             margin-bottom: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .btn-submit, .btn-cancel {
-            font-size: 1.2em;
+        .btn-submit, .btn-cancel, .btn-back {
+            font-size: 1em;
             padding: 10px 20px;
+            border-radius: 20px;
             transition: all 0.3s ease;
-            border-radius: 50px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
         .btn-submit {
             background-color: #28a745;
             color: white;
             border: none;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
-        .btn-submit:hover {
-            background-color: #218838;
-            transform: translateY(-3px);
-            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
         }
         .btn-cancel {
             background-color: #dc3545;
             color: white;
             border: none;
             margin-left: 15px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
         }
         .btn-cancel:hover {
             background-color: #c82333;
             transform: translateY(-3px);
-            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+        }
+        .btn-back:hover {
+            background-color: #5a6268;
+            transform: translateY(-3px);
         }
         .button-group {
             text-align: center;
             margin-top: 30px;
-            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Modifier le Médicament</h2>
+<div class="container">
+    <a href="gestion_medicaments.php" class="btn btn-back mb-3">
+        <i class="fas fa-arrow-left"></i> Retour à la Gestion des Médicaments
+    </a>
+    <h2>Modifier le Médicament</h2>
     
     <form method="POST">
         <div class="form-section">
