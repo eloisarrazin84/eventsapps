@@ -27,6 +27,7 @@ if ($user_role === 'admin') {
 }
 ?>
 
+<!-- Menu de notifications -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
     <a class="navbar-brand" href="#">
         <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png" alt="Logo" style="width: 50px;">
@@ -36,7 +37,7 @@ if ($user_role === 'admin') {
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'home.php' ? 'active' : ''; ?>">
+            <li class="nav-item">
                 <a class="nav-link" href="home.php"><i class="fas fa-th-large"></i> Mes applications</a>
             </li>
         </ul>
@@ -54,19 +55,12 @@ if ($user_role === 'admin') {
                         <?php if (empty($notifications) && empty($approvalNotifications)): ?>
                             <p class="dropdown-item text-muted">Aucune notification</p>
                         <?php else: ?>
-                            <?php foreach ($notifications as $notification): ?>
-                                <div class="dropdown-item notification-item" data-id="<?php echo $notification['id']; ?>">
-                                    <p><?php echo htmlspecialchars($notification['message']); ?></p>
-                                    <button class="btn btn-sm btn-secondary mark-as-read">Marquer comme lu</button>
-                                </div>
-                            <?php endforeach; ?>
                             <?php if ($user_role === 'admin' && !empty($approvalNotifications)): ?>
-                                <hr>
-                                <h6 class="dropdown-header">Utilisateurs en attente d'approbation</h6>
+                                <div class="dropdown-header">Utilisateurs en attente d'approbation</div>
                                 <?php foreach ($approvalNotifications as $user): ?>
                                     <div class="dropdown-item approval-notification">
                                         <p>L'utilisateur '<?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>' est en attente d'approbation.</p>
-                                        <a href="approve_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-primary">Approuver</a>
+                                        <a href="approve_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-primary approve-btn">Approuver</a>
                                     </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -93,38 +87,6 @@ if ($user_role === 'admin') {
         </ul>
     </div>
 </nav>
-
-<!-- Script pour marquer les notifications comme lues -->
-<script>
-document.querySelectorAll('.mark-as-read').forEach(button => {
-    button.addEventListener('click', function(event) {
-        event.preventDefault();
-        
-        // Récupération de l'ID de la notification
-        const notificationItem = this.closest('.notification-item');
-        const notificationId = notificationItem.getAttribute('data-id');
-
-        // Envoi de la requête AJAX
-        fetch('mark_as_read.php?id=' + notificationId)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Marque la notification comme lue
-                    notificationItem.remove();
-                    
-                    // Mettre à jour le badge de notifications
-                    let badge = document.querySelector('.notification-badge');
-                    let unreadCount = parseInt(badge.innerText);
-                    badge.innerText = unreadCount - 1;
-                    if (unreadCount - 1 <= 0) {
-                        badge.style.display = 'none';
-                    }
-                }
-            })
-            .catch(error => console.error('Erreur:', error));
-    });
-});
-</script>
 
 <!-- CSS pour un menu de notifications moderne -->
 <style>
@@ -156,63 +118,60 @@ document.querySelectorAll('.mark-as-read').forEach(button => {
 
 .notification-badge {
     position: absolute;
-    top: 0;
-    right: 0;
-    transform: translate(25%, -25%);
+    top: -5px;
+    right: -10px;
     background-color: #dc3545;
     color: white;
     border-radius: 50%;
+    padding: 5px 8px;
     font-size: 0.8em;
-    padding: 5px 7px;
 }
 
-.dropdown-menu {
+.notification-dropdown {
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
     max-width: 300px;
-    padding: 0;
 }
 
-.notification-dropdown .notification-item {
-    padding: 10px;
+.notification-dropdown .dropdown-header {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #333;
+    padding: 8px 15px;
+    border-bottom: 1px solid #f1f1f1;
+    background-color: #f8f8f8;
+}
+
+.notification-dropdown .approval-notification {
+    padding: 10px 15px;
     border-bottom: 1px solid #f1f1f1;
 }
 
-.notification-dropdown .notification-item:last-child {
+.notification-dropdown .approval-notification:last-child {
     border-bottom: none;
-}
-
-.notification-dropdown .notification-item p {
-    margin: 0;
-    font-size: 14px;
-    color: #333;
-}
-
-.notification-dropdown .mark-as-read {
-    margin-top: 5px;
-    font-size: 12px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 3px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.notification-dropdown .mark-as-read:hover {
-    background-color: #5a6268;
 }
 
 .notification-dropdown .approval-notification p {
     margin: 0;
-    font-size: 14px;
+    font-size: 0.9em;
     color: #333;
 }
 
-.notification-dropdown .btn-primary {
-    font-size: 12px;
-    padding: 3px 8px;
-    margin-top: 5px;
+.notification-dropdown .approve-btn {
+    margin-top: 8px;
+    display: inline-block;
+    font-size: 0.85em;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.notification-dropdown .approve-btn:hover {
+    background-color: #0056b3;
 }
 </style>
