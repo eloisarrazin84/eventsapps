@@ -10,6 +10,14 @@ while (($line = fgets($file)) !== false) {
     }
 }
 fclose($file);
+
+// Connexion à la base de données pour récupérer les lieux de stockage
+$conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
+$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$stmt = $conn->prepare("SELECT * FROM stock_locations");
+$stmt->execute();
+$stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -38,28 +46,6 @@ fclose($file);
             margin-right: 8px;
             color: #007bff;
         }
-        .progress-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-        }
-        .progress-bar {
-            width: 100%;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            overflow: hidden;
-            height: 10px;
-            margin-right: 10px;
-        }
-        .progress-bar-inner {
-            height: 100%;
-            background-color: #007bff;
-            transition: width 0.3s;
-        }
-        .progress-bar-inner.low { background-color: #dc3545; }
-        .progress-bar-inner.medium { background-color: #ffc107; }
-        .progress-bar-inner.high { background-color: #28a745; }
         .btn-submit, .btn-cancel {
             font-size: 1.2em;
             padding: 12px 24px;
@@ -127,6 +113,21 @@ fclose($file);
             </div>
         </div>
 
+        <!-- Section Lieu de Stockage -->
+        <div class="form-section">
+            <h4>Lieu de Stockage</h4>
+            <div class="form-group">
+                <label class="icon-label" for="stock_location_id"><i class="fas fa-warehouse"></i> Lieu de stockage</label>
+                <select class="form-control" id="stock_location_id" name="stock_location_id" required>
+                    <?php foreach ($stockLocations as $location): ?>
+                        <option value="<?php echo $location['id']; ?>">
+                            <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
         <!-- Boutons Ajouter et Annuler -->
         <div class="button-group">
             <button type="submit" class="btn btn-submit">Ajouter</button>
@@ -144,28 +145,6 @@ fclose($file);
     // Initialisation des tooltips
     $(function () {
         $('[data-toggle="tooltip"]').tooltip();
-    });
-
-    // Gestion de la barre de progression
-    const form = document.getElementById('medicamentForm');
-    const progress = document.getElementById('progress');
-    const progressText = document.getElementById('progressText');
-
-    form.addEventListener('input', () => {
-        const filledFields = [...form.elements].filter(el => el.value !== "" && el.type !== "submit").length;
-        const totalFields = form.elements.length - 1; // Exclude the submit button
-        const percentage = Math.round((filledFields / totalFields) * 100);
-        
-        progress.style.width = percentage + "%";
-        progressText.innerText = percentage + "%";
-        
-        if (percentage <= 33) {
-            progress.className = 'progress-bar-inner low';
-        } else if (percentage <= 66) {
-            progress.className = 'progress-bar-inner medium';
-        } else {
-            progress.className = 'progress-bar-inner high';
-        }
     });
 
     // Passer la liste des noms de médicaments à JavaScript pour l'autocomplétion
