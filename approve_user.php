@@ -13,22 +13,41 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-function loadTemplate($templateName, $variables) {
-    $templatePath = __DIR__ . "/email_templates/$templateName.html";
-    
-    // Debug temporaire pour afficher le chemin exact
-    error_log("Chemin du template : " . $templatePath);
+// Fonction de chargement du template avec le contenu intégré
+function loadTemplate($variables) {
+    $templateContent = <<<HTML
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: Arial, sans-serif; }
+            .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+            h1 { color: #007bff; }
+            .button { display: inline-block; padding: 10px 15px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px; }
+            .footer { font-size: 12px; color: #777; text-align: center; margin-top: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Compte approuvé</h1>
+            <p>Bonjour {{ first_name }} {{ last_name }},</p>
+            <p>Félicitations ! Votre compte a été approuvé. Vous pouvez désormais vous connecter à notre plateforme en utilisant votre identifiant et votre mot de passe.</p>
+            <a href="https://event.outdoorsecours.fr/login.php" class="button">Se connecter</a>
+            <div class="footer">
+                <p>Outdoor Secours - 2024</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    HTML;
 
-    if (file_exists($templatePath)) {
-        $templateContent = file_get_contents($templatePath);
-        foreach ($variables as $key => $value) {
-            $templateContent = str_replace("{{ $key }}", $value, $templateContent);
-        }
-        return $templateContent;
-    } else {
-        error_log("Template non trouvé: $templatePath");
-        throw new Exception("Template non trouvé: $templatePath");
+    // Remplacement des variables
+    foreach ($variables as $key => $value) {
+        $templateContent = str_replace("{{ $key }}", $value, $templateContent);
     }
+
+    return $templateContent;
 }
 
 // Connexion à la base de données
@@ -65,31 +84,32 @@ if (isset($_GET['id'])) {
             ];
 
             // Charger le template et envoyer l'email
-            $templateContent = loadTemplate("test_template", $variables);
+            $templateContent = loadTemplate($variables);
             try {
                 if (!sendEmail($email, $subject, $templateContent)) {
                     error_log("Erreur d'envoi d'email : envoi échoué pour $email");
-                    echo "Erreur : envoi de l'email de confirmation échoué.";
-                } else {
-                    echo "Email de confirmation envoyé avec succès.";
+                    echo "<script>alert('Erreur lors de l\'envoi de l\'email de confirmation.');</script>";
                 }
             } catch (Exception $e) {
                 error_log("Erreur lors de l'envoi de l'email : " . $e->getMessage());
-                echo "Erreur : " . $e->getMessage();
+                echo "<script>alert('Erreur : " . $e->getMessage() . "');</script>";
             }
         } else {
-            echo "Erreur : Utilisateur introuvable.";
+            echo "<script>alert('Erreur : Utilisateur introuvable.');</script>";
         }
 
-        // Journalisation avant la redirection
-        error_log("Approbation de l'utilisateur réussie : $userId");
-        echo "Approbation réussie pour l'utilisateur ID $userId. Vérifiez les logs pour l'état de l'email.";
+        // Afficher le pop-up de confirmation et rediriger vers la page de gestion des utilisateurs
+        echo "<script>
+                alert('Approbation réussie pour l\\'utilisateur ID $userId.');
+                window.location.href = 'manage_users.php';
+              </script>";
 
     } catch (PDOException $e) {
         error_log("Erreur de base de données : " . $e->getMessage());
-        echo "Erreur de base de données : " . $e->getMessage();
+        echo "<script>alert('Erreur de base de données : " . $e->getMessage() . "');</script>";
     }
 } else {
     error_log("ID utilisateur manquant dans la requête");
-    echo "Erreur : ID utilisateur manquant.";
+    echo "<script>alert('Erreur : ID utilisateur manquant.');</script>";
 }
+?>
