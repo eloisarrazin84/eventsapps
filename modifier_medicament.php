@@ -12,15 +12,21 @@ if (isset($_GET['id'])) {
         $stmt->execute();
         $medicament = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Récupérer les lieux de stockage disponibles
+        $stmt = $conn->prepare("SELECT * FROM stock_locations");
+        $stmt->execute();
+        $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         // Traitement du formulaire de modification
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $stmt = $conn->prepare("UPDATE medicaments SET nom = :nom, description = :description, numero_lot = :numero_lot, quantite = :quantite, date_expiration = :date_expiration, type_produit = :type_produit WHERE id = :id");
+            $stmt = $conn->prepare("UPDATE medicaments SET nom = :nom, description = :description, numero_lot = :numero_lot, quantite = :quantite, date_expiration = :date_expiration, type_produit = :type_produit, stock_location_id = :stock_location_id WHERE id = :id");
             $stmt->bindParam(':nom', $_POST['nom']);
             $stmt->bindParam(':description', $_POST['description']);
             $stmt->bindParam(':numero_lot', $_POST['numero_lot']);
             $stmt->bindParam(':quantite', $_POST['quantite']);
             $stmt->bindParam(':date_expiration', $_POST['date_expiration']);
             $stmt->bindParam(':type_produit', $_POST['type_produit']);
+            $stmt->bindParam(':stock_location_id', $_POST['stock_location_id']);
             $stmt->bindParam(':id', $medicament_id);
             $stmt->execute();
 
@@ -84,7 +90,7 @@ if (isset($_GET['id'])) {
         .button-group {
             text-align: center;
             margin-top: 30px;
-            margin-bottom: 20px; /* Espace sous les boutons */
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -120,6 +126,16 @@ if (isset($_GET['id'])) {
                     <option value="PER OS" <?php if ($medicament['type_produit'] == 'PER OS') echo 'selected'; ?>>PER OS</option>
                     <option value="Injectable" <?php if ($medicament['type_produit'] == 'Injectable') echo 'selected'; ?>>Injectable</option>
                     <option value="Inhalable" <?php if ($medicament['type_produit'] == 'Inhalable') echo 'selected'; ?>>Inhalable</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="stock_location_id">Lieu de Stockage</label>
+                <select class="form-control" id="stock_location_id" name="stock_location_id">
+                    <?php foreach ($stockLocations as $location): ?>
+                        <option value="<?php echo $location['id']; ?>" <?php if ($medicament['stock_location_id'] == $location['id']) echo 'selected'; ?>>
+                            <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
         </div>
