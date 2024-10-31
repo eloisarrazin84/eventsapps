@@ -152,13 +152,27 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
 <div class="container mt-5">
-    <!-- Bouton Ajouter un Médicament -->
-    <div class="add-button">
-        <a href="ajouter_medicament.php" class="btn btn-success"><i class="fas fa-plus-circle"></i> Ajouter un Médicament</a>
+    <!-- Menu Accordéon pour les actions -->
+    <div class="accordion mb-4" id="actionMenu">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <i class="fas fa-bars"></i> Menu d'Actions
+                    </button>
+                </h2>
+            </div>
+
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#actionMenu">
+                <div class="card-body">
+                    <a href="dashboard_medicaments.php" class="btn btn-secondary mb-2"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
+                    <a href="ajouter_medicament.php" class="btn btn-success mb-2"><i class="fas fa-plus-circle"></i> Ajouter un Médicament</a>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <!-- Titre de la page et bouton de retour -->
-    <a href="dashboard_medicaments.php" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
+
+    <!-- Titre de la page -->
     <h1>Gestion des Médicaments</h1>
 
     <!-- Formulaire de Filtrage -->
