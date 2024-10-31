@@ -17,13 +17,6 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 // Définir l'URL de la photo de profil ou utiliser une image par défaut si la photo n'est pas disponible
 $profilePictureUrl = !empty($user['profile_picture']) ? $user['profile_picture'] : 'images/default_profile.png';
 
-// Récupérer les notifications non lues
-$stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = :user_id AND is_read = 0");
-$stmt->bindParam(':user_id', $user_id);
-$stmt->execute();
-$notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$unreadNotifications = count($notifications);
-
 // Récupérer les utilisateurs en attente d'approbation pour les administrateurs uniquement
 $approvalNotifications = [];
 if ($user_role === 'admin') {
