@@ -20,7 +20,7 @@ function sendEmail($to, $subject, $template, $variables = [], $from = 'notificat
         $mail->SMTPAuth = true;
         $mail->Username = getenv('SMTP_USERNAME');
         $mail->Password = getenv('SMTP_PASSWORD');
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = getenv('SMTP_PORT');
 
         // Debug pour diagnostic
