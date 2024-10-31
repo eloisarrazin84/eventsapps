@@ -16,7 +16,6 @@ $query = "SELECT medicaments.*, stock_locations.location_name, stock_locations.b
           LEFT JOIN stock_locations ON medicaments.stock_location_id = stock_locations.id 
           WHERE 1=1";
 
-// Appliquer les filtres
 if (!empty($filterNom)) {
     $query .= " AND nom LIKE :filterNom";
 }
@@ -27,13 +26,10 @@ if (!empty($filterLocation)) {
     $query .= " AND stock_location_id = :filterLocation";
 }
 
-// Ajouter le tri
 $query .= " ORDER BY $sortColumn $sortOrder";
 
-// Préparer la requête
 $stmt = $conn->prepare($query);
 
-// Lier les paramètres des filtres
 if (!empty($filterNom)) {
     $stmt->bindValue(':filterNom', "%$filterNom%");
 }
@@ -47,7 +43,6 @@ if (!empty($filterLocation)) {
 $stmt->execute();
 $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Récupérer les lieux de stockage
 $stmt = $conn->prepare("SELECT * FROM stock_locations");
 $stmt->execute();
 $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -61,118 +56,131 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Gestion des Médicaments</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-   <style>
-    .container {
-        margin-top: 20px;
-        padding: 20px;
-        background-color: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+    <style>
+        .container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    h1 {
-        font-size: 2em;
-        margin-bottom: 30px;
-        color: #007bff;
-        text-align: center;
-    }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #007bff;
+            text-align: center;
+        }
 
-    .filter-form .form-control {
-        margin-bottom: 15px;
-        padding: 10px;
-        border-radius: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+        .action-menu {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-    .btn-primary,
-    .btn-secondary {
-        border-radius: 20px;
-        padding: 10px 20px;
-    }
+        .btn-action {
+            font-size: 0.9em;
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
 
-    .card-header {
-        background-color: #007bff;
-        color: #fff;
-        font-weight: bold;
-        padding: 15px;
-        font-size: 1.2em;
-    }
+        .btn-action .fa {
+            font-size: 0.9em;
+        }
 
-    .table {
-        margin-top: 15px;
-        font-size: 1em;
-        border-spacing: 0 10px;
-    }
+        .btn-back {
+            background-color: #6c757d;
+            color: #fff;
+            text-decoration: none;
+        }
 
-    .table th,
-    .table td {
-        vertical-align: middle;
-        padding: 15px;
-        text-align: center;
-    }
+        .btn-back:hover {
+            background-color: #5a6268;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
 
-    .table tbody tr {
-        background-color: #f9f9f9;
-        border-radius: 10px;
-    }
+        .btn-add {
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+        }
 
-    .btn-warning,
-    .btn-danger {
-        border-radius: 15px;
-        padding: 5px 15px;
-        margin-right: 5px;
-    }
+        .btn-add:hover {
+            background-color: #218838;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
 
-    .btn-warning {
-        background-color: #ffc107;
-        color: #000;
-        border: none;
-    }
+        .card-header {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+            padding: 15px;
+            font-size: 1.2em;
+        }
 
-    .btn-danger {
-        background-color: #dc3545;
-        color: #fff;
-        border: none;
-    }
+        .table {
+            margin-top: 15px;
+            font-size: 1em;
+            border-spacing: 0 10px;
+        }
 
-    .btn-warning:hover {
-        background-color: #ffca2c;
-    }
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 15px;
+            text-align: center;
+        }
 
-    .btn-danger:hover {
-        background-color: #e02a32;
-    }
+        .table tbody tr {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
 
-    .add-button {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 20px;
-    }
-</style>
+        .btn-warning, .btn-danger {
+            border-radius: 15px;
+            padding: 5px 15px;
+            margin-right: 5px;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #000;
+            border: none;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-warning:hover {
+            background-color: #ffca2c;
+        }
+
+        .btn-danger:hover {
+            background-color: #e02a32;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5">
-    <!-- Menu Accordéon pour les actions -->
-    <div class="accordion mb-4" id="actionMenu">
-        <div class="card">
-            <div class="card-header" id="headingOne">
-                <h2 class="mb-0">
-                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        <i class="fas fa-bars"></i> Menu d'Actions
-                    </button>
-                </h2>
-            </div>
-
-            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#actionMenu">
-                <div class="card-body">
-                    <a href="dashboard_medicaments.php" class="btn btn-secondary mb-2"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
-                    <a href="ajouter_medicament.php" class="btn btn-success mb-2"><i class="fas fa-plus-circle"></i> Ajouter un Médicament</a>
-                </div>
-            </div>
-        </div>
+<div class="container">
+    <!-- Menu d'Actions -->
+    <div class="action-menu">
+        <a href="dashboard_medicaments.php" class="btn-action btn-back">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+        <a href="ajouter_medicament.php" class="btn-action btn-add">
+            <i class="fas fa-plus-circle"></i> Ajouter un Médicament
+        </a>
     </div>
 
-    <!-- Titre de la page -->
     <h1>Gestion des Médicaments</h1>
 
     <!-- Formulaire de Filtrage -->
@@ -198,7 +206,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Liste des Médicaments -->
     <div class="card">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header">
             <i class="fas fa-capsules"></i> Médicaments Disponibles
         </div>
         <div class="card-body">
@@ -237,7 +245,6 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<!-- Scripts JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
