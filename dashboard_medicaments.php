@@ -23,6 +23,8 @@ $expiringSoon = $expiringSoon->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+
     <title>Dashboard Médicaments</title>
     <style>
         .card-stats { transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); }
