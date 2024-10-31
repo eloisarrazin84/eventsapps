@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'email/sendEmail.php'; // Inclusion de la fonction d'envoi d'email
+require_once 'mail/sendEmail.php'; // Inclusion de la fonction d'envoi d'email
 
 // Vérifier si l'utilisateur est un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
