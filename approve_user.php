@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'mail/sendEmail.php'; // Inclusion de la fonction d'envoi d'email
+require_once __DIR__ . '/mail/sendEmail.php'; // Inclusion de la fonction d'envoi d'email
 
 // Vérifier si l'utilisateur est un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -41,13 +41,12 @@ if (isset($_GET['id'])) {
                 'last_name' => $user['last_name']
             ];
 
-            // Envoyer l'email de confirmation d'approbation
-         try {
-    sendEmail($email, $subject, "user_approved", $variables);
-} catch (Exception $e) {
-    echo "Erreur d'envoi d'email : " . $e->getMessage();
-}
-
+            // Charger le contenu du template et envoyer l'email
+            $templateContent = loadTemplate("user_approved", $variables);
+            if (!sendEmail($email, $subject, $templateContent)) {
+                echo "Erreur d'envoi d'email.";
+            }
+        }
 
         // Rediriger vers la page de gestion des utilisateurs avec un message de succès
         header("Location: manage_users.php");
