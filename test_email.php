@@ -10,8 +10,8 @@ try {
     $mail->isSMTP();
     $mail->Host = 'smtp.gmail.com';
     $mail->SMTPAuth = true;
-    $mail->Username = getenv('SMTP_USERNAME'); // Assurez-vous que la variable d'environnement est définie
-    $mail->Password = getenv('SMTP_PASSWORD'); // Assurez-vous que la variable d'environnement est définie
+    $mail->Username = eloi@bewitness.fr
+    $mail->Password = kliy flmk mbff laob
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = 587;
 
