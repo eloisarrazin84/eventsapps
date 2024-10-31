@@ -65,7 +65,7 @@ if (isset($_GET['id'])) {
             ];
 
             // Charger le template et envoyer l'email
-            $templateContent = loadTemplate("user_approved", $variables);
+            $templateContent = loadTemplate("test_template", $variables);
             try {
                 if (!sendEmail($email, $subject, $templateContent)) {
                     error_log("Erreur d'envoi d'email : envoi échoué pour $email");
