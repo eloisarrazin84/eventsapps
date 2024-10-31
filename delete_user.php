@@ -1,5 +1,5 @@
 <?php
-session_start();  // Démarre une session pour gérer les utilisateurs connectés.
+session_start();
 
 // Vérifie si l'utilisateur est un administrateur. Si ce n'est pas le cas, il est redirigé vers la page de connexion.
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -22,16 +22,33 @@ if (isset($_GET['id'])) {
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Prépare la requête SQL pour supprimer l'utilisateur avec l'ID spécifié
+        // Démarrer une transaction pour garantir que toutes les suppressions sont faites ensemble
+        $conn->beginTransaction();
+
+        // Supprimer les enregistrements dans `notifications` associés à l'utilisateur
+        $stmt = $conn->prepare("DELETE FROM notifications WHERE user_id = :user_id");
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->execute();
+
+        // Supprimer les enregistrements dans `user_event_data` associés à l'utilisateur
+        $stmt = $conn->prepare("DELETE FROM user_event_data WHERE user_id = :user_id");
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->execute();
+
+        // Supprimer l'utilisateur dans `users`
         $stmt = $conn->prepare("DELETE FROM users WHERE id = :id");
-        $stmt->bindParam(':id', $userId);  // Lie l'ID de l'utilisateur à la requête.
-        $stmt->execute();  // Exécute la requête de suppression.
+        $stmt->bindParam(':id', $userId);
+        $stmt->execute();
+
+        // Valider la transaction
+        $conn->commit();
 
         // Redirige vers la page de gestion des utilisateurs après la suppression
         header("Location: manage_users.php");
         exit();
     } catch (PDOException $e) {
-        // Gère les erreurs de connexion ou d'exécution de la requête
+        // En cas d'erreur, annule la transaction et affiche le message d'erreur
+        $conn->rollBack();
         echo "Erreur : " . $e->getMessage();
     }
 } else {
