@@ -57,96 +57,45 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        .container {
-            max-width: 900px; /* Ajustez la largeur maximale selon vos besoins */
-            margin-top: 50px;
+        body {
             background-color: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
-
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
         h1 {
             font-size: 2em;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             color: #007bff;
             text-align: center;
         }
-
         .action-menu {
             display: flex;
-            justify-content: space-between; /* Espace entre les éléments */
+            justify-content: space-between;
             margin-bottom: 20px;
         }
-
+        .form-inline {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
         .form-inline .form-control {
-            border-radius: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-right: 10px;
-            min-width: 120px; /* Largeur minimale pour les champs de filtre */
+            margin: 0 5px;
         }
-
-        .btn-primary, .btn-danger, .btn-secondary {
-            border-radius: 20px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-back {
-            margin-bottom: 20px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
         .table {
-            margin-top: 15px;
-            font-size: 1em;
-            border-spacing: 0 10px;
-            overflow-x: auto; /* Permet le défilement horizontal si le tableau dépasse */
+            font-size: 0.9em;
         }
-
         .table th, .table td {
             vertical-align: middle;
-            padding: 15px;
             text-align: center;
-            white-space: nowrap; /* Empêche le texte de s'enrouler */
         }
-
-        .table tbody tr {
-            background-color: #f9f9f9;
-            border-radius: 10px;
-        }
-
-        .btn-warning, .btn-danger {
-            border-radius: 15px;
-            padding: 5px 15px;
-            margin-right: 5px;
-        }
-
-        .btn-warning {
-            background-color: #ffc107;
-            color: #000;
-            border: none;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: #fff;
-            border: none;
-        }
-
-        .btn-warning:hover {
-            background-color: #ffca2c;
-        }
-
-        .btn-danger:hover {
-            background-color: #e02a32;
+        .btn {
+            margin: 0 2px;
         }
     </style>
 </head>
@@ -156,21 +105,23 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Menu d'Actions -->
     <div class="action-menu">
-        <a href="dashboard_medicaments.php" class="btn btn-back mb-4"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
+        <a href="dashboard_medicaments.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Retour</a>
         <a href="ajouter_medicament.php" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Ajouter un Médicament</a>
-        <button class="btn btn-info" data-toggle="modal" data-target="#pdfModal"><i class="fas fa-file-pdf"></i> Générer Inventaire PDF</button>
+        <button class="btn btn-info" data-toggle="modal" data-target="#pdfModal">
+            <i class="fas fa-file-pdf"></i> Générer Inventaire PDF
+        </button>
     </div>
 
     <!-- Formulaire de Filtrage -->
-    <form method="GET" class="form-inline justify-content-center mb-4">
-        <input type="text" name="filter_nom" class="form-control mr-2" placeholder="Filtrer par nom" value="<?php echo htmlspecialchars($filterNom); ?>">
-        <select name="filter_type" class="form-control mr-2">
+    <form method="GET" class="form-inline mb-4">
+        <input type="text" name="filter_nom" class="form-control" placeholder="Filtrer par nom" value="<?php echo htmlspecialchars($filterNom); ?>">
+        <select name="filter_type" class="form-control">
             <option value="">Filtrer par type</option>
             <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
             <option value="Injectable" <?php echo $filterType == 'Injectable' ? 'selected' : ''; ?>>Injectable</option>
             <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
         </select>
-        <select name="filter_location" class="form-control mr-2">
+        <select name="filter_location" class="form-control">
             <option value="">Filtrer par lieu de stockage</option>
             <?php foreach ($stockLocations as $location): ?>
                 <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
@@ -178,7 +129,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </option>
             <?php endforeach; ?>
         </select>
-        <button type="submit" class="btn btn-primary mr-2">Appliquer les filtres</button>
+        <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
         <a href="gestion_medicaments.php" class="btn btn-secondary">Réinitialiser</a>
     </form>
 
