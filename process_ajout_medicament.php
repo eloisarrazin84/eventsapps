@@ -14,14 +14,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $type_produit = $_POST['type_produit'];
     $stock_location_id = $_POST['stock_location_id'];
     
-    // Initialisation du chemin de la photo par défaut
+    // Initialiser le chemin de la photo
     $photoPath = null;
 
-    // Gestion de l'upload de la photo avec diagnostics
+    // Gérer l'upload de la photo
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
         $uploadDir = 'uploads/';
         
-        // Assurez-vous que le dossier d'uploads existe
+        // Créer le dossier d'upload s'il n'existe pas
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
@@ -30,15 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $uploadFile = $uploadDir . $photoName;
         
         if (move_uploaded_file($_FILES['photo']['tmp_name'], $uploadFile)) {
-            $photoPath = $uploadFile; // Chemin de la photo enregistrée
-        } else {
-            die("Échec du téléchargement du fichier.");
+            $photoPath = $uploadFile;
         }
-    } else {
-        echo "Aucun fichier téléchargé ou une erreur est survenue lors de l'upload.";
     }
 
-    // Préparation de la requête d'insertion
+    // Préparer la requête d'insertion
     $stmt = $conn->prepare("INSERT INTO medicaments (nom, numero_lot, description, quantite, date_expiration, type_produit, stock_location_id, photo_path) VALUES (:nom, :numero_lot, :description, :quantite, :date_expiration, :type_produit, :stock_location_id, :photo_path)");
     $stmt->bindParam(':nom', $nom);
     $stmt->bindParam(':numero_lot', $numero_lot);
@@ -51,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $stmt->execute();
 
-    // Redirection vers la liste des médicaments
+    // Redirection après insertion
     header("Location: gestion_medicaments.php");
     exit();
 }
