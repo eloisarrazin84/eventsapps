@@ -170,6 +170,10 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .table td .btn + .btn {
     margin-left: 5px; /* Ajustez la valeur selon vos préférences */
 }
+                  .table td .btn {
+    margin-right: 8px; /* Ajustez la valeur pour plus ou moins d'espace */
+}
+
     </style>
 </head>
 <body>
