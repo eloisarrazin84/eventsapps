@@ -24,7 +24,19 @@ if (isset($_GET['id'])) {
 
         // Traitement du formulaire de modification
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $stmt = $conn->prepare("UPDATE medicaments SET nom = :nom, description = :description, numero_lot = :numero_lot, quantite = :quantite, date_expiration = :date_expiration, type_produit = :type_produit, stock_location_id = :stock_location_id WHERE id = :id");
+            // Upload de la nouvelle image si elle est fournie
+            $imagePath = $medicament['photo_path']; // Utiliser le chemin existant par défaut
+            if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
+                $uploadDir = 'uploads/';
+                $imageName = uniqid() . '_' . basename($_FILES['photo']['name']);
+                $uploadFile = $uploadDir . $imageName;
+                if (move_uploaded_file($_FILES['photo']['tmp_name'], $uploadFile)) {
+                    $imagePath = $uploadFile;
+                }
+            }
+
+            // Mise à jour des informations du médicament
+            $stmt = $conn->prepare("UPDATE medicaments SET nom = :nom, description = :description, numero_lot = :numero_lot, quantite = :quantite, date_expiration = :date_expiration, type_produit = :type_produit, stock_location_id = :stock_location_id, photo_path = :photo_path WHERE id = :id");
             $stmt->bindParam(':nom', $_POST['nom']);
             $stmt->bindParam(':description', $_POST['description']);
             $stmt->bindParam(':numero_lot', $_POST['numero_lot']);
@@ -32,6 +44,7 @@ if (isset($_GET['id'])) {
             $stmt->bindParam(':date_expiration', $_POST['date_expiration']);
             $stmt->bindParam(':type_produit', $_POST['type_produit']);
             $stmt->bindParam(':stock_location_id', $_POST['stock_location_id']);
+            $stmt->bindParam(':photo_path', $imagePath);
             $stmt->bindParam(':id', $medicament_id);
             $stmt->execute();
 
@@ -127,7 +140,7 @@ if (isset($_GET['id'])) {
     </a>
     <h2>Modifier le Médicament</h2>
     
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         <div class="form-section">
             <div class="form-group">
                 <label for="nom">Nom du médicament</label>
@@ -166,6 +179,10 @@ if (isset($_GET['id'])) {
                         </option>
                     <?php endforeach; ?>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="photo">Photo du Médicament</label>
+                <input type="file" class="form-control-file" id="photo" name="photo">
             </div>
         </div>
 
