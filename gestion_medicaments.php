@@ -56,6 +56,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Gestion des Médicaments</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
         .container {
             margin-top: 20px;
@@ -167,33 +168,39 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .btn-danger:hover {
             background-color: #e02a32;
         }
-.table td .btn {
-    display: block;           /* Les boutons sont affichés en bloc pour être l'un sous l'autre */
-    width: 100%;               /* Chaque bouton prend la largeur de son conteneur */
-    margin-bottom: 8px;        /* Ajoute un espace en bas de chaque bouton */
-}
+        .table td .btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 8px;
+        }
 
-.table td .btn:last-child {
-    margin-bottom: 0;          /* Pas de marge pour le dernier bouton */
-}
+        .table td .btn:last-child {
+            margin-bottom: 0;
+        }
 
-
+        .signature-pad {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
+    <h1>Gestion des Médicaments</h1>
+
     <!-- Menu d'Actions -->
     <div class="action-menu">
-        <a href="dashboard_medicaments.php" class="btn-action btn-back btn-secondary">
+        <a href="dashboard_medicaments.php" class="btn-action btn-back">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
-        <!-- Bouton pour ouvrir le modal de sélection de lieu de stockage -->
+        <a href="ajouter_medicament.php" class="btn-action btn-add">
+            <i class="fas fa-plus-circle"></i> Ajouter un Médicament
+        </a>
         <button class="btn btn-info" data-toggle="modal" data-target="#pdfModal">
             <i class="fas fa-file-pdf"></i> Générer Inventaire PDF
         </button>
     </div>
-
-    <h1>Gestion des Médicaments</h1>
 
     <!-- Formulaire de Filtrage -->
     <form method="GET" class="form-inline justify-content-center mb-4">
@@ -258,17 +265,17 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<!-- Modal pour sélectionner le lieu de stockage pour le PDF -->
+<!-- Modal pour sélectionner le lieu de stockage et capturer la signature pour le PDF -->
 <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="pdfModalLabel">Générer PDF d'Inventaire</h5>
+                <h5 class="modal-title" id="pdfModalLabel">Générer PDF d'Inventaire avec Signature</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="generer_pdf.php" method="GET">
+            <form action="generer_pdf.php" method="POST">
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="locationSelect">Sélectionner le lieu de stockage</label>
@@ -279,6 +286,14 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Signature :</label>
+                        <div class="signature-pad">
+                            <canvas id="signatureCanvas" width="400" height="150"></canvas>
+                        </div>
+                        <button type="button" class="btn btn-secondary mt-2" id="clearSignature">Effacer la signature</button>
+                        <input type="hidden" name="signature" id="signatureInput">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -292,5 +307,20 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const canvas = document.getElementById('signatureCanvas');
+    const signaturePad = new SignaturePad(canvas);
+
+    document.getElementById('clearSignature').addEventListener('click', () => signaturePad.clear());
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (!signaturePad.isEmpty()) {
+            document.getElementById('signatureInput').value = signaturePad.toDataURL('image/png');
+        } else {
+            alert("Veuillez ajouter une signature.");
+            e.preventDefault();
+        }
+    });
+</script>
 </body>
 </html>
