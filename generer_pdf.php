@@ -75,29 +75,23 @@ foreach ($medicaments as $medicament) {
     $fill = !$fill;
 }
 
-// Section de signature
-$pdf->Ln(15);
-$pdf->SetFont('helvetica', 'I', 10);
-$pdf->Cell(0, 10, "Signature de la personne ayant validé l'inventaire :", 0, 1, 'L');
-$pdf->Cell(0, 15, '', 'B');
-
-// Vérifier et ajouter la signature si elle est présente
+// Enregistrer la signature si elle est présente
 if ($signatureData) {
     $signatureData = str_replace('data:image/png;base64,', '', $signatureData);
-    $signatureData = base64_decode($signatureData);
+    $signatureData = str_replace(' ', '+', $signatureData);
+    $signature = base64_decode($signatureData);
 
-    // Utiliser un dossier temporaire approprié
-    $signatureFilePath = '/tmp/signature.png';
-    if (file_put_contents($signatureFilePath, $signatureData) === false) {
-        die("Erreur : Impossible d'enregistrer la signature. Vérifiez les permissions d'écriture.");
-    }
+    $signaturePath = '/tmp/signature.png';
+    file_put_contents($signaturePath, $signature);
 
-    // Vérifier si le fichier est bien enregistré avant de l'afficher
-    if (file_exists($signatureFilePath)) {
-        $pdf->Image($signatureFilePath, 15, $pdf->GetY() + 5, 40, 20, 'PNG');
-    } else {
-        die("Erreur : Fichier de signature introuvable.");
-    }
+    // Ajouter la signature dans le PDF
+    $pdf->Ln(15);
+    $pdf->SetFont('helvetica', 'I', 10);
+    $pdf->Cell(0, 10, "Signature de la personne ayant validé l'inventaire :", 0, 1, 'L');
+    $pdf->Image($signaturePath, 15, $pdf->GetY(), 50, 20, 'PNG');
+    
+    // Supprimer le fichier temporaire de signature après l'insertion dans le PDF
+    unlink($signaturePath);
 }
 
 // Sortie du PDF
