@@ -6,7 +6,9 @@ $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!")
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Vérifier si le lieu de stockage est spécifié
-$location_id = isset($_GET['location_id']) ? $_GET['location_id'] : null;
+$location_id = isset($_POST['location_id']) ? $_POST['location_id'] : null;
+$signatureData = isset($_POST['signature']) ? $_POST['signature'] : null;
+
 if (!$location_id) {
     die("Lieu de stockage non spécifié.");
 }
@@ -78,6 +80,17 @@ $pdf->Ln(15);
 $pdf->SetFont('helvetica', 'I', 10);
 $pdf->Cell(0, 10, "Signature de la personne ayant validé l'inventaire :", 0, 1, 'L');
 $pdf->Cell(0, 15, '', 'B');
+
+// Si une signature est fournie, l'ajouter au PDF
+if ($signatureData) {
+    $signatureData = str_replace('data:image/png;base64,', '', $signatureData);
+    $signatureData = base64_decode($signatureData);
+    $signatureFilePath = '/tmp/signature.png';
+    file_put_contents($signatureFilePath, $signatureData);
+
+    // Ajouter la signature au PDF
+    $pdf->Image($signatureFilePath, 15, $pdf->GetY() + 5, 40, 20, 'PNG');
+}
 
 // Sortie du PDF
 $pdf->Output('inventaire_medicaments_' . $location['location_name'] . '.pdf', 'I');
