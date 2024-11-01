@@ -111,6 +111,15 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <option value="Inhalable">Inhalable</option>
                 </select>
             </div>
+            <!-- Section pour ajouter la photo du médicament -->
+<div class="form-section">
+    <h4>Photo du Médicament</h4>
+    <div class="form-group">
+        <label class="icon-label" for="photo"><i class="fas fa-image"></i> Téléchargez une photo</label>
+        <input type="file" class="form-control-file" id="photo" name="photo" accept="image/*">
+    </div>
+</div>
+
         </div>
 
         <!-- Section Lieu de Stockage -->
