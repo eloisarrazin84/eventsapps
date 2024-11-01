@@ -167,6 +167,9 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .btn-danger:hover {
             background-color: #e02a32;
         }
+        .table td .btn + .btn {
+            margin-left: 5px; /* Ajustez la valeur selon vos préférences */
+        }
     </style>
 </head>
 <body>
