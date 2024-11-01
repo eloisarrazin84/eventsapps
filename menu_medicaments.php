@@ -3,7 +3,7 @@
 session_start();
 $user_id = $_SESSION['user_id'];
 
-// Connexion unique à la base de données
+// Connexion à la base de données
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -19,6 +19,11 @@ $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $unreadNotifications = count($notifications);
+
+// Récupérer les médicaments expirant dans moins de 30 jours
+$stmt = $conn->prepare("SELECT nom, date_expiration, numero_lot FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)");
+$stmt->execute();
+$expiringSoonMeds = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
@@ -60,13 +65,13 @@ $unreadNotifications = count($notifications);
                     </a>
                     <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
                         <div class="dropdown-header">Notifications</div>
-                        <?php if (empty($notifications)): ?>
-                            <p class="dropdown-item">Aucune notification</p>
+                        <?php if (empty($expiringSoonMeds)): ?>
+                            <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
                         <?php else: ?>
-                            <?php foreach ($notifications as $notification): ?>
-                                <div class="dropdown-item notification-item" data-id="<?php echo $notification['id']; ?>">
-                                    <p class="notification-text"><?php echo htmlspecialchars($notification['message']); ?></p>
-                                    <button class="btn btn-sm btn-secondary mark-as-read">Marquer comme lu</button>
+                            <?php foreach ($expiringSoonMeds as $med): ?>
+                                <div class="dropdown-item">
+                                    <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lot: <?php echo htmlspecialchars($med['numero_lot']); ?>,
+                                    Expire le: <?php echo htmlspecialchars($med['date_expiration']); ?>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -163,17 +168,6 @@ $unreadNotifications = count($notifications);
     text-overflow: ellipsis;
 }
 
-.mark-as-read {
-    font-size: 0.85em;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    text-decoration: none;
-    cursor: pointer;
-}
-
 .profile-picture {
     width: 40px;
     height: 40px;
@@ -188,9 +182,4 @@ $unreadNotifications = count($notifications);
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     min-width: 200px;
 }
-
-.mark-as-read:hover {
-    background-color: #0056b3;
-}
 </style>
-
