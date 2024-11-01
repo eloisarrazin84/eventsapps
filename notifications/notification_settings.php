@@ -11,7 +11,7 @@ $notifications = [];
 
 // Récupérer les paramètres de notification pour l'utilisateur
 foreach ($notificationTypes as $type) {
-    $stmt = $conn->prepare("SELECT is_enabled FROM user_notifications WHERE user_id = :user_id AND notification_type = :type");
+    $stmt = $conn->prepare("SELECT is_enabled FROM user_notifications WHERE user_id = :user_id AND notification_type = :type LIMIT 1");
     $stmt->bindParam(':user_id', $user_id);
     $stmt->bindParam(':type', $type);
     $stmt->execute();
@@ -30,21 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':type', $type);
         $stmt->bindParam(':is_enabled', $is_enabled);
-
-        // Exécuter la requête
-        if (!$stmt->execute()) {
-            die("Erreur lors de la mise à jour des notifications.");
-        }
-    }
-
-    // Récupérer à nouveau les paramètres de notification après la mise à jour
-    foreach ($notificationTypes as $type) {
-        $stmt = $conn->prepare("SELECT is_enabled FROM user_notifications WHERE user_id = :user_id AND notification_type = :type");
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->bindParam(':type', $type);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $notifications[$type] = $result ? $result['is_enabled'] : 1; // Activer par défaut si pas trouvé
+        $stmt->execute(); // Exécuter la requête sans condition d'erreur
     }
 
     // Afficher le message de confirmation
