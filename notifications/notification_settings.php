@@ -1,39 +1,36 @@
 <?php
-// Démarrer la session et récupérer les informations utilisateur
 session_start();
 $user_id = $_SESSION['user_id'];
 
-// Connexion unique à la base de données
+// Connexion à la base de données
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Vérifier si l'utilisateur est connecté et a le bon rôle
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login.php");
-    exit();
+// Vérification de la soumission du formulaire
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    foreach ($_POST['notifications'] as $notificationType => $isEnabled) {
+        // Mettez à jour la préférence de notification dans la base de données
+        $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, notification_type, is_enabled) VALUES (:user_id, :notification_type, :is_enabled)
+                                 ON DUPLICATE KEY UPDATE is_enabled = :is_enabled");
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':notification_type', $notificationType);
+        $stmt->bindParam(':is_enabled', $isEnabled);
+        $stmt->execute();
+    }
 }
 
-// Récupérer les notifications actuelles
-$stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = :user_id");
+// Récupérer les notifications de l'utilisateur
+$stmt = $conn->prepare("SELECT notification_type, is_enabled FROM user_notifications WHERE user_id = :user_id");
 $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
-$notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$userNotifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Traitement du formulaire si soumis
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    foreach ($notifications as $notification) {
-        $notificationId = $notification['id'];
-        $isEnabled = isset($_POST["notification_$notificationId"]) ? 1 : 0; // 1 pour activé, 0 pour désactivé
-        
-        // Mettre à jour l'état de la notification
-        $updateStmt = $conn->prepare("UPDATE notifications SET is_enabled = :is_enabled WHERE id = :id AND user_id = :user_id");
-        $updateStmt->bindParam(':is_enabled', $isEnabled);
-        $updateStmt->bindParam(':id', $notificationId);
-        $updateStmt->bindParam(':user_id', $user_id);
-        $updateStmt->execute();
-    }
-    echo "<div class='alert alert-success'>Les paramètres de notification ont été mis à jour avec succès.</div>";
-}
+// Préparer un tableau pour stocker les préférences
+$notifications = [
+    'expire_soon' => 'Médicaments expirant bientôt',
+    // Ajoutez d'autres types de notifications ici si nécessaire
+];
+
 ?>
 
 <!DOCTYPE html>
@@ -44,8 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container mt-5">
-    <h2>Paramètres de Notification</h2>
+
+<div class="container">
+    <h1>Paramètres de Notification</h1>
     <form method="POST" action="">
         <table class="table">
             <thead>
@@ -55,11 +53,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($notifications as $notification): ?>
+                <?php foreach ($notifications as $type => $description): ?>
+                    <?php
+                    // Vérifiez si la notification est activée pour l'utilisateur
+                    $isEnabled = false;
+                    foreach ($userNotifications as $userNotification) {
+                        if ($userNotification['notification_type'] === $type) {
+                            $isEnabled = $userNotification['is_enabled'];
+                            break;
+                        }
+                    }
+                    ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($notification['message']); ?></td>
+                        <td><?php echo htmlspecialchars($description); ?></td>
                         <td>
-                            <input type="checkbox" name="notification_<?php echo $notification['id']; ?>" value="1" <?php echo $notification['is_enabled'] ? 'checked' : ''; ?>>
+                            <input type="checkbox" name="notifications[<?php echo $type; ?>]" value="1" <?php echo $isEnabled ? 'checked' : ''; ?>>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -68,5 +76,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <button type="submit" class="btn btn-primary">Sauvegarder</button>
     </form>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
