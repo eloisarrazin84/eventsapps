@@ -23,13 +23,21 @@ foreach ($notificationTypes as $type) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($notificationTypes as $type) {
         $is_enabled = isset($_POST[$type]) ? 1 : 0;
+        
         // Vérifier si l'enregistrement existe
         $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, notification_type, is_enabled) VALUES (:user_id, :type, :is_enabled)
                                  ON DUPLICATE KEY UPDATE is_enabled = :is_enabled");
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':type', $type);
         $stmt->bindParam(':is_enabled', $is_enabled);
-        $stmt->execute();
+        
+        // Exécution de la requête
+        if ($stmt->execute()) {
+            // Log de débogage
+            error_log("Notification pour $type mise à jour : " . ($is_enabled ? 'Activée' : 'Désactivée'));
+        } else {
+            error_log("Erreur lors de la mise à jour de la notification pour $type");
+        }
     }
     // Récupérer à nouveau les paramètres de notification après la mise à jour
     foreach ($notificationTypes as $type) {
