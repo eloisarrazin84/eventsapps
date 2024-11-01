@@ -1,3 +1,4 @@
+<?php
 require_once('tcpdf/tcpdf.php');
 
 // Connexion à la base de données
@@ -96,3 +97,4 @@ if ($signature_image && $signature_image['error'] == UPLOAD_ERR_OK) {
 
 // Sortie du PDF
 $pdf->Output('inventaire_medicaments_' . $location['location_name'] . '.pdf', 'I');
+?>
