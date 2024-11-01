@@ -215,46 +215,53 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <a href="gestion_medicaments.php" class="btn btn-secondary">Réinitialiser</a>
     </form>
 
-    <!-- Liste des Médicaments -->
-    <div class="card">
-        <div class="card-header">
-            <i class="fas fa-capsules"></i> Médicaments Disponibles
-        </div>
-        <div class="card-body">
-            <table class="table table-hover table-bordered">
-                <thead class="thead-light">
-                    <tr>
-                        <th><a href="?sort=nom&order=<?php echo $sortOrder == 'ASC' ? 'desc' : 'asc'; ?>">Nom</a></th>
-                        <th>Description</th>
-                        <th>N° de lot</th>
-                        <th><a href="?sort=quantite&order=<?php echo $sortOrder == 'ASC' ? 'desc' : 'asc'; ?>">Quantité</a></th>
-                        <th><a href="?sort=date_expiration&order=<?php echo $sortOrder == 'ASC' ? 'desc' : 'asc'; ?>">Date d'expiration</a></th>
-                        <th><a href="?sort=type_produit&order=<?php echo $sortOrder == 'ASC' ? 'desc' : 'asc'; ?>">Type</a></th>
-                        <th>Lieu de Stockage</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($medicaments as $medicament): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($medicament['nom']); ?></td>
-                            <td><?php echo htmlspecialchars($medicament['description']); ?></td>
-                            <td><?php echo htmlspecialchars($medicament['numero_lot']); ?></td>
-                            <td><?php echo htmlspecialchars($medicament['quantite']); ?></td>
-                            <td><?php echo htmlspecialchars($medicament['date_expiration']); ?></td>
-                            <td><?php echo htmlspecialchars($medicament['type_produit']); ?></td>
-                            <td><?php echo htmlspecialchars($medicament['location_name'] . ($medicament['bag_name'] ? " - " . $medicament['bag_name'] : '')); ?></td>
-                            <td>
-                                <a href="medicament_details.php?id=<?php echo $medicament['id']; ?>" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Voir Détails</a>      
-                                <a href="modifier_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Modifier</a>
-                                <a href="supprimer_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce médicament ?');"><i class="fas fa-trash-alt"></i> Supprimer</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+<!-- Liste des Médicaments -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-capsules"></i> Médicaments Disponibles
     </div>
+    <div class="card-body">
+        <table class="table table-hover table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>N° de lot</th>
+                    <th>Quantité</th>
+                    <th>Date d'expiration</th>
+                    <th>Type</th>
+                    <th>Lieu de Stockage</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($medicaments as $medicament): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($medicament['nom']); ?></td>
+                        <td><?php echo htmlspecialchars($medicament['description']); ?></td>
+                        <td><?php echo htmlspecialchars($medicament['numero_lot']); ?></td>
+                        <td><?php echo htmlspecialchars($medicament['quantite']); ?></td>
+                        <td><?php echo htmlspecialchars($medicament['date_expiration']); ?></td>
+                        <td><?php echo htmlspecialchars($medicament['type_produit']); ?></td>
+                        <td>
+                            <?php echo htmlspecialchars($medicament['location_name'] . ($medicament['bag_name'] ? " - " . $medicament['bag_name'] : '')); ?>
+                            <br>
+                            <a href="generer_pdf.php?location_id=<?php echo $medicament['stock_location_id']; ?>" class="btn btn-info btn-sm mt-2">
+                                <i class="fas fa-file-pdf"></i> Générer PDF
+                            </a>
+                        </td>
+                        <td>
+                            <a href="medicament_details.php?id=<?php echo $medicament['id']; ?>" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Voir Détails</a>
+                            <a href="modifier_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Modifier</a>
+                            <a href="supprimer_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce médicament ?');"><i class="fas fa-trash-alt"></i> Supprimer</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
