@@ -6,8 +6,8 @@ $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!")
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Vérifier si un lieu de stockage a été sélectionné
-if (isset($_POST['stock_location_id'])) {
-    $locationId = $_POST['stock_location_id'];
+if (isset($_GET['location_id'])) {
+    $locationId = $_GET['location_id'];
 
     // Récupérer les informations du lieu de stockage
     $stmt = $conn->prepare("SELECT * FROM stock_locations WHERE id = :id");
