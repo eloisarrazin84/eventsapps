@@ -46,7 +46,7 @@ $pdf->Cell(0, 10, 'Date de génération : ' . date('d/m/Y'), 0, 1, 'R');
 $pdf->Ln(5);
 $pdf->SetFont('helvetica', 'B', 11);
 $pdf->Cell(40, 8, 'Nom', 1, 0, 'C');
-$pdf->Cell(45, 8, 'Description', 1, 0, 'C');
+$pdf->Cell(50, 8, 'Description', 1, 0, 'C'); // Élargir la colonne de description
 $pdf->Cell(30, 8, 'N° de Lot', 1, 0, 'C');
 $pdf->Cell(15, 8, 'Quantité', 1, 0, 'C');
 $pdf->Cell(30, 8, 'Date d\'Expiration', 1, 0, 'C');
@@ -56,7 +56,7 @@ $pdf->SetFont('helvetica', '', 10);
 
 foreach ($medicaments as $medicament) {
     $pdf->Cell(40, 8, $medicament['nom'], 1);
-    $pdf->Cell(45, 8, $medicament['description'], 1);
+    $pdf->MultiCell(50, 8, $medicament['description'], 1, 'L', 0, 0); // Utiliser MultiCell pour gérer les sauts de ligne
     $pdf->Cell(30, 8, $medicament['numero_lot'], 1);
     $pdf->Cell(15, 8, $medicament['quantite'], 1);
     $pdf->Cell(30, 8, $medicament['date_expiration'], 1);
