@@ -32,13 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':is_enabled', $is_enabled);
 
         // Exécuter la requête
-        if ($stmt->execute()) {
-            // Ajout de message de débogage pour confirmation
-            error_log("Mise à jour de notification pour $type: " . ($is_enabled ? 'Activée' : 'Désactivée'));
-        } else {
-            error_log("Erreur lors de la mise à jour de la notification pour $type");
-            // Affichage d'une erreur si l'exécution échoue
-            die("Erreur lors de la mise à jour de la notification pour $type.");
+        if (!$stmt->execute()) {
+            die("Erreur lors de la mise à jour des notifications.");
         }
     }
 
@@ -51,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         $notifications[$type] = $result ? $result['is_enabled'] : 1; // Activer par défaut si pas trouvé
     }
+
+    // Afficher le message de confirmation
     $confirmationMessage = "Paramètres de notification mis à jour.";
 }
 ?>
