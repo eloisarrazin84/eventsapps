@@ -1,9 +1,9 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Démarrer la session et récupérer les informations utilisateur
 session_start();
+$user_id = $_SESSION['user_id'];
 
-// Connexion à la base de données
+// Connexion unique à la base de données
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -15,7 +15,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 // Récupérer les notifications actuelles
 $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = :user_id");
-$stmt->bindParam(':user_id', $_SESSION['user_id']);
+$stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -23,7 +23,7 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $notificationId = $_POST['notification_id'];
     $isEnabled = isset($_POST['is_enabled']) ? 1 : 0; // 1 pour activé, 0 pour désactivé
-    
+
     // Mettre à jour l'état de la notification
     $updateStmt = $conn->prepare("UPDATE notifications SET is_enabled = :is_enabled WHERE id = :id");
     $updateStmt->bindParam(':is_enabled', $isEnabled);
@@ -51,11 +51,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($notifications as $notification): ?>
+                <?php foreach ($notifications as $notification): 
+                    $isEnabled = isset($notification['is_enabled']) ? $notification['is_enabled'] : 0; // Défaut à 0 si non défini
+                ?>
                     <tr>
                         <td><?php echo htmlspecialchars($notification['message']); ?></td>
                         <td>
-                            <input type="checkbox" name="is_enabled" value="1" <?php echo $notification['is_enabled'] ? 'checked' : ''; ?>>
+                            <input type="checkbox" name="is_enabled" value="1" <?php echo $isEnabled ? 'checked' : ''; ?>>
                             <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
                         </td>
                     </tr>
