@@ -57,45 +57,64 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
         .container {
-            max-width: 1200px;
-            margin: 20px auto;
+            margin-top: 20px;
             padding: 20px;
             background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             font-size: 2em;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             color: #007bff;
             text-align: center;
         }
+
         .action-menu {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
-        .form-inline {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        .form-inline .form-control {
-            margin: 0 5px;
-        }
-        .table {
+
+        .btn-action {
             font-size: 0.9em;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
+        .dropdown-item {
+            border-radius: 20px;
+        }
+
+        .table {
+            margin-top: 15px;
+            font-size: 1em;
+            border-spacing: 0 10px;
+        }
+
         .table th, .table td {
             vertical-align: middle;
+            padding: 15px;
             text-align: center;
         }
-        .btn {
-            margin: 0 2px;
+
+        .btn-warning, .btn-danger {
+            border-radius: 15px;
+            padding: 5px 15px;
+            margin-right: 5px;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #e02a32;
         }
     </style>
 </head>
@@ -105,23 +124,32 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Menu d'Actions -->
     <div class="action-menu">
-        <a href="dashboard_medicaments.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Retour</a>
-        <a href="ajouter_medicament.php" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Ajouter un Médicament</a>
-        <button class="btn btn-info" data-toggle="modal" data-target="#pdfModal">
-            <i class="fas fa-file-pdf"></i> Générer Inventaire PDF
-        </button>
+        <a href="dashboard_medicaments.php" class="btn btn-secondary btn-action">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+        
+        <!-- Dropdown Action Button -->
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Actions
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="ajouter_medicament.php"><i class="fas fa-plus-circle"></i> Ajouter un Médicament</a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#pdfModal"><i class="fas fa-file-pdf"></i> Générer Inventaire PDF</a>
+            </div>
+        </div>
     </div>
 
     <!-- Formulaire de Filtrage -->
-    <form method="GET" class="form-inline mb-4">
-        <input type="text" name="filter_nom" class="form-control" placeholder="Filtrer par nom" value="<?php echo htmlspecialchars($filterNom); ?>">
-        <select name="filter_type" class="form-control">
+    <form method="GET" class="form-inline justify-content-center mb-4">
+        <input type="text" name="filter_nom" class="form-control mr-2" placeholder="Filtrer par nom" value="<?php echo htmlspecialchars($filterNom); ?>">
+        <select name="filter_type" class="form-control mr-2">
             <option value="">Filtrer par type</option>
             <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
             <option value="Injectable" <?php echo $filterType == 'Injectable' ? 'selected' : ''; ?>>Injectable</option>
             <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
         </select>
-        <select name="filter_location" class="form-control">
+        <select name="filter_location" class="form-control mr-2">
             <option value="">Filtrer par lieu de stockage</option>
             <?php foreach ($stockLocations as $location): ?>
                 <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
@@ -129,7 +157,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </option>
             <?php endforeach; ?>
         </select>
-        <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
+        <button type="submit" class="btn btn-primary mr-2">Appliquer les filtres</button>
         <a href="gestion_medicaments.php" class="btn btn-secondary">Réinitialiser</a>
     </form>
 
@@ -175,7 +203,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<!-- Modal pour sélectionner le lieu de stockage et télécharger la signature pour le PDF -->
+<!-- Modal pour sélectionner le lieu de stockage et capturer la signature pour le PDF -->
 <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
