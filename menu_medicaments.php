@@ -20,10 +20,20 @@ $stmt->execute();
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $unreadNotifications = count($notifications);
 
-// Récupérer les médicaments expirant dans moins de 30 jours
-$stmt = $conn->prepare("SELECT nom, date_expiration, numero_lot FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)");
+// Vérifier si les notifications pour les médicaments expirant bientôt sont activées
+$stmt = $conn->prepare("SELECT is_enabled FROM user_notifications WHERE user_id = :user_id AND notification_type = 'expire_soon'");
+$stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
-$expiringSoonMeds = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$notificationSetting = $stmt->fetch(PDO::FETCH_ASSOC);
+$notificationEnabled = $notificationSetting ? $notificationSetting['is_enabled'] : 1; // Activer par défaut si pas trouvé
+
+// Récupérer les médicaments expirant dans moins de 30 jours si la notification est activée
+$expiringSoonMeds = [];
+if ($notificationEnabled) {
+    $stmt = $conn->prepare("SELECT nom, date_expiration, numero_lot FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)");
+    $stmt->execute();
+    $expiringSoonMeds = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
