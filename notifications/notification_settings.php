@@ -22,7 +22,7 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Traitement du formulaire si soumis
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $notificationId = $_POST['notification_id'];
-    $isEnabled = $_POST['is_enabled'] ? 1 : 0; // 1 pour activé, 0 pour désactivé
+    $isEnabled = isset($_POST['is_enabled']) ? 1 : 0; // 1 pour activé, 0 pour désactivé
     
     // Mettre à jour l'état de la notification
     $updateStmt = $conn->prepare("UPDATE notifications SET is_enabled = :is_enabled WHERE id = :id");
