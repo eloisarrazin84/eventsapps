@@ -31,7 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':is_enabled', $is_enabled);
         $stmt->execute();
     }
-    // Afficher le message de confirmation
+    // Récupérer à nouveau les paramètres de notification après la mise à jour
+    foreach ($notificationTypes as $type) {
+        $stmt = $conn->prepare("SELECT is_enabled FROM user_notifications WHERE user_id = :user_id AND notification_type = :type");
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':type', $type);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $notifications[$type] = $result ? $result['is_enabled'] : 1; // Activer par défaut si pas trouvé
+    }
     $confirmationMessage = "Paramètres de notification mis à jour.";
 }
 ?>
