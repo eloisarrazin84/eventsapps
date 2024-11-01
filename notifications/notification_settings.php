@@ -21,14 +21,18 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Traitement du formulaire si soumis
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $notificationId = $_POST['notification_id'];
-    $isEnabled = isset($_POST['is_enabled']) ? 1 : 0; // 1 pour activé, 0 pour désactivé
-
-    // Mettre à jour l'état de la notification
-    $updateStmt = $conn->prepare("UPDATE notifications SET is_enabled = :is_enabled WHERE id = :id");
-    $updateStmt->bindParam(':is_enabled', $isEnabled);
-    $updateStmt->bindParam(':id', $notificationId);
-    $updateStmt->execute();
+    foreach ($notifications as $notification) {
+        $notificationId = $notification['id'];
+        $isEnabled = isset($_POST["notification_$notificationId"]) ? 1 : 0; // 1 pour activé, 0 pour désactivé
+        
+        // Mettre à jour l'état de la notification
+        $updateStmt = $conn->prepare("UPDATE notifications SET is_enabled = :is_enabled WHERE id = :id AND user_id = :user_id");
+        $updateStmt->bindParam(':is_enabled', $isEnabled);
+        $updateStmt->bindParam(':id', $notificationId);
+        $updateStmt->bindParam(':user_id', $user_id);
+        $updateStmt->execute();
+    }
+    echo "<div class='alert alert-success'>Les paramètres de notification ont été mis à jour avec succès.</div>";
 }
 ?>
 
@@ -51,14 +55,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($notifications as $notification): 
-                    $isEnabled = isset($notification['is_enabled']) ? $notification['is_enabled'] : 0; // Défaut à 0 si non défini
-                ?>
+                <?php foreach ($notifications as $notification): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($notification['message']); ?></td>
                         <td>
-                            <input type="checkbox" name="is_enabled" value="1" <?php echo $isEnabled ? 'checked' : ''; ?>>
-                            <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
+                            <input type="checkbox" name="notification_<?php echo $notification['id']; ?>" value="1" <?php echo $notification['is_enabled'] ? 'checked' : ''; ?>>
                         </td>
                     </tr>
                 <?php endforeach; ?>
