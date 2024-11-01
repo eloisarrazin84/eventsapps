@@ -166,13 +166,17 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .btn-danger:hover {
             background-color: #e02a32;
-                  
-        .table td .btn + .btn {
-    margin-left: 5px; /* Ajustez la valeur selon vos préférences */
+        }
+.table td .btn {
+    display: block;           /* Les boutons sont affichés en bloc pour être l'un sous l'autre */
+    width: 100%;               /* Chaque bouton prend la largeur de son conteneur */
+    margin-bottom: 8px;        /* Ajoute un espace en bas de chaque bouton */
 }
-                  .table td .btn {
-    margin-right: 8px; /* Ajustez la valeur pour plus ou moins d'espace */
+
+.table td .btn:last-child {
+    margin-bottom: 0;          /* Pas de marge pour le dernier bouton */
 }
+
 
     </style>
 </head>
