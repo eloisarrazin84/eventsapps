@@ -1,96 +1,74 @@
 <?php
-// Activer l'affichage des erreurs
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-require_once('tcpdf/tcpdf.php'); // Chemin vers la bibliothèque TCPDF
-
-// Vérifier si un ID de lieu est passé en paramètre
-if (!isset($_GET['location_id'])) {
-    die('Lieu de stockage non spécifié.');
-}
-
-$locationId = $_GET['location_id'];
+require_once('tcpdf/tcpdf.php');
 
 // Connexion à la base de données
-try {
-    $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
+$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Récupérer les informations du lieu de stockage
-    $stmt = $conn->prepare("SELECT location_name, bag_name FROM stock_locations WHERE id = :id");
-    $stmt->bindParam(':id', $locationId, PDO::PARAM_INT);
-    $stmt->execute();
-    $location = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$location) {
-        die('Lieu de stockage non trouvé.');
-    }
-
-    // Récupérer les médicaments pour le lieu de stockage spécifié
-    $stmt = $conn->prepare("SELECT nom, description, numero_lot, quantite, date_expiration, type_produit FROM medicaments WHERE stock_location_id = :location_id");
-    $stmt->bindParam(':location_id', $locationId, PDO::PARAM_INT);
-    $stmt->execute();
-    $medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("Erreur de connexion : " . $e->getMessage());
+// Récupérer les informations du lieu de stockage
+$location_id = isset($_GET['location_id']) ? $_GET['location_id'] : null;
+if (!$location_id) {
+    die("Lieu de stockage non spécifié.");
 }
 
-// Création du PDF
+$stmt = $conn->prepare("SELECT * FROM stock_locations WHERE id = :id");
+$stmt->bindParam(':id', $location_id);
+$stmt->execute();
+$location = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$location) {
+    die("Lieu de stockage introuvable.");
+}
+
+// Récupérer les médicaments pour ce lieu de stockage
+$stmt = $conn->prepare("SELECT * FROM medicaments WHERE stock_location_id = :id");
+$stmt->bindParam(':id', $location_id);
+$stmt->execute();
+$medicaments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Initialiser le PDF
 $pdf = new TCPDF();
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Outdoor Secours');
-$pdf->SetTitle('Inventaire des Médicaments');
-$pdf->SetSubject('Inventaire par lieu de stockage');
-$pdf->SetHeaderData('', 0, 'Inventaire des Médicaments', $location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : ''));
-
-// Configurer les marges et le pied de page
-$pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-$pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-
-// Ajouter une page
+$pdf->SetMargins(15, 20, 15);
 $pdf->AddPage();
 
-// Titre
+// Logo et titre
+$logo = 'https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png';
+$pdf->Image($logo, 15, 10, 30, 30, 'PNG');
 $pdf->SetFont('helvetica', 'B', 14);
-$pdf->Cell(0, 10, 'Inventaire des Médicaments - ' . $location['location_name'], 0, 1, 'C');
+$pdf->Cell(0, 10, "Inventaire des Médicaments - " . $location['location_name'] . ' - ' . $location['bag_name'], 0, 1, 'C');
 $pdf->Ln(5);
 
-// Tableau des médicaments
+// Date de génération
 $pdf->SetFont('helvetica', '', 10);
-$html = '<table border="1" cellpadding="4">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Description</th>
-                    <th>N° de Lot</th>
-                    <th>Quantité</th>
-                    <th>Date d\'Expiration</th>
-                    <th>Type</th>
-                </tr>
-            </thead>
-            <tbody>';
+$pdf->Cell(0, 10, 'Date de génération : ' . date('d/m/Y'), 0, 1, 'R');
+
+// Tableau des médicaments
+$pdf->SetFont('helvetica', 'B', 12);
+$pdf->Ln(5);
+$pdf->Cell(40, 8, 'Nom', 1, 0, 'C');
+$pdf->Cell(40, 8, 'Description', 1, 0, 'C');
+$pdf->Cell(25, 8, 'N° de Lot', 1, 0, 'C');
+$pdf->Cell(20, 8, 'Quantité', 1, 0, 'C');
+$pdf->Cell(35, 8, 'Date d\'Expiration', 1, 0, 'C');
+$pdf->Cell(30, 8, 'Type', 1, 1, 'C');
+
+$pdf->SetFont('helvetica', '', 10);
 
 foreach ($medicaments as $medicament) {
-    $html .= '<tr>
-                <td>' . htmlspecialchars($medicament['nom']) . '</td>
-                <td>' . htmlspecialchars($medicament['description']) . '</td>
-                <td>' . htmlspecialchars($medicament['numero_lot']) . '</td>
-                <td>' . htmlspecialchars($medicament['quantite']) . '</td>
-                <td>' . htmlspecialchars($medicament['date_expiration']) . '</td>
-                <td>' . htmlspecialchars($medicament['type_produit']) . '</td>
-              </tr>';
+    $pdf->Cell(40, 8, $medicament['nom'], 1);
+    $pdf->Cell(40, 8, $medicament['description'], 1);
+    $pdf->Cell(25, 8, $medicament['numero_lot'], 1);
+    $pdf->Cell(20, 8, $medicament['quantite'], 1);
+    $pdf->Cell(35, 8, $medicament['date_expiration'], 1);
+    $pdf->Cell(30, 8, $medicament['type_produit'], 1, 1);
 }
 
-$html .= '</tbody></table>';
-$pdf->writeHTML($html, true, false, true, false, '');
+// Espace pour la signature
+$pdf->Ln(15);
+$pdf->SetFont('helvetica', 'I', 10);
+$pdf->Cell(0, 10, "Signature de la personne ayant validé l'inventaire :", 0, 1, 'L');
+$pdf->Cell(0, 20, '', 'B'); // Ligne pour la signature
 
-// Sortie du PDF
-$pdf->Output('inventaire_medicaments.pdf', 'I');
+// Sortie du fichier PDF
+$pdf->Output('inventaire_medicaments_' . $location['location_name'] . '.pdf', 'I');
 ?>
