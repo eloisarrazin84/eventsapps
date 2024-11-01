@@ -184,12 +184,13 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container">
     <!-- Menu d'Actions -->
     <div class="action-menu">
-        <a href="dashboard_medicaments.php" class="btn-action btn-back">
+        <a href="dashboard_medicaments.php" class="btn-action btn-back btn-secondary">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
-        <a href="ajouter_medicament.php" class="btn-action btn-add">
-            <i class="fas fa-plus-circle"></i> Ajouter un Médicament
-        </a>
+        <!-- Bouton pour ouvrir le modal de sélection de lieu de stockage -->
+        <button class="btn btn-info" data-toggle="modal" data-target="#pdfModal">
+            <i class="fas fa-file-pdf"></i> Générer Inventaire PDF
+        </button>
     </div>
 
     <h1>Gestion des Médicaments</h1>
@@ -215,57 +216,81 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <a href="gestion_medicaments.php" class="btn btn-secondary">Réinitialiser</a>
     </form>
 
-<!-- Liste des Médicaments -->
-<div class="card">
-    <div class="card-header">
-        <i class="fas fa-capsules"></i> Médicaments Disponibles
-    </div>
-    <div class="card-body">
-        <table class="table table-hover table-bordered">
-            <thead class="thead-light">
-                <tr>
-                    <th>Nom</th>
-                    <th>Description</th>
-                    <th>N° de lot</th>
-                    <th>Quantité</th>
-                    <th>Date d'expiration</th>
-                    <th>Type</th>
-                    <th>Lieu de Stockage</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($medicaments as $medicament): ?>
+    <!-- Liste des Médicaments -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-capsules"></i> Médicaments Disponibles
+        </div>
+        <div class="card-body">
+            <table class="table table-hover table-bordered">
+                <thead class="thead-light">
                     <tr>
-                        <td><?php echo htmlspecialchars($medicament['nom']); ?></td>
-                        <td><?php echo htmlspecialchars($medicament['description']); ?></td>
-                        <td><?php echo htmlspecialchars($medicament['numero_lot']); ?></td>
-                        <td><?php echo htmlspecialchars($medicament['quantite']); ?></td>
-                        <td><?php echo htmlspecialchars($medicament['date_expiration']); ?></td>
-                        <td><?php echo htmlspecialchars($medicament['type_produit']); ?></td>
-                        <td>
-                            <?php echo htmlspecialchars($medicament['location_name'] . ($medicament['bag_name'] ? " - " . $medicament['bag_name'] : '')); ?>
-                            <br>
-                            <a href="generer_pdf.php?location_id=<?php echo $medicament['stock_location_id']; ?>" class="btn btn-info btn-sm mt-2">
-                                <i class="fas fa-file-pdf"></i> Générer PDF
-                            </a>
-                        </td>
-                        <td>
-                            <a href="medicament_details.php?id=<?php echo $medicament['id']; ?>" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Voir Détails</a>
-                            <a href="modifier_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Modifier</a>
-                            <a href="supprimer_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce médicament ?');"><i class="fas fa-trash-alt"></i> Supprimer</a>
-                        </td>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>N° de lot</th>
+                        <th>Quantité</th>
+                        <th>Date d'expiration</th>
+                        <th>Type</th>
+                        <th>Lieu de Stockage</th>
+                        <th>Actions</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($medicaments as $medicament): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($medicament['nom']); ?></td>
+                            <td><?php echo htmlspecialchars($medicament['description']); ?></td>
+                            <td><?php echo htmlspecialchars($medicament['numero_lot']); ?></td>
+                            <td><?php echo htmlspecialchars($medicament['quantite']); ?></td>
+                            <td><?php echo htmlspecialchars($medicament['date_expiration']); ?></td>
+                            <td><?php echo htmlspecialchars($medicament['type_produit']); ?></td>
+                            <td><?php echo htmlspecialchars($medicament['location_name'] . ($medicament['bag_name'] ? " - " . $medicament['bag_name'] : '')); ?></td>
+                            <td>
+                                <a href="medicament_details.php?id=<?php echo $medicament['id']; ?>" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Voir Détails</a>
+                                <a href="modifier_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Modifier</a>
+                                <a href="supprimer_medicament.php?id=<?php echo $medicament['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce médicament ?');"><i class="fas fa-trash-alt"></i> Supprimer</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
+<!-- Modal pour sélectionner le lieu de stockage pour le PDF -->
+<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pdfModalLabel">Générer PDF d'Inventaire</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="generer_pdf.php" method="GET">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="locationSelect">Sélectionner le lieu de stockage</label>
+                        <select class="form-control" id="locationSelect" name="location_id" required>
+                            <?php foreach ($stockLocations as $location): ?>
+                                <option value="<?php echo $location['id']; ?>">
+                                    <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Générer PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
