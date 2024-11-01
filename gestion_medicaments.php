@@ -184,40 +184,42 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 Filtres
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <form method="GET" action="gestion_medicaments.php">
-                    <div class="dropdown-item">
+                <div class="dropdown-item">
+                    <form method="GET" action="gestion_medicaments.php">
                         <label for="filter_nom">Filtrer par nom:</label>
                         <input type="text" name="filter_nom" class="form-control" placeholder="Nom" value="<?php echo htmlspecialchars($filterNom); ?>">
-                    </div>
-                    <div class="dropdown-item">
-                        <label for="filter_type">Filtrer par type:</label>
-                        <select name="filter_type" class="form-control">
-                            <option value="">Sélectionner</option>
-                            <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
-                            <option value="Injectable" <?php echo $filterType == 'Injectable' ? 'selected' : ''; ?>>Injectable</option>
-                            <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
-                        </select>
-                    </div>
-                    <div class="dropdown-item">
-                        <label for="filter_location">Filtrer par lieu de stockage:</label>
-                        <select name="filter_location" class="form-control">
-                            <option value="">Sélectionner</option>
-                            <?php foreach ($stockLocations as $location): ?>
-                                <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="dropdown-item">
-                        <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
-                    </div>
-                </form>
+                </div>
+                <div class="dropdown-item">
+                    <label for="filter_type">Filtrer par type:</label>
+                    <select name="filter_type" class="form-control">
+                        <option value="">Sélectionner</option>
+                        <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
+                        <option value="Injectable" <?php echo $filterType == 'Injectable' ? 'selected' : ''; ?>>Injectable</option>
+                        <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
+                    </select>
+                </div>
+                <div class="dropdown-item">
+                    <label for="filter_location">Filtrer par lieu de stockage:</label>
+                    <select name="filter_location" class="form-control">
+                        <option value="">Sélectionner</option>
+                        <?php foreach ($stockLocations as $location): ?>
+                            <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="dropdown-item">
+                    <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
+                </div>
+                    </form>
+                </div>
             </div>
         </div>
         <a href="gestion_medicaments.php" class="btn btn-secondary ml-2">Réinitialiser</a>
     </form>
 </div>
+
     <!-- Liste des Médicaments -->
     <div class="card">
         <div class="card-header">
