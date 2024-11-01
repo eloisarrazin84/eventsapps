@@ -53,7 +53,7 @@ $pdf->Cell(30, 8, 'Type', 1, 1, 'C', 1);
 $pdf->SetFont('helvetica', '', 9);
 $pdf->SetFillColor(255, 255, 255); // Couleur de fond pour les lignes
 foreach ($medicaments as $medicament) {
-    $pdf->Cell(60, 8, $medicament['nom'], 1, 0, 'L', 1);
+    $pdf->MultiCell(60, 8, $medicament['nom'], 1, 'L', 1, 0);
     $pdf->Cell(30, 8, $medicament['numero_lot'], 1, 0, 'C', 1);
     $pdf->Cell(20, 8, $medicament['quantite'], 1, 0, 'C', 1);
     $pdf->Cell(40, 8, $medicament['date_expiration'], 1, 0, 'C', 1);
