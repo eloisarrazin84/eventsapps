@@ -17,18 +17,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Initialisation du chemin de la photo par défaut
     $photoPath = null;
 
-    // Gestion de l'upload de la photo
+    // Gestion de l'upload de la photo avec diagnostics
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
         $uploadDir = 'uploads/';
+        
         // Assurez-vous que le dossier d'uploads existe
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
+        
         $photoName = uniqid() . '_' . basename($_FILES['photo']['name']);
         $uploadFile = $uploadDir . $photoName;
+        
         if (move_uploaded_file($_FILES['photo']['tmp_name'], $uploadFile)) {
             $photoPath = $uploadFile; // Chemin de la photo enregistrée
+        } else {
+            die("Échec du téléchargement du fichier.");
         }
+    } else {
+        echo "Aucun fichier téléchargé ou une erreur est survenue lors de l'upload.";
     }
 
     // Préparation de la requête d'insertion
