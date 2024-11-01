@@ -92,7 +92,7 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container">
     <!-- Bouton de retour au tableau de bord -->
-    <a href="dashboard_medicaments.php" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
+    <a href="dashboard_medicaments.php" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Retour</a>
 
     <h2>Gestion des Lieux de Stockage</h2>
 
