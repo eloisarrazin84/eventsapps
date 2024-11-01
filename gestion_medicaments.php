@@ -176,36 +176,48 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
-
-    <!-- Formulaire de Filtrage -->
-    <form method="GET" class="form-inline">
-        <div class="filter-group">
-            <label class="filter-label" for="filter_nom">Filtrer par nom:</label>
-            <input type="text" name="filter_nom" class="form-control" placeholder="Nom" value="<?php echo htmlspecialchars($filterNom); ?>">
+<!-- Formulaire de Filtrage -->
+<form method="GET" class="form-inline justify-content-between mb-4">
+    <div class="filter-group">
+        <div class="dropdown">
+            <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Filtres
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <form method="GET">
+                    <div class="dropdown-item">
+                        <label for="filter_nom">Filtrer par nom:</label>
+                        <input type="text" name="filter_nom" class="form-control" placeholder="Nom" value="<?php echo htmlspecialchars($filterNom); ?>">
+                    </div>
+                    <div class="dropdown-item">
+                        <label for="filter_type">Filtrer par type:</label>
+                        <select name="filter_type" class="form-control">
+                            <option value="">Sélectionner</option>
+                            <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
+                            <option value="Injectable" <?php echo $filterType == 'Injectable' ? 'selected' : ''; ?>>Injectable</option>
+                            <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
+                        </select>
+                    </div>
+                    <div class="dropdown-item">
+                        <label for="filter_location">Filtrer par lieu de stockage:</label>
+                        <select name="filter_location" class="form-control">
+                            <option value="">Sélectionner</option>
+                            <?php foreach ($stockLocations as $location): ?>
+                                <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="dropdown-item">
+                        <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="filter-group">
-            <label class="filter-label" for="filter_type">Filtrer par type:</label>
-            <select name="filter_type" class="form-control">
-                <option value="">Sélectionner</option>
-                <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
-                <option value="Injectable" <?php echo $filterType == 'Injectable' ? 'selected' : ''; ?>>Injectable</option>
-                <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label class="filter-label" for="filter_location">Filtrer par lieu de stockage:</label>
-            <select name="filter_location" class="form-control">
-                <option value="">Sélectionner</option>
-                <?php foreach ($stockLocations as $location): ?>
-                    <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
         <a href="gestion_medicaments.php" class="btn btn-secondary">Réinitialiser</a>
-    </form>
+    </div>
+</form>
 
     <!-- Liste des Médicaments -->
     <div class="card">
