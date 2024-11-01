@@ -34,14 +34,14 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Gestion des lieux de stockage</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Gestion des Lieux de Stockage</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         .container {
             max-width: 800px;
             margin-top: 50px;
-            background-color: #f8f9fa;
+            background-color: #ffffff;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
@@ -57,30 +57,34 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-right: 10px;
         }
-        .btn-primary, .btn-danger, .btn-secondary {
+        .btn {
             border-radius: 20px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary, .btn-danger, .btn-secondary {
+            color: white;
+        }
+        .btn-primary {
+            background-color: #007bff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
         }
         .btn-primary:hover {
             background-color: #0056b3;
         }
-        .btn-back {
-            margin-bottom: 20px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
         }
         .table th, .table td {
             text-align: center;
             vertical-align: middle;
-        }
-        .btn-back:hover {
-            background-color: #5a6268;
-        }
-        .btn-danger:hover {
-            background-color: #c82333;
         }
     </style>
 </head>
@@ -88,9 +92,9 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container">
     <!-- Bouton de retour au tableau de bord -->
-    <a href="dashboard_medicaments.php" class="btn btn-back mb-4"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
+    <a href="dashboard_medicaments.php" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
 
-    <h2>Gestion des lieux de stockage</h2>
+    <h2>Gestion des Lieux de Stockage</h2>
 
     <!-- Formulaire pour ajouter un lieu de stockage -->
     <form method="POST" class="form-inline justify-content-center mb-4">
