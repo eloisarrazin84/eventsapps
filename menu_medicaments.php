@@ -169,15 +169,6 @@ if ($notificationEnabled) {
     border-bottom: 1px solid #f1f1f1;
 }
 
-.notification-text {
-    font-size: 0.9em;
-    color: #333;
-    margin-right: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .profile-picture {
     width: 40px;
     height: 40px;
