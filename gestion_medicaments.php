@@ -92,10 +92,6 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .btn-action .fa {
-            font-size: 0.9em;
-        }
-
         .btn-back {
             background-color: #6c757d;
             color: #fff;
@@ -201,27 +197,6 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <i class="fas fa-file-pdf"></i> Générer Inventaire PDF
         </button>
     </div>
-
-    <!-- Formulaire de Filtrage -->
-    <form method="GET" class="form-inline justify-content-center mb-4">
-        <input type="text" name="filter_nom" class="form-control mr-2" placeholder="Filtrer par nom" value="<?php echo htmlspecialchars($filterNom); ?>">
-        <select name="filter_type" class="form-control mr-2">
-            <option value="">Filtrer par type</option>
-            <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
-            <option value="Injectable" <?php echo $filterType == 'Injectable' ? 'selected' : ''; ?>>Injectable</option>
-            <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
-        </select>
-        <select name="filter_location" class="form-control mr-2">
-            <option value="">Filtrer par lieu de stockage</option>
-            <?php foreach ($stockLocations as $location): ?>
-                <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <button type="submit" class="btn btn-primary mr-2">Appliquer les filtres</button>
-        <a href="gestion_medicaments.php" class="btn btn-secondary">Réinitialiser</a>
-    </form>
 
     <!-- Liste des Médicaments -->
     <div class="card">
