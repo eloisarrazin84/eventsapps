@@ -71,7 +71,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-5">
     <h2 class="text-center mb-4">Ajouter un Médicament</h2>
     
-    <form method="POST" action="process_ajout_medicament.php" id="medicamentForm">
+    <form method="POST" action="process_ajout_medicament.php" enctype="multipart/form-data" id="medicamentForm">
         <!-- Section Informations Générales -->
         <div class="form-section">
             <h4>Informations Générales</h4>
