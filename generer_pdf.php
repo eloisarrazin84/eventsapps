@@ -1,4 +1,3 @@
-<?php
 require_once('tcpdf/tcpdf.php');
 
 // Connexion à la base de données
@@ -7,7 +6,7 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Vérifier si le lieu de stockage est spécifié
 $location_id = isset($_POST['location_id']) ? $_POST['location_id'] : null;
-$signatureData = isset($_POST['signature']) ? $_POST['signature'] : null;
+$signature_image = isset($_FILES['signature_image']) ? $_FILES['signature_image'] : null;
 
 if (!$location_id) {
     die("Lieu de stockage non spécifié.");
@@ -75,25 +74,25 @@ foreach ($medicaments as $medicament) {
     $fill = !$fill;
 }
 
-// Enregistrer la signature si elle est présente
-if ($signatureData) {
-    $signatureData = str_replace('data:image/png;base64,', '', $signatureData);
-    $signatureData = str_replace(' ', '+', $signatureData);
-    $signature = base64_decode($signatureData);
+// Section de signature
+$pdf->Ln(15);
+$pdf->SetFont('helvetica', 'I', 10);
+$pdf->Cell(0, 10, "Signature de la personne ayant validé l'inventaire :", 0, 1, 'L');
 
-    $signaturePath = '/tmp/signature.png';
-    file_put_contents($signaturePath, $signature);
-
-    // Ajouter la signature dans le PDF
-    $pdf->Ln(15);
-    $pdf->SetFont('helvetica', 'I', 10);
-    $pdf->Cell(0, 10, "Signature de la personne ayant validé l'inventaire :", 0, 1, 'L');
-    $pdf->Image($signaturePath, 15, $pdf->GetY(), 50, 20, 'PNG');
+// Vérifier si une image de signature a été téléchargée
+if ($signature_image && $signature_image['error'] == UPLOAD_ERR_OK) {
+    // Déplacer le fichier téléchargé vers un dossier temporaire
+    $upload_dir = 'uploads/signatures/';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true); // Créer le dossier s'il n'existe pas
+    }
     
-    // Supprimer le fichier temporaire de signature après l'insertion dans le PDF
-    unlink($signaturePath);
+    $signature_path = $upload_dir . basename($signature_image['name']);
+    move_uploaded_file($signature_image['tmp_name'], $signature_path);
+    $pdf->Image($signature_path, '', '', 50, 15, 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+} else {
+    $pdf->Cell(0, 15, "Aucune signature fournie.", 0, 1, 'L');
 }
 
 // Sortie du PDF
 $pdf->Output('inventaire_medicaments_' . $location['location_name'] . '.pdf', 'I');
-?>
