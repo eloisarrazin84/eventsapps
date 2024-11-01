@@ -58,13 +58,13 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         .container {
-            max-width: 800px;
-            margin-top: 50px;
-            background-color: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        }
+    max-width: 900px; /* Ajustez la largeur maximale selon vos besoins */
+    margin-top: 50px;
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
         h1 {
             font-weight: bold;
             color: #007bff;
@@ -72,16 +72,18 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             margin-bottom: 30px;
         }
         .action-menu {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .btn-primary, .btn-danger, .btn-secondary {
+    display: flex;
+    justify-content: space-between; /* Espace entre les éléments */
+    margin-bottom: 20px;
+}
+.btn-danger{
             border-radius: 20px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
+              .btn-primary, .btn-secondary {
+    margin-left: 5px; /* Ajoute un espacement entre les boutons */
+}
+
         .btn-primary:hover {
             background-color: #0056b3;
         }
@@ -103,6 +105,22 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .btn-danger:hover {
             background-color: #c82333;
         }
+              .form-inline .form-control {
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 10px;
+    min-width: 120px; /* Largeur minimale pour les champs de filtre */
+}
+              .table {
+    overflow-x: auto; /* Permet le défilement horizontal si le tableau dépasse */
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    padding: 15px;
+    text-align: center;
+    white-space: nowrap; /* Empêche le texte de s'enrouler */
+}
     </style>
 </head>
 <body>
@@ -112,17 +130,21 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     <h1>Gestion des Médicaments</h1>
 
-    <div class="action-menu">
-        <a href="ajouter_medicament.php" class="btn btn-primary">
-            <i class="fas fa-plus-circle"></i> Ajouter un Médicament
-        </a>
-        <button class="btn btn-info" data-toggle="modal" data-target="#pdfModal">
-            <i class="fas fa-file-pdf"></i> Générer Inventaire PDF
-        </button>
-    </div>
+  <div class="action-menu">
+    <a href="dashboard_medicaments.php" class="btn-action btn-back">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+    <a href="ajouter_medicament.php" class="btn-action btn-add">
+        <i class="fas fa-plus-circle"></i> Ajouter un Médicament
+    </a>
+    <button class="btn btn-info" data-toggle="modal" data-target="#pdfModal">
+        <i class="fas fa-file-pdf"></i> Générer Inventaire PDF
+    </button>
+</div>
 
-    <!-- Formulaire de Filtrage -->
-    <form method="GET" class="form-inline justify-content-center mb-4">
+<!-- Formulaire de Filtrage -->
+<form method="GET" class="form-inline justify-content-center mb-4">
+    <div class="mb-2"> <!-- Ajout d'un div pour l'espacement -->
         <input type="text" name="filter_nom" class="form-control mr-2" placeholder="Filtrer par nom" value="<?php echo htmlspecialchars($filterNom); ?>">
         <select name="filter_type" class="form-control mr-2">
             <option value="">Filtrer par type</option>
@@ -140,7 +162,8 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </select>
         <button type="submit" class="btn btn-primary mr-2">Appliquer les filtres</button>
         <a href="gestion_medicaments.php" class="btn btn-secondary">Réinitialiser</a>
-    </form>
+    </div>
+</form>
 
     <!-- Liste des Médicaments -->
     <table class="table table-hover table-bordered">
