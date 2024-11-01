@@ -81,15 +81,23 @@ $pdf->SetFont('helvetica', 'I', 10);
 $pdf->Cell(0, 10, "Signature de la personne ayant validé l'inventaire :", 0, 1, 'L');
 $pdf->Cell(0, 15, '', 'B');
 
-// Si une signature est fournie, l'ajouter au PDF
+// Vérifier et ajouter la signature si elle est présente
 if ($signatureData) {
     $signatureData = str_replace('data:image/png;base64,', '', $signatureData);
     $signatureData = base64_decode($signatureData);
-    $signatureFilePath = '/tmp/signature.png';
-    file_put_contents($signatureFilePath, $signatureData);
 
-    // Ajouter la signature au PDF
-    $pdf->Image($signatureFilePath, 15, $pdf->GetY() + 5, 40, 20, 'PNG');
+    // Utiliser un dossier temporaire approprié
+    $signatureFilePath = '/tmp/signature.png';
+    if (file_put_contents($signatureFilePath, $signatureData) === false) {
+        die("Erreur : Impossible d'enregistrer la signature. Vérifiez les permissions d'écriture.");
+    }
+
+    // Vérifier si le fichier est bien enregistré avant de l'afficher
+    if (file_exists($signatureFilePath)) {
+        $pdf->Image($signatureFilePath, 15, $pdf->GetY() + 5, 40, 20, 'PNG');
+    } else {
+        die("Erreur : Fichier de signature introuvable.");
+    }
 }
 
 // Sortie du PDF
