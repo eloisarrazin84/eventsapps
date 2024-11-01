@@ -82,7 +82,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .form-inline {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end; /* Aligne à droite */
             margin-bottom: 20px;
         }
 
@@ -97,24 +97,6 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
         .btn-info {
             background-color: #17a2b8;
             color: white;
@@ -122,17 +104,6 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .btn-info:hover {
             background-color: #138496;
-        }
-
-        .filter-label {
-            margin-right: 10px; /* Ajout d'espace entre le label et le select */
-            font-weight: bold; /* Rendre le label en gras */
-        }
-
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 10px; /* Espace entre les éléments du filtre */
         }
 
         .table {
@@ -176,49 +147,47 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
-<!-- Formulaire de Filtrage -->
-<div class="d-flex justify-content-end mb-4">
-    <form method="GET" class="form-inline">
-        <div class="dropdown">
-            <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Filtres
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <div class="dropdown-item">
-                    <form method="GET" action="gestion_medicaments.php">
+
+    <!-- Formulaire de Filtrage -->
+    <div class="d-flex justify-content-end mb-4">
+        <form method="GET" class="form-inline">
+            <div class="dropdown">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Filtres
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-item">
                         <label for="filter_nom">Filtrer par nom:</label>
                         <input type="text" name="filter_nom" class="form-control" placeholder="Nom" value="<?php echo htmlspecialchars($filterNom); ?>">
-                </div>
-                <div class="dropdown-item">
-                    <label for="filter_type">Filtrer par type:</label>
-                    <select name="filter_type" class="form-control">
-                        <option value="">Sélectionner</option>
-                        <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
-                        <option value="Injectable" <?php echo $filterType == 'Injectable' ? 'selected' : ''; ?>>Injectable</option>
-                        <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
-                    </select>
-                </div>
-                <div class="dropdown-item">
-                    <label for="filter_location">Filtrer par lieu de stockage:</label>
-                    <select name="filter_location" class="form-control">
-                        <option value="">Sélectionner</option>
-                        <?php foreach ($stockLocations as $location): ?>
-                            <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="dropdown-item">
-                    <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
-                </div>
-                    </form>
+                    </div>
+                    <div class="dropdown-item">
+                        <label for="filter_type">Filtrer par type:</label>
+                        <select name="filter_type" class="form-control">
+                            <option value="">Sélectionner</option>
+                            <option value="PER OS" <?php echo $filterType == 'PER OS' ? 'selected' : ''; ?>>PER OS</option>
+                            <option value="Injectable" <?php echo $filterType == 'Injectable' ? 'selected' : ''; ?>>Injectable</option>
+                            <option value="Inhalable" <?php echo $filterType == 'Inhalable' ? 'selected' : ''; ?>>Inhalable</option>
+                        </select>
+                    </div>
+                    <div class="dropdown-item">
+                        <label for="filter_location">Filtrer par lieu de stockage:</label>
+                        <select name="filter_location" class="form-control">
+                            <option value="">Sélectionner</option>
+                            <?php foreach ($stockLocations as $location): ?>
+                                <option value="<?php echo $location['id']; ?>" <?php echo $filterLocation == $location['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="dropdown-item text-center">
+                        <button type="submit" class="btn btn-primary">Appliquer les filtres</button>
+                    </div>
                 </div>
             </div>
-        </div>
-        <a href="gestion_medicaments.php" class="btn btn-secondary ml-2">Réinitialiser</a>
-    </form>
-</div>
+            <a href="gestion_medicaments.php" class="btn btn-secondary ml-2">Réinitialiser</a>
+        </form>
+    </div>
 
     <!-- Liste des Médicaments -->
     <div class="card">
