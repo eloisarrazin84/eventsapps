@@ -33,8 +33,8 @@ $pdf->AddPage();
 
 // Logo et titre
 $logo = 'https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png';
-$pdf->Image($logo, 15, 10, 30, 30, 'PNG');
-$pdf->SetFont('helvetica', 'B', 14);
+$pdf->Image($logo, 15, 10, 20, 20, 'PNG');
+$pdf->SetFont('helvetica', 'B', 16);
 $pdf->Cell(0, 10, "Inventaire des Médicaments - " . $location['location_name'] . ' - ' . $location['bag_name'], 0, 1, 'C');
 $pdf->Ln(5);
 
@@ -43,31 +43,31 @@ $pdf->SetFont('helvetica', '', 10);
 $pdf->Cell(0, 10, 'Date de génération : ' . date('d/m/Y'), 0, 1, 'R');
 
 // Tableau des médicaments
-$pdf->SetFont('helvetica', 'B', 12);
 $pdf->Ln(5);
+$pdf->SetFont('helvetica', 'B', 11);
 $pdf->Cell(40, 8, 'Nom', 1, 0, 'C');
-$pdf->Cell(40, 8, 'Description', 1, 0, 'C');
-$pdf->Cell(25, 8, 'N° de Lot', 1, 0, 'C');
-$pdf->Cell(20, 8, 'Quantité', 1, 0, 'C');
-$pdf->Cell(35, 8, 'Date d\'Expiration', 1, 0, 'C');
-$pdf->Cell(30, 8, 'Type', 1, 1, 'C');
+$pdf->Cell(45, 8, 'Description', 1, 0, 'C');
+$pdf->Cell(30, 8, 'N° de Lot', 1, 0, 'C');
+$pdf->Cell(15, 8, 'Quantité', 1, 0, 'C');
+$pdf->Cell(30, 8, 'Date d\'Expiration', 1, 0, 'C');
+$pdf->Cell(25, 8, 'Type', 1, 1, 'C');
 
 $pdf->SetFont('helvetica', '', 10);
 
 foreach ($medicaments as $medicament) {
     $pdf->Cell(40, 8, $medicament['nom'], 1);
-    $pdf->Cell(40, 8, $medicament['description'], 1);
-    $pdf->Cell(25, 8, $medicament['numero_lot'], 1);
-    $pdf->Cell(20, 8, $medicament['quantite'], 1);
-    $pdf->Cell(35, 8, $medicament['date_expiration'], 1);
-    $pdf->Cell(30, 8, $medicament['type_produit'], 1, 1);
+    $pdf->Cell(45, 8, $medicament['description'], 1);
+    $pdf->Cell(30, 8, $medicament['numero_lot'], 1);
+    $pdf->Cell(15, 8, $medicament['quantite'], 1);
+    $pdf->Cell(30, 8, $medicament['date_expiration'], 1);
+    $pdf->Cell(25, 8, $medicament['type_produit'], 1, 1);
 }
 
 // Espace pour la signature
 $pdf->Ln(15);
 $pdf->SetFont('helvetica', 'I', 10);
 $pdf->Cell(0, 10, "Signature de la personne ayant validé l'inventaire :", 0, 1, 'L');
-$pdf->Cell(0, 20, '', 'B'); // Ligne pour la signature
+$pdf->Cell(0, 15, '', 'B'); // Ligne pour la signature
 
 // Sortie du fichier PDF
 $pdf->Output('inventaire_medicaments_' . $location['location_name'] . '.pdf', 'I');
