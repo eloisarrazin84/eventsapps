@@ -31,7 +31,7 @@ $pdf->AddPage();
 
 // Ajouter le logo et le titre de manière alignée
 $logo = 'https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png';
-$pdf->Image($logo, 15, 10, 18, 18, 'PNG');
+$pdf->Image($logo, 15, 10, 15, 15, 'PNG');
 $pdf->SetFont('helvetica', 'B', 16);
 $pdf->Cell(0, 10, "Inventaire des Médicaments - " . $location['location_name'] . ' - ' . $location['bag_name'], 0, 1, 'C');
 $pdf->Ln(8);
@@ -44,22 +44,20 @@ $pdf->Cell(0, 10, 'Date de génération : ' . date('d/m/Y'), 0, 1, 'R');
 $pdf->Ln(5);
 $pdf->SetFillColor(230, 230, 230); // Couleur de fond pour les en-têtes
 $pdf->SetFont('helvetica', 'B', 10);
-$pdf->Cell(45, 8, 'Nom', 1, 0, 'C', 1);
-$pdf->Cell(60, 8, 'Description', 1, 0, 'C', 1);
+$pdf->Cell(60, 8, 'Nom', 1, 0, 'C', 1);
 $pdf->Cell(30, 8, 'N° de Lot', 1, 0, 'C', 1);
-$pdf->Cell(15, 8, 'Quantité', 1, 0, 'C', 1);
-$pdf->Cell(30, 8, 'Date d\'Expiration', 1, 0, 'C', 1);
-$pdf->Cell(20, 8, 'Type', 1, 1, 'C', 1);
+$pdf->Cell(20, 8, 'Quantité', 1, 0, 'C', 1);
+$pdf->Cell(40, 8, 'Date d\'Expiration', 1, 0, 'C', 1);
+$pdf->Cell(30, 8, 'Type', 1, 1, 'C', 1);
 
 $pdf->SetFont('helvetica', '', 9);
 $pdf->SetFillColor(255, 255, 255); // Couleur de fond pour les lignes
 foreach ($medicaments as $medicament) {
-    $pdf->Cell(45, 8, $medicament['nom'], 1, 0, 'L', 1);
-    $pdf->MultiCell(60, 8, $medicament['description'], 1, 'L', 0, 0); // MultiCell pour texte long
+    $pdf->Cell(60, 8, $medicament['nom'], 1, 0, 'L', 1);
     $pdf->Cell(30, 8, $medicament['numero_lot'], 1, 0, 'C', 1);
-    $pdf->Cell(15, 8, $medicament['quantite'], 1, 0, 'C', 1);
-    $pdf->Cell(30, 8, $medicament['date_expiration'], 1, 0, 'C', 1);
-    $pdf->Cell(20, 8, $medicament['type_produit'], 1, 1, 'C', 1);
+    $pdf->Cell(20, 8, $medicament['quantite'], 1, 0, 'C', 1);
+    $pdf->Cell(40, 8, $medicament['date_expiration'], 1, 0, 'C', 1);
+    $pdf->Cell(30, 8, $medicament['type_produit'], 1, 1, 'C', 1);
 }
 
 // Ajouter un espace pour la signature
