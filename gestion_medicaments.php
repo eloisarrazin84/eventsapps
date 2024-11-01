@@ -81,12 +81,15 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         .form-inline {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 20px;
         }
 
         .form-control {
             border-radius: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-right: 10px;
         }
 
         .btn {
@@ -161,17 +164,21 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </a>
         <div class="btn-group">
             <button class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Actions
+                <i class="fas fa-cogs"></i> Actions
             </button>
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="ajouter_medicament.php">Ajouter un Médicament</a>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#pdfModal">Générer Inventaire PDF</a>
+                <a class="dropdown-item" href="ajouter_medicament.php">
+                    <i class="fas fa-plus-circle"></i> Ajouter un Médicament
+                </a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#pdfModal">
+                    <i class="fas fa-file-pdf"></i> Générer Inventaire PDF
+                </a>
             </div>
         </div>
     </div>
 
     <!-- Formulaire de Filtrage -->
-    <form method="GET" class="form-inline justify-content-between mb-4">
+    <form method="GET" class="form-inline">
         <div class="filter-group">
             <label class="filter-label" for="filter_nom">Filtrer par nom:</label>
             <input type="text" name="filter_nom" class="form-control" placeholder="Nom" value="<?php echo htmlspecialchars($filterNom); ?>">
