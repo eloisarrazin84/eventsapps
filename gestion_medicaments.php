@@ -265,7 +265,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<!-- Modal pour sélectionner le lieu de stockage et capturer la signature pour le PDF -->
+<!-- Modal pour sélectionner le lieu de stockage et télécharger la signature pour le PDF -->
 <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -275,7 +275,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="generer_pdf.php" method="POST">
+            <form action="generer_pdf.php" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="locationSelect">Sélectionner le lieu de stockage</label>
@@ -288,12 +288,8 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Signature :</label>
-                        <div class="signature-pad">
-                            <canvas id="signatureCanvas" width="400" height="150"></canvas>
-                        </div>
-                        <button type="button" class="btn btn-secondary mt-2" id="clearSignature">Effacer la signature</button>
-                        <input type="hidden" name="signature" id="signatureInput">
+                        <label for="signatureImage">Télécharger une image de la signature :</label>
+                        <input type="file" class="form-control" id="signatureImage" name="signature_image" accept="image/*" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -304,6 +300,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 </div>
+
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
