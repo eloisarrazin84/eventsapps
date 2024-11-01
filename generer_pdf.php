@@ -5,7 +5,6 @@ require_once('tcpdf/tcpdf.php');
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Récupérer les informations du lieu de stockage
 $location_id = isset($_GET['location_id']) ? $_GET['location_id'] : null;
 if (!$location_id) {
     die("Lieu de stockage non spécifié.");
@@ -20,7 +19,6 @@ if (!$location) {
     die("Lieu de stockage introuvable.");
 }
 
-// Récupérer les médicaments pour ce lieu de stockage
 $stmt = $conn->prepare("SELECT * FROM medicaments WHERE stock_location_id = :id");
 $stmt->bindParam(':id', $location_id);
 $stmt->execute();
@@ -31,43 +29,44 @@ $pdf = new TCPDF();
 $pdf->SetMargins(15, 20, 15);
 $pdf->AddPage();
 
-// Logo et titre
+// Ajouter le logo et le titre de manière alignée
 $logo = 'https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png';
-$pdf->Image($logo, 15, 10, 20, 20, 'PNG');
+$pdf->Image($logo, 15, 10, 18, 18, 'PNG');
 $pdf->SetFont('helvetica', 'B', 16);
 $pdf->Cell(0, 10, "Inventaire des Médicaments - " . $location['location_name'] . ' - ' . $location['bag_name'], 0, 1, 'C');
-$pdf->Ln(5);
+$pdf->Ln(8);
 
-// Date de génération
+// Ajouter la date de génération alignée à droite
 $pdf->SetFont('helvetica', '', 10);
 $pdf->Cell(0, 10, 'Date de génération : ' . date('d/m/Y'), 0, 1, 'R');
 
 // Tableau des médicaments
 $pdf->Ln(5);
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell(40, 8, 'Nom', 1, 0, 'C');
-$pdf->Cell(50, 8, 'Description', 1, 0, 'C'); // Élargir la colonne de description
-$pdf->Cell(30, 8, 'N° de Lot', 1, 0, 'C');
-$pdf->Cell(15, 8, 'Quantité', 1, 0, 'C');
-$pdf->Cell(30, 8, 'Date d\'Expiration', 1, 0, 'C');
-$pdf->Cell(25, 8, 'Type', 1, 1, 'C');
+$pdf->SetFillColor(230, 230, 230); // Couleur de fond pour les en-têtes
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(45, 8, 'Nom', 1, 0, 'C', 1);
+$pdf->Cell(60, 8, 'Description', 1, 0, 'C', 1);
+$pdf->Cell(30, 8, 'N° de Lot', 1, 0, 'C', 1);
+$pdf->Cell(15, 8, 'Quantité', 1, 0, 'C', 1);
+$pdf->Cell(30, 8, 'Date d\'Expiration', 1, 0, 'C', 1);
+$pdf->Cell(20, 8, 'Type', 1, 1, 'C', 1);
 
-$pdf->SetFont('helvetica', '', 10);
-
+$pdf->SetFont('helvetica', '', 9);
+$pdf->SetFillColor(255, 255, 255); // Couleur de fond pour les lignes
 foreach ($medicaments as $medicament) {
-    $pdf->Cell(40, 8, $medicament['nom'], 1);
-    $pdf->MultiCell(50, 8, $medicament['description'], 1, 'L', 0, 0); // Utiliser MultiCell pour gérer les sauts de ligne
-    $pdf->Cell(30, 8, $medicament['numero_lot'], 1);
-    $pdf->Cell(15, 8, $medicament['quantite'], 1);
-    $pdf->Cell(30, 8, $medicament['date_expiration'], 1);
-    $pdf->Cell(25, 8, $medicament['type_produit'], 1, 1);
+    $pdf->Cell(45, 8, $medicament['nom'], 1, 0, 'L', 1);
+    $pdf->MultiCell(60, 8, $medicament['description'], 1, 'L', 0, 0); // MultiCell pour texte long
+    $pdf->Cell(30, 8, $medicament['numero_lot'], 1, 0, 'C', 1);
+    $pdf->Cell(15, 8, $medicament['quantite'], 1, 0, 'C', 1);
+    $pdf->Cell(30, 8, $medicament['date_expiration'], 1, 0, 'C', 1);
+    $pdf->Cell(20, 8, $medicament['type_produit'], 1, 1, 'C', 1);
 }
 
-// Espace pour la signature
+// Ajouter un espace pour la signature
 $pdf->Ln(15);
 $pdf->SetFont('helvetica', 'I', 10);
 $pdf->Cell(0, 10, "Signature de la personne ayant validé l'inventaire :", 0, 1, 'L');
-$pdf->Cell(0, 15, '', 'B'); // Ligne pour la signature
+$pdf->Cell(0, 15, '', 'B');
 
 // Sortie du fichier PDF
 $pdf->Output('inventaire_medicaments_' . $location['location_name'] . '.pdf', 'I');
