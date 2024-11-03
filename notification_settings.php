@@ -6,7 +6,7 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $user_id = $_SESSION['user_id'];
 
 // Récupérer tous les types de notification
-$notificationTypes = ['expire_soon'];
+$notificationTypes = ['expire_soon']; // Ajouter d'autres types si nécessaire
 $notifications = [];
 
 // Récupérer les paramètres de notification pour l'utilisateur
@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':is_enabled', $is_enabled);
         $stmt->execute();
     }
+
     // Afficher le message de confirmation
     $confirmationMessage = "Paramètres de notification mis à jour.";
 }
@@ -43,15 +44,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Paramètres de Notification</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .confirmation-message {
+            margin-top: 20px;
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-5">
     <h2>Paramètres de Notification</h2>
+
+    <!-- Afficher le message de confirmation si présent -->
     <?php if (isset($confirmationMessage)): ?>
-        <div class="alert alert-success">
+        <div class="confirmation-message">
             <?php echo $confirmationMessage; ?>
         </div>
     <?php endif; ?>
+
     <form method="POST">
         <?php foreach ($notificationTypes as $type): ?>
             <div class="form-check">
