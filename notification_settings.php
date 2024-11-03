@@ -30,7 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':type', $type);
         $stmt->bindParam(':is_enabled', $is_enabled);
-        $stmt->execute();
+
+        // Exécuter la requête et vérifier les erreurs
+        if (!$stmt->execute()) {
+            die("Erreur lors de la mise à jour des notifications : " . implode(", ", $stmt->errorInfo()));
+        }
     }
 
     // Afficher le message de confirmation
