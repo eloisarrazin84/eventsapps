@@ -75,15 +75,19 @@ if ($notificationEnabled) {
                     </a>
                     <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
                         <div class="dropdown-header">Notifications</div>
-                        <?php if (empty($expiringSoonMeds)): ?>
-                            <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
+                        <?php if ($notificationEnabled): ?>
+                            <?php if (empty($expiringSoonMeds)): ?>
+                                <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
+                            <?php else: ?>
+                                <?php foreach ($expiringSoonMeds as $med): ?>
+                                    <div class="dropdown-item">
+                                        <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lot: <?php echo htmlspecialchars($med['numero_lot']); ?>,
+                                        Expire le: <?php echo htmlspecialchars($med['date_expiration']); ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         <?php else: ?>
-                            <?php foreach ($expiringSoonMeds as $med): ?>
-                                <div class="dropdown-item">
-                                    <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lot: <?php echo htmlspecialchars($med['numero_lot']); ?>,
-                                    Expire le: <?php echo htmlspecialchars($med['date_expiration']); ?>
-                                </div>
-                            <?php endforeach; ?>
+                            <p class="dropdown-item">Notifications désactivées.</p>
                         <?php endif; ?>
                     </div>
                 </li>
