@@ -1,6 +1,6 @@
 <?php
-require 'EmailService.php'; // Assurez-vous que votre service d'envoi d'e-mails est correctement inclus
-require_once 'EmailTemplate.php'; // Incluez la classe EmailTemplate
+require_once __DIR__ . '/mail/EmailService.php';
+require_once __DIR__ . '/mail/EmailTemplate.php'; // Assurez-vous que ce fichier existe
 
 function getExpiringMeds($conn) {
     $stmt = $conn->prepare("
