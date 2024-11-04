@@ -102,7 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
                         <?php endif; ?>
                     </div>
                 </li>
-
                 <li class="nav-item dropdown ml-3">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="rounded-circle profile-picture">
@@ -172,12 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
     font-weight: bold;
     color: #333;
     padding: 10px 15px;
-}
-
-.notification-dropdown .dropdown-item {
-    white-space: nowrap; /* Empêche le texte de se diviser sur plusieurs lignes */
-    overflow: hidden; /* Cache le texte qui dépasse */
-    text-overflow: ellipsis; /* Ajoute '...' à la fin du texte qui déborde */
+    border-bottom: 1px solid #f1f1f1;
 }
 
 .profile-picture {
