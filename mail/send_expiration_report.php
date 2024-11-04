@@ -21,22 +21,6 @@ $expiringMeds = getExpiringMeds($conn);
 
 // Modèle d'e-mail en HTML
 $emailTemplate = '
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Récapitulatif des Médicaments Expirants</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .med-list { margin: 20px 0; }
-        .med-list li { margin-bottom: 10px; }
-    </style>
-</head>
-<body>
-    <h1>Récapitulatif des Médicaments Expirants</h1>
-    <ul class="med-list">{{medicaments}}</ul>
-</body>
-</html>
-';
 if (!empty($expiringMeds)) {
     $medList = '';
     foreach ($expiringMeds as $med) {
