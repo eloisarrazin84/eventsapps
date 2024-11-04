@@ -26,6 +26,7 @@ if (!empty($expiringMeds)) {
     foreach ($expiringMeds as $med) {
         $medList .= "<li>" . htmlspecialchars($med['nom']) . " - Lot: " . htmlspecialchars($med['numero_lot']) . ", Expire le: " . htmlspecialchars($med['date_expiration']) . ", Lieu: " . htmlspecialchars($med['location_name']) . "</li>";
     }
+<<<<<<< HEAD
 
     // Insérer la liste des médicaments dans le modèle
     $body = str_replace('{{medicaments}}', $medList, $emailTemplate);
@@ -37,24 +38,4 @@ if (!empty($expiringMeds)) {
     // Pas de médicaments expirants
     $body = str_replace('{{medicaments}}', '<li>Aucun médicament n\'est en cours d\'expiration.</li>', $emailTemplate);
     $emailService = new EmailService();
-    $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
-// Envoyer l'e-mail avec la liste des médicaments
-    $emailService = new EmailService();
-    $emailService->sendEmail(
-        'contact@outdoorsecours.fr', 
-        'Récapitulatif des Médicaments Expirants', 
-        'med_expiration_report', // Nom du modèle
-        ['medicaments' => $medList] // Variables à remplacer dans le modèle
-    );
-} else {
-    // Pas de médicaments expirants
-    $body = '<li>Aucun médicament n\'est en cours d\'expiration.</li>';
-    $emailService = new EmailService();
-    $emailService->sendEmail(
-        'contact@outdoorsecours.fr', 
-        'Récapitulatif des Médicaments Expirants', 
-        'med_expiration_report', 
-        ['medicaments' => $body] // Variables à remplacer dans le modèle
-    );
-}
 ?>
