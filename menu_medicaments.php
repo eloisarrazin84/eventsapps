@@ -80,36 +80,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
         </ul>
         <ul class="navbar-nav ml-auto">
             <?php if (isset($_SESSION['user_id'])): ?>
-<!-- Menu de notification -->
-<li class="nav-item dropdown">
-    <a class="nav-link notification-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-bell notification-bell"></i>
-        <?php if ($unreadNotifications > 0): ?>
-            <span class="badge badge-danger notification-badge"><?php echo $unreadNotifications; ?></span>
-        <?php endif; ?>
-    </a>
-    <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
-        <div class="dropdown-header">Notifications</div>
-        <?php if ($notificationEnabled): ?>
-            <?php if (empty($expiringSoonMeds)): ?>
-                <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
-            <?php else: ?>
-                <?php foreach ($expiringSoonMeds as $med): ?>
-                    <form method="POST">
-                        <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['id']); ?>">
-                        <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
-                            <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['lieu_stockage']); ?>, 
-                            Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
-                            Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
-                        </button>
-                    </form>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        <?php else: ?>
-            <p class="dropdown-item">Notifications désactivées.</p>
-        <?php endif; ?>
-    </div>
-</li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link notification-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-bell notification-bell"></i>
+                        <?php if ($unreadNotifications > 0): ?>
+                            <span class="badge badge-danger notification-badge"><?php echo $unreadNotifications; ?></span>
+                        <?php endif; ?>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
+                        <div class="dropdown-header">Notifications</div>
+                        <?php if ($notificationEnabled): ?>
+                            <?php if (empty($expiringSoonMeds)): ?>
+                                <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
+                            <?php else: ?>
+                                <?php foreach ($expiringSoonMeds as $med): ?>
+                                    <form method="POST">
+                                        <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['id']); ?>">
+                                        <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
+                                            <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
+                                            Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
+                                            Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
+                                        </button>
+                                    </form>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <p class="dropdown-item">Notifications désactivées.</p>
+                        <?php endif; ?>
+                    </div>
+                </li>
                 <li class="nav-item dropdown ml-3">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img src="<?php echo $user['profile_picture']; ?>" alt="Photo de profil" class="rounded-circle profile-picture">
