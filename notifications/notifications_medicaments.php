@@ -18,4 +18,11 @@ function getExpiringSoonMeds($conn) {
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+function markNotificationAsRead($conn, $notification_id, $user_id) {
+    $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE id = :notification_id AND user_id = :user_id");
+    $stmt->bindParam(':notification_id', $notification_id);
+    $stmt->bindParam(':user_id', $user_id);
+    return $stmt->execute();
+}
+
 ?>
