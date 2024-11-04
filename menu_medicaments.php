@@ -41,15 +41,6 @@ if ($notificationEnabled) {
     $stmt->execute();
     $expiringSoonMeds = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-// Gérer le marquage des notifications comme lues
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
-    $notification_id = $_POST['notification_id'];
-    markNotificationAsRead($conn, $notification_id, $user_id);
-    // Pour des mises à jour en temps réel, vous pouvez renvoyer une réponse JSON ici
-    echo json_encode(["status" => "success"]);
-    exit();
-}
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
@@ -95,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
                                 <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
                             <?php else: ?>
                                 <?php foreach ($expiringSoonMeds as $med): ?>
-                                    <form method="POST" action="notifications/mark_notification_read.php">
+                                    <form method="POST" action="notifications/mark_notification_read.php" class="mark-read-form">
                                         <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['med_id']); ?>">
                                         <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
                                             <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
@@ -197,27 +188,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
     min-width: 200px;
 }
 </style>
-
-<!-- Code JavaScript pour gérer le formulaire et éviter le rechargement de la page -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('.mark-read-form').submit(function(e) {
-        e.preventDefault(); // Empêcher le rechargement de la page
-        var form = $(this);
-        
-        $.ajax({
-            type: 'POST',
-            url: form.attr('action'), // Assurez-vous que l'action est correctement définie
-            data: form.serialize(),
-            success: function(response) {
-                // Mettre à jour l'affichage ou masquer la notification
-                form.closest('.dropdown-item').remove(); // Retirer la notification du menu
-            },
-            error: function() {
-                alert("Une erreur s'est produite lors de la mise à jour de la notification.");
-            }
-        });
-    });
-});
-</script>
