@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/mail/EmailService.php';
-require_once __DIR__ . '/mail/EmailTemplate.php'; // Assurez-vous que ce fichier existe
+require_once __DIR__ . '/EmailService.php'; // Chemin correct pour EmailService.php
+require_once __DIR__ . '/EmailTemplate.php'; // Chemin correct pour EmailTemplate.php
 
 function getExpiringMeds($conn) {
     $stmt = $conn->prepare("
@@ -20,24 +20,25 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 // Récupérer les médicaments qui expirent
 $expiringMeds = getExpiringMeds($conn);
 
-// Préparer la liste des médicaments
-$medList = '';
-if (!empty($expiringMeds)) {
-    foreach ($expiringMeds as $med) {
-        $medList .= "<li>" . htmlspecialchars($med['nom']) . " - Lot: " . htmlspecialchars($med['numero_lot']) . ", Expire le: " . htmlspecialchars($med['date_expiration']) . ", Lieu: " . htmlspecialchars($med['location_name']) . "</li>";
+try {
+    $emailTemplate = 'med_expiration_report'; // Nom du modèle d'email à utiliser
+
+    if (!empty($expiringMeds)) {
+        $medList = '';
+        foreach ($expiringMeds as $med) {
+            $medList .= "<li>" . htmlspecialchars($med['nom']) . " - Lot: " . htmlspecialchars($med['numero_lot']) . ", Expire le: " . htmlspecialchars($med['date_expiration']) . ", Lieu: " . htmlspecialchars($med['location_name']) . "</li>";
+        }
+
+        // Créez le corps de l'e-mail en utilisant le modèle
+        $body = EmailTemplate::loadTemplate($emailTemplate, ['medicaments' => $medList]);
+    } else {
+        $body = EmailTemplate::loadTemplate($emailTemplate, ['medicaments' => '<li>Aucun médicament n\'est en cours d\'expiration.</li>']);
     }
-} else {
-    $medList = '<li>Aucun médicament n\'est en cours d\'expiration.</li>';
+
+    // Envoyer l'e-mail
+    $emailService = new EmailService();
+    $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
+} catch (Exception $e) {
+    echo "Erreur : " . $e->getMessage(); // Afficher l'erreur
 }
-
-// Charger le modèle d'e-mail
-$emailTemplate = 'med_expiration_report'; // Nom du fichier sans extension
-$userVariables = ['medicaments' => $medList]; // Passer la liste des médicaments
-
-// Charger le corps de l'e-mail
-$body = EmailTemplate::loadTemplate($emailTemplate, $userVariables);
-
-// Envoyer l'e-mail
-$emailService = new EmailService();
-$emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
 ?>
