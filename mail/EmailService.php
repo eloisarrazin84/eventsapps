@@ -3,7 +3,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '/var/www/html/outdoorsecevent/vendor/autoload.php'; // Chemin vers autoload.php de Composer
+require '/path/to/vendor/autoload.php'; // Ajustez le chemin vers autoload.php
 
 class EmailService
 {
@@ -14,36 +14,27 @@ class EmailService
         $this->mailer = new PHPMailer(true);
         $this->mailer->CharSet = 'UTF-8';
 
-        try {
-            $this->mailer->isSMTP();
-            $this->mailer->Host = 'smtp.office365.com';
-            $this->mailer->SMTPAuth = true;
-            $this->mailer->Username = 'notification@outdoorsecours.fr';
-            $this->mailer->Password = 'Lipton2019!';
-            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $this->mailer->Port = 587;
-            $this->mailer->setFrom('notification@outdoorsecours.fr', 'Outdoor Secours');
-        } catch (Exception $e) {
-            error_log("Erreur de configuration SMTP : {$e->getMessage()}");
-        }
+        // Configuration SMTP
+        $this->mailer->isSMTP();
+        $this->mailer->Host = 'smtp.example.com';
+        $this->mailer->SMTPAuth = true;
+        $this->mailer->Username = 'your_email@example.com';
+        $this->mailer->Password = 'your_password';
+        $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $this->mailer->Port = 587;
+        $this->mailer->setFrom('from@example.com', 'Your Name');
     }
 
     public function sendEmail($to, $subject, $templateName, $variables = [])
     {
-        try {
-            $this->mailer->addAddress($to);
-            $this->mailer->isHTML(true);
-            $this->mailer->Subject = $subject;
+        $this->mailer->addAddress($to);
+        $this->mailer->isHTML(true);
+        $this->mailer->Subject = $subject;
 
-            // Charger le contenu du template et remplacer les variables
-            $this->mailer->Body = EmailTemplate::loadTemplate($templateName, $variables);
+        // Charger le contenu du template et remplacer les variables
+        $this->mailer->Body = EmailTemplate::loadTemplate($templateName, $variables);
 
-            // Envoi de l'email
-            $this->mailer->send();
-            return true;
-        } catch (Exception $e) {
-            error_log("Erreur d'envoi d'email : {$this->mailer->ErrorInfo}");
-            return false;
-        }
+        // Envoi de l'email
+        return $this->mailer->send();
     }
 }
