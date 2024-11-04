@@ -1,6 +1,5 @@
 <?php
 require 'EmailService.php'; // Assurez-vous que votre service d'envoi d'e-mails est correctement inclus
-require 'EmailTemplate.php'; // Assurez-vous que la classe EmailTemplate est incluse
 
 function getExpiringMeds($conn) {
     $stmt = $conn->prepare("
@@ -34,7 +33,7 @@ $emailTemplate = '
 </head>
 <body>
     <h1>Récapitulatif des Médicaments Expirants</h1>
-    <ul class="med-list">{{medicaments}}</ul>
+    <ul class="med-list>{{medicaments}}</ul>
 </body>
 </html>
 ';
