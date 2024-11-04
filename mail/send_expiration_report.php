@@ -21,12 +21,28 @@ $expiringMeds = getExpiringMeds($conn);
 
 // Modèle d'e-mail en HTML
 $emailTemplate = '
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Récapitulatif des Médicaments Expirants</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .med-list { margin: 20px 0; }
+        .med-list li { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Récapitulatif des Médicaments Expirants</h1>
+    <ul class="med-list">{{medicaments}}</ul>
+</body>
+</html>
+';
+
 if (!empty($expiringMeds)) {
     $medList = '';
     foreach ($expiringMeds as $med) {
         $medList .= "<li>" . htmlspecialchars($med['nom']) . " - Lot: " . htmlspecialchars($med['numero_lot']) . ", Expire le: " . htmlspecialchars($med['date_expiration']) . ", Lieu: " . htmlspecialchars($med['location_name']) . "</li>";
     }
-<<<<<<< HEAD
 
     // Insérer la liste des médicaments dans le modèle
     $body = str_replace('{{medicaments}}', $medList, $emailTemplate);
@@ -38,4 +54,6 @@ if (!empty($expiringMeds)) {
     // Pas de médicaments expirants
     $body = str_replace('{{medicaments}}', '<li>Aucun médicament n\'est en cours d\'expiration.</li>', $emailTemplate);
     $emailService = new EmailService();
+    $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
+}
 ?>
