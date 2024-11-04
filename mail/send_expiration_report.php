@@ -63,18 +63,18 @@ $emailTemplate = '
             background: #e7f3fe;
             border-left: 4px solid #2196F3;
             border-radius: 4px;
-            position: relative; /* Pour positionner l'icône */
-            padding-left: 40px; /* Ajout d'espace pour l'icône */
+            position: relative;
+            padding-left: 40px;
         }
         .med-list li:before {
-            content: ""; /* Icône de médicament */
-            background: url("https://example.com/path/to/med-icon.png") no-repeat; /* Remplacez par l'URL de votre icône */
+            content: ""; 
+            background: url("https://example.com/path/to/med-icon.png") no-repeat; 
             position: absolute;
-            left: 10px; /* Positionnement à gauche */
-            top: 50%; /* Centrer verticalement */
-            transform: translateY(-50%); /* Ajustement du centrage */
-            width: 24px; /* Taille de l'icône */
-            height: 24px; /* Taille de l'icône */
+            left: 10px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            width: 24px; 
+            height: 24px; 
         }
         .footer {
             margin-top: 30px;
