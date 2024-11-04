@@ -63,7 +63,7 @@ $emailTemplate = '
             background: #e7f3fe;
             border-left: 4px solid #2196F3;
             border-radius: 4px;
-            position: relative; /* Pour positionner l\'icône */
+            position: relative; /* Pour positionner l'icône */
             padding-left: 40px; /* Ajout d'espace pour l'icône */
         }
         .med-list li:before {
