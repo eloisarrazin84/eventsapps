@@ -28,14 +28,25 @@ $emailTemplate = '
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Récapitulatif des Médicaments Expirants</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .med-list { margin: 20px 0; }
-        .med-list li { margin-bottom: 10px; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        .logo { display: block; margin: 0 auto 20px; width: 150px; }
+        .med-list { margin: 20px 0; padding: 0; list-style-type: none; }
+        .med-list li { margin-bottom: 15px; padding: 10px; background: #e7f3fe; border-left: 4px solid #2196F3; border-radius: 4px; position: relative; padding-left: 40px; }
+        .med-list li:before { content: ""; background: url("https://example.com/path/to/med-icon.png") no-repeat; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; }
+        .footer { margin-top: 30px; font-size: 12px; color: #777; text-align: center; }
     </style>
 </head>
 <body>
-    <h1>Récapitulatif des Médicaments Expirants</h1>
-    <ul class="med-list">{{medicaments}}</ul>
+    <div class="container">
+        <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png" alt="Logo" class="logo">
+        <h1>Récapitulatif des Médicaments Expirants</h1>
+        <ul class="med-list">{{medicaments}}</ul>
+        <div class="footer">
+            <p>Cet e-mail a été envoyé par votre système de gestion de médicaments.</p>
+        </div>
+    </div>
 </body>
 </html>
 ';
@@ -48,14 +59,12 @@ if (!empty($expiringMeds)) {
 
     // Insérer la liste des médicaments dans le modèle
     $body = str_replace('{{medicaments}}', $medList, $emailTemplate);
-
-    // Envoyer l'e-mail
-    $emailService = new EmailService();
-    $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
 } else {
     // Pas de médicaments expirants
     $body = str_replace('{{medicaments}}', '<li>Aucun médicament n\'est en cours d\'expiration.</li>', $emailTemplate);
-    $emailService = new EmailService();
-    $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
 }
+
+// Envoyer l'e-mail
+$emailService = new EmailService();
+$emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
 ?>
