@@ -4,8 +4,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require '/var/www/html/outdoorsecevent/vendor/autoload.php'; // Chemin vers autoload.php de Composer
-require_once 'EmailTemplate.php';
-
 
 class EmailService
 {
@@ -14,10 +12,9 @@ class EmailService
     public function __construct()
     {
         $this->mailer = new PHPMailer(true);
-        $this->mailer->CharSet = 'UTF-8'; // Encodage UTF-8 pour le support des accents
+        $this->mailer->CharSet = 'UTF-8';
 
         try {
-            // Configuration SMTP
             $this->mailer->isSMTP();
             $this->mailer->Host = 'smtp.office365.com';
             $this->mailer->SMTPAuth = true;
@@ -25,8 +22,6 @@ class EmailService
             $this->mailer->Password = 'Lipton2019!';
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $this->mailer->Port = 587;
-
-            // Paramètres de l'expéditeur
             $this->mailer->setFrom('notification@outdoorsecours.fr', 'Outdoor Secours');
         } catch (Exception $e) {
             error_log("Erreur de configuration SMTP : {$e->getMessage()}");
@@ -36,7 +31,7 @@ class EmailService
     public function sendEmail($to, $subject, $templateName, $variables = [])
     {
         try {
-            $this->mailer->addAddress($to); // Destinataire
+            $this->mailer->addAddress($to);
             $this->mailer->isHTML(true);
             $this->mailer->Subject = $subject;
 
