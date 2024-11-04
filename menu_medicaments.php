@@ -111,5 +111,77 @@ if ($notificationEnabled) {
 
 <!-- CSS pour le menu amélioré -->
 <style>
-/* Votre CSS existant ici */
+.navbar {
+    background-color: #f8f9fa;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .nav-link {
+    color: #007bff;
+    font-weight: bold;
+    padding: 10px 15px;
+    font-size: 1.1em;
+}
+
+.notification-toggle {
+    position: relative;
+    display: inline-block;
+    color: #007bff;
+}
+
+.notification-bell {
+    font-size: 1.7em;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff3e3e;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 8px;
+    font-size: 0.8em;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.notification-dropdown {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    max-width: 320px;
+    min-width: 300px;
+}
+
+.notification-dropdown .dropdown-header {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #333;
+    padding: 10px 15px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.notification-dropdown .notification-item {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #007bff;
+}
+
+.profile-dropdown {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    min-width: 200px;
+}
 </style>
