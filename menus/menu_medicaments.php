@@ -160,7 +160,6 @@ $(document).ready(function() {
     });
 });
 </script>
-
 <!-- CSS pour le menu amélioré -->
 <style>
 .navbar {
