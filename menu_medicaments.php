@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
                                 <?php foreach ($expiringSoonMeds as $med): ?>
                                     <form method="POST">
                                         <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['id']); ?>">
-                                        <button type="submit" name="mark_as_read" class="dropdown-item">
+                                        <button type="submit" name="mark_as_read" class="dropdown-item" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                             <strong><?php echo htmlspecialchars(explode(' ', $med['nom'])[0]); ?></strong> - Lieu : <?php echo htmlspecialchars($med['lieu_stockage']); ?>, 
                                             Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
                                             Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
