@@ -22,8 +22,10 @@ $expiringMeds = getExpiringMeds($conn);
 // Modèle d'e-mail en HTML
 $emailTemplate = '
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Récapitulatif des Médicaments Expirants</title>
     <style>
         body { font-family: Arial, sans-serif; }
@@ -33,7 +35,7 @@ $emailTemplate = '
 </head>
 <body>
     <h1>Récapitulatif des Médicaments Expirants</h1>
-    <ul class="med-list>{{medicaments}}</ul>
+    <ul class="med-list">{{medicaments}}</ul>
 </body>
 </html>
 ';
