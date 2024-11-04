@@ -124,26 +124,26 @@ if ($notificationEnabled) {
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('.mark-notification-form').on('submit', function(event) {
-        event.preventDefault(); // Empêche la soumission par défaut du formulaire
-        var form = $(this);
-        
+    $('.mark-as-read').on('click', function(event) {
+        event.preventDefault(); // Empêche le comportement par défaut
+        var notificationId = $(this).data('id');
+        console.log("Notification ID:", notificationId); // Débogage
         $.ajax({
             url: 'notifications/mark_notification_read.php',
             method: 'POST',
-            data: form.serialize(),
+            data: { notification_id: notificationId },
             success: function(response) {
-                // Vérifier si la réponse indique un succès
+                console.log("Response from server:", response); // Affiche la réponse du serveur
                 var data = JSON.parse(response);
                 if (data.status === 'success') {
-                    // Masquer la notification ou mettre à jour l'interface
-                    form.closest('.dropdown-item').fadeOut(); // Masquer la notification cliquée
-                    // Optionnel: Mettre à jour le badge si besoin
-                    // location.reload(); // Décommentez si vous voulez recharger la page
+                    console.log('Notification marked as read'); // Débogage
+                    location.reload(); // Recharger la page pour afficher les notifications mises à jour
+                } else {
+                    console.error('Error marking notification as read:', data.message);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Erreur lors de la mise à jour de la notification:', error);
+                console.error('AJAX error:', error);
             }
         });
     });
