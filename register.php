@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/mail/EmailService.php';
-require_once __DIR__ . '/mail/EmailTemplate.php';
+require_once __DIR__ . '/mail/EmailTemplate.php'; // Assurez-vous que ce fichier existe
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
