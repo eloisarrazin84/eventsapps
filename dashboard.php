@@ -120,7 +120,7 @@ try {
 </head>
 <body>
 
-<?php include 'menu.php'; ?>
+<?php include 'menus/menu.php'; ?>
 
 <div class="container">
     <h1 class="mt-5">Événements à venir</h1>
