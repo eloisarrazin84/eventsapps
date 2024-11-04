@@ -86,11 +86,14 @@ if ($notificationEnabled) {
                                 <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
                             <?php else: ?>
                                 <?php foreach ($expiringSoonMeds as $med): ?>
-                                    <div class="dropdown-item mark-as-read" data-id="<?php echo htmlspecialchars($med['med_id']); ?>">
-                                        <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
-                                        Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
-                                        Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
-                                    </div>
+                                    <form method="POST" class="mark-notification-form">
+                                        <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['med_id']); ?>">
+                                        <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
+                                            <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
+                                            Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
+                                            Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
+                                        </button>
+                                    </form>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         <?php else: ?>
@@ -118,20 +121,26 @@ if ($notificationEnabled) {
 </nav>
 
 <!-- JavaScript pour gérer le clic sur les notifications -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('.mark-as-read').on('click', function() {
-        var notificationId = $(this).data('id');
+    $('.mark-notification-form').on('submit', function(event) {
+        event.preventDefault(); // Empêche la soumission par défaut du formulaire
+        var form = $(this);
+        
         $.ajax({
             url: 'notifications/mark_notification_read.php',
             method: 'POST',
-            data: { notification_id: notificationId },
+            data: form.serialize(),
             success: function(response) {
-                // Gérer la réponse ici
-                // Par exemple, masquer la notification ou mettre à jour l'interface
-                // Si tout va bien, vous pouvez également masquer le dropdown ou mettre à jour le badge
-                $('#notificationDropdown').dropdown('toggle');
-                location.reload(); // Recharger la page pour afficher les notifications mises à jour
+                // Vérifier si la réponse indique un succès
+                var data = JSON.parse(response);
+                if (data.status === 'success') {
+                    // Masquer la notification ou mettre à jour l'interface
+                    form.closest('.dropdown-item').fadeOut(); // Masquer la notification cliquée
+                    // Optionnel: Mettre à jour le badge si besoin
+                    // location.reload(); // Décommentez si vous voulez recharger la page
+                }
             },
             error: function(xhr, status, error) {
                 console.error('Erreur lors de la mise à jour de la notification:', error);
