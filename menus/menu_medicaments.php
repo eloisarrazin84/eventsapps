@@ -86,15 +86,16 @@ if ($notificationEnabled) {
                                 <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
                             <?php else: ?>
                                 <?php foreach ($expiringSoonMeds as $med): ?>
-                                    <form method="POST" class="mark-notification-form">
-                                        <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['med_id']); ?>">
-                                        <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
-                                            <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
-                                            Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
-                                            Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
-                                        </button>
-                                    </form>
-                                <?php endforeach; ?>
+    <form method="POST" action="notifications/mark_notification_read.php" class="mark-as-read-form">
+        <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['med_id']); ?>">
+        <button type="button" class="dropdown-item mark-notification" data-id="<?php echo htmlspecialchars($med['med_id']); ?>" style="text-align: left; white-space: normal;">
+            <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
+            Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
+            Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
+        </button>
+    </form>
+<?php endforeach; ?>
+
                             <?php endif; ?>
                         <?php else: ?>
                             <p class="dropdown-item">Notifications désactivées.</p>
@@ -124,10 +125,9 @@ if ($notificationEnabled) {
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('.mark-as-read').on('click', function(event) {
-        event.preventDefault(); // Empêche le comportement par défaut
-        var notificationId = $(this).data('id');
-        console.log("Notification ID:", notificationId); // Débogage
+    $('.mark-notification').on('click', function() {
+        var notificationId = $(this).data('id'); // Récupérer l'ID de notification à partir de l'attribut de données
+        console.log("Notification ID:", notificationId); // Pour le débogage
         $.ajax({
             url: 'notifications/mark_notification_read.php',
             method: 'POST',
@@ -136,7 +136,7 @@ $(document).ready(function() {
                 console.log("Response from server:", response); // Affiche la réponse du serveur
                 var data = JSON.parse(response);
                 if (data.status === 'success') {
-                    console.log('Notification marked as read'); // Débogage
+                    console.log('Notification marked as read'); // Pour le débogage
                     location.reload(); // Recharger la page pour afficher les notifications mises à jour
                 } else {
                     console.error('Error marking notification as read:', data.message);
