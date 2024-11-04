@@ -32,7 +32,14 @@ $notificationEnabled = getNotificationSetting($conn, $user_id);
 // Récupérer les médicaments expirant dans moins de 30 jours
 $expiringSoonMeds = [];
 if ($notificationEnabled) {
-    $expiringSoonMeds = getExpiringSoonMeds($conn);
+    $stmt = $conn->prepare("
+        SELECT m.nom, m.date_expiration, m.numero_lot, sl.location_name 
+        FROM medicaments m 
+        JOIN stock_locations sl ON m.stock_location_id = sl.id 
+        WHERE m.date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+    ");
+    $stmt->execute();
+    $expiringSoonMeds = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Gérer le marquage des notifications comme lues
