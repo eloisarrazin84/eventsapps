@@ -32,9 +32,7 @@ $notificationEnabled = getNotificationSetting($conn, $user_id);
 // Récupérer les médicaments expirant dans moins de 30 jours
 $expiringSoonMeds = [];
 if ($notificationEnabled) {
-    $stmt = $conn->prepare("SELECT nom, date_expiration, numero_lot, lieu_stockage FROM medicaments WHERE date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)");
-    $stmt->execute();
-    $expiringSoonMeds = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $expiringSoonMeds = getExpiringSoonMeds($conn);
 }
 
 // Gérer le marquage des notifications comme lues
@@ -75,33 +73,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
         </ul>
         <ul class="navbar-nav ml-auto">
             <?php if (isset($_SESSION['user_id'])): ?>
-<!-- Icône de notifications avec cloche et badge -->
-<li class="nav-item dropdown">
-    <a class="nav-link notification-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-bell notification-bell"></i>
-        <?php if ($unreadNotifications > 0): ?>
-            <span class="badge badge-danger notification-badge"><?php echo $unreadNotifications; ?></span>
-        <?php endif; ?>
-    </a>
-    <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
-        <div class="dropdown-header">Notifications</div>
-        <?php if ($notificationEnabled): ?>
-            <?php if (empty($expiringSoonMeds)): ?>
-                <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
-            <?php else: ?>
-                <?php foreach ($expiringSoonMeds as $med): ?>
-                    <div class="dropdown-item">
-                        <strong><?php echo htmlspecialchars(explode(' ', $med['nom'])[0]); ?></strong> - Lieu : <?php echo htmlspecialchars($med['lieu_stockage']); ?>, 
-                        Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
-                        Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
+                <li class="nav-item dropdown">
+                    <a class="nav-link notification-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-bell notification-bell"></i>
+                        <?php if ($unreadNotifications > 0): ?>
+                            <span class="badge badge-danger notification-badge"><?php echo $unreadNotifications; ?></span>
+                        <?php endif; ?>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
+                        <div class="dropdown-header">Notifications</div>
+                        <?php if ($notificationEnabled): ?>
+                            <?php if (empty($expiringSoonMeds)): ?>
+                                <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
+                            <?php else: ?>
+                                <?php foreach ($expiringSoonMeds as $med): ?>
+                                    <form method="POST">
+                                        <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['id']); ?>">
+                                        <button type="submit" name="mark_as_read" class="dropdown-item">
+                                            <strong><?php echo htmlspecialchars(explode(' ', $med['nom'])[0]); ?></strong> - Lieu : <?php echo htmlspecialchars($med['lieu_stockage']); ?>, 
+                                            Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
+                                            Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
+                                        </button>
+                                    </form>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <p class="dropdown-item">Notifications désactivées.</p>
+                        <?php endif; ?>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        <?php else: ?>
-            <p class="dropdown-item">Notifications désactivées.</p>
-        <?php endif; ?>
-    </div>
-</li>
+                </li>
 
                 <li class="nav-item dropdown ml-3">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -172,8 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
     font-weight: bold;
     color: #333;
     padding: 10px 15px;
-    border-bottom: 1px solid #f1f1f1;
 }
+
 .notification-dropdown .dropdown-item {
     white-space: nowrap; /* Empêche le texte de se diviser sur plusieurs lignes */
     overflow: hidden; /* Cache le texte qui dépasse */
