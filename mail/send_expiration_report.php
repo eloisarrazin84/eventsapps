@@ -1,5 +1,6 @@
 <?php
 require 'EmailService.php'; // Assurez-vous que votre service d'envoi d'e-mails est correctement inclus
+require 'EmailTemplate.php'; // Assurez-vous que la classe EmailTemplate est incluse
 
 function getExpiringMeds($conn) {
     $stmt = $conn->prepare("
@@ -13,13 +14,8 @@ function getExpiringMeds($conn) {
 }
 
 // Connexion à la base de données
-try {
-    $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    error_log("Erreur de connexion à la base de données : " . $e->getMessage());
-    exit();
-}
+$conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
+$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Récupérer les médicaments qui expirent
 $expiringMeds = getExpiringMeds($conn);
@@ -51,17 +47,14 @@ if (!empty($expiringMeds)) {
 
     // Insérer la liste des médicaments dans le modèle
     $body = str_replace('{{medicaments}}', $medList, $emailTemplate);
+
+    // Envoyer l'e-mail
+    $emailService = new EmailService();
+    $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
 } else {
     // Pas de médicaments expirants
     $body = str_replace('{{medicaments}}', '<li>Aucun médicament n\'est en cours d\'expiration.</li>', $emailTemplate);
-}
-
-// Envoyer l'e-mail
-$emailService = new EmailService();
-if ($emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body)) {
-    echo "L'e-mail a été envoyé avec succès.";
-} else {
-    echo "Erreur lors de l\'envoi de l\'e-mail.";
+    $emailService = new EmailService();
+    $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
 }
 ?>
-
