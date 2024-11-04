@@ -46,8 +46,8 @@ if ($notificationEnabled) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
     $notification_id = $_POST['notification_id'];
     markNotificationAsRead($conn, $notification_id, $user_id);
-    header("Location: " . $_SERVER['PHP_SELF']); // Recharger la page pour mettre à jour l'affichage
-    exit();
+    echo json_encode(['status' => 'success']); // Retourne une réponse JSON pour l'AJAX
+    exit(); // Terminer le script ici pour éviter le chargement de la page
 }
 ?>
 
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
                                 <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
                             <?php else: ?>
                                 <?php foreach ($expiringSoonMeds as $med): ?>
-                                    <form method="POST" action="notifications/mark_notification_read.php">
+                                    <form method="POST" class="mark-as-read">
                                         <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['med_id']); ?>">
                                         <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
                                             <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
@@ -127,6 +127,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
         </ul>
     </div>
 </nav>
+
+<!-- AJAX pour marquer les notifications comme lues -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.mark-as-read').on('submit', function(e) {
+        e.preventDefault(); // Empêche le rechargement de la page
+        var form = $(this);
+        $.ajax({
+            type: 'POST',
+            url: 'notifications/mark_notification_read.php', // Modifiez cette ligne si nécessaire
+            data: form.serialize(), // Serialize les données du formulaire
+            success: function(response) {
+                // Traitement de la réponse si nécessaire
+                console.log(response); // Vous pouvez vérifier la réponse dans la console
+                form.closest('.dropdown-item').remove(); // Supprimer la notification marquée
+            },
+            error: function(xhr, status, error) {
+                console.error(error); // Log de l'erreur
+            }
+        });
+    });
+});
+</script>
 
 <!-- CSS pour le menu amélioré -->
 <style>
