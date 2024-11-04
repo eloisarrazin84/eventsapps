@@ -24,8 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($notificationTypes as $type) {
         $is_enabled = isset($_POST[$type]) ? 1 : 0;
 
-        // Vérifier si l'enregistrement existe
-        $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, notification_type, is_enabled) VALUES (:user_id, :type, :is_enabled)
+        // Insérer ou mettre à jour la notification
+        $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, notification_type, is_enabled)
+                                 VALUES (:user_id, :type, :is_enabled)
                                  ON DUPLICATE KEY UPDATE is_enabled = :is_enabled");
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':type', $type);
@@ -63,10 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container mt-5">
     <h2>Paramètres de Notification</h2>
 
-    <!-- Bouton de retour vers le profil -->
     <a href="profile.php" class="btn btn-secondary mb-3">Retour vers le Profil</a>
 
-    <!-- Afficher le message de confirmation si présent -->
     <?php if (isset($confirmationMessage)): ?>
         <div class="confirmation-message">
             <?php echo $confirmationMessage; ?>
