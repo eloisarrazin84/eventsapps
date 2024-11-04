@@ -32,17 +32,20 @@ class EmailService
         }
     }
 
-    public function sendEmail($to, $subject, $body)
+    public function sendEmail($to, $subject, $templateName, $variables = [])
     {
         try {
             $this->mailer->addAddress($to); // Destinataire
             $this->mailer->isHTML(true);
             $this->mailer->Subject = $subject;
-            $this->mailer->Body = $body;
+
+            // Charger le contenu du template et remplacer les variables
+            $this->mailer->Body = EmailTemplate::loadTemplate($templateName, $variables);
+
+            // Envoi de l'email
             $this->mailer->send();
         } catch (Exception $e) {
             error_log("Erreur d'envoi d'email : {$this->mailer->ErrorInfo}");
         }
     }
 }
-
