@@ -4,6 +4,8 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require '/var/www/html/outdoorsecevent/vendor/autoload.php'; // Chemin vers autoload.php de Composer
+require_once 'EmailTemplate.php';
+
 
 class EmailService
 {
