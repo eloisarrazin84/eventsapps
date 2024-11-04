@@ -40,10 +40,4 @@ $body = EmailTemplate::loadTemplate($emailTemplate, $userVariables);
 // Envoyer l'e-mail
 $emailService = new EmailService();
 $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
-
-} catch (Exception $e) {
-    // Afficher l'erreur en cas de problème lors de l'envoi de l'email
-    echo "Erreur lors de l'envoi de l'email : " . $e->getMessage();
-    exit();
-}
 ?>
