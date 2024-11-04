@@ -86,14 +86,15 @@ if ($notificationEnabled) {
                                 <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
                             <?php else: ?>
                                 <?php foreach ($expiringSoonMeds as $med): ?>
-                                    <div class="dropdown-item mark-notification" data-id="<?php echo htmlspecialchars($med['med_id']); ?>">
-                                        <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
-                                        Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
-                                        Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
-                                    </div>
+                                    <form method="POST" action="notifications/mark_notification_read.php" class="mark-as-read-form">
+                                        <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['med_id']); ?>">
+                                        <button type="button" class="dropdown-item mark-notification" data-id="<?php echo htmlspecialchars($med['med_id']); ?>" style="text-align: left; white-space: normal;">
+                                            <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
+                                            Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
+                                            Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
+                                        </button>
+                                    </form>
                                 <?php endforeach; ?>
-                                <div class="dropdown-divider"></div>
-                                <button class="btn btn-link mark-all-read" style="padding: 0; margin: 5px;" data-user-id="<?php echo $user_id; ?>">Marquer tout comme lu</button>
                             <?php endif; ?>
                         <?php else: ?>
                             <p class="dropdown-item">Notifications désactivées.</p>
@@ -124,7 +125,7 @@ if ($notificationEnabled) {
 <script>
 $(document).ready(function() {
     $('.mark-notification').on('click', function() {
-        var notificationId = $(this).data('id');
+        var notificationId = $(this).data('id'); // Récupérer l'ID de notification à partir de l'attribut de données
         $.ajax({
             url: 'notifications/mark_notification_read.php',
             method: 'POST',
@@ -140,26 +141,9 @@ $(document).ready(function() {
             }
         });
     });
-
-    $('.mark-all-read').on('click', function() {
-        var userId = $(this).data('user-id');
-        $.ajax({
-            url: 'notifications/mark_all_notifications_read.php',
-            method: 'POST',
-            data: { user_id: userId },
-            success: function(response) {
-                var data = JSON.parse(response);
-                if (data.status === 'success') {
-                    location.reload(); // Recharger la page pour afficher les notifications mises à jour
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX error:', error);
-            }
-        });
-    });
 });
 </script>
+
 <!-- CSS pour le menu amélioré -->
 <style>
 .navbar {
