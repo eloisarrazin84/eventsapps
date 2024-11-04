@@ -24,7 +24,6 @@ if (!empty($expiringMeds)) {
     foreach ($expiringMeds as $med) {
         $medList .= "<li>" . htmlspecialchars($med['nom']) . " - Lot: " . htmlspecialchars($med['numero_lot']) . ", Expire le: " . htmlspecialchars($med['date_expiration']) . ", Lieu: " . htmlspecialchars($med['location_name']) . "</li>";
     }
-
     // Envoyer l'e-mail avec la liste des médicaments
     $emailService = new EmailService();
     $emailService->sendEmail(
