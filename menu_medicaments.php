@@ -33,7 +33,7 @@ $notificationEnabled = getNotificationSetting($conn, $user_id);
 $expiringSoonMeds = [];
 if ($notificationEnabled) {
     $stmt = $conn->prepare("
-        SELECT m.nom, m.date_expiration, m.numero_lot, sl.location_name 
+        SELECT m.id AS med_id, m.nom, m.date_expiration, m.numero_lot, sl.location_name 
         FROM medicaments m 
         JOIN stock_locations sl ON m.stock_location_id = sl.id 
         WHERE m.date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
@@ -46,6 +46,7 @@ if ($notificationEnabled) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
     $notification_id = $_POST['notification_id'];
     markNotificationAsRead($conn, $notification_id, $user_id);
+    // Optionnel: vous pouvez faire un JSON réponse ici si vous souhaitez que l'UI soit plus réactive
     header("Location: " . $_SERVER['PHP_SELF']); // Recharger la page pour mettre à jour l'affichage
     exit();
 }
@@ -89,24 +90,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
                     </a>
                     <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notificationDropdown">
                         <div class="dropdown-header">Notifications</div>
-                        <?php if ($notificationEnabled): ?>
-                            <?php if (empty($expiringSoonMeds)): ?>
-                                <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
-                            <?php else: ?>
-                                <?php foreach ($expiringSoonMeds as $med): ?>
-                                    <form method="POST">
-                                        <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['id']); ?>">
-                                        <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
-                                            <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
-                                            Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
-                                            Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
-                                        </button>
-                                    </form>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        <?php else: ?>
-                            <p class="dropdown-item">Notifications désactivées.</p>
-                        <?php endif; ?>
+                      <?php if ($notificationEnabled): ?>
+    <?php if (empty($expiringSoonMeds)): ?>
+        <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
+    <?php else: ?>
+        <?php foreach ($expiringSoonMeds as $med): ?>
+            <form method="POST">
+                <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['med_id']); ?>">
+                <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
+                    <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
+                    Lot : <?php echo htmlspecialchars($med['numero_lot']); ?>, 
+                    Expire : <?php echo htmlspecialchars($med['date_expiration']); ?>
+                </button>
+            </form>
+        <?php endforeach; ?>
+    <?php endif; ?>
+<?php else: ?>
+    <p class="dropdown-item">Notifications désactivées.</p>
+<?php endif; ?>
                     </div>
                 </li>
                 <li class="nav-item dropdown ml-3">
