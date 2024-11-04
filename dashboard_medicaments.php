@@ -1,4 +1,4 @@
-<?php
+us/<?php
 session_start();
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -72,7 +72,7 @@ foreach ($stockByLocation as $location) {
     </style>
 </head>
 <body>
-<?php include 'menu_medicaments.php'; ?>
+<?php include 'menus/menu_medicaments.php'; ?>
 
 <div class="container">
     <h1 class="mb-4">Dashboard des Médicaments</h1>
