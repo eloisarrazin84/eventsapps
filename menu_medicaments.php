@@ -20,7 +20,7 @@ $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Inclure le fichier de notifications
-include 'notifications/notifications_medicaments.php';
+include 'notifications/notifications_medicaments.php'; // Inclure le fichier de notifications
 
 // Récupérer les notifications non lues
 $notifications = getUnreadNotifications($conn, $user_id);
@@ -33,6 +33,14 @@ $notificationEnabled = getNotificationSetting($conn, $user_id);
 $expiringSoonMeds = [];
 if ($notificationEnabled) {
     $expiringSoonMeds = getExpiringSoonMeds($conn);
+}
+
+// Gérer le marquage des notifications comme lues
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
+    $notification_id = $_POST['notification_id'];
+    markNotificationAsRead($conn, $notification_id, $user_id);
+    header("Location: " . $_SERVER['PHP_SELF']); // Recharger la page pour mettre à jour l'affichage
+    exit();
 }
 ?>
 
@@ -82,6 +90,10 @@ if ($notificationEnabled) {
                                     <div class="dropdown-item">
                                         <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lot: <?php echo htmlspecialchars($med['numero_lot']); ?>,
                                         Expire le: <?php echo htmlspecialchars($med['date_expiration']); ?>
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="notification_id" value="<?php echo $med['id']; ?>">
+                                            <button type="submit" name="mark_as_read" class="btn btn-link" style="padding: 0; color: #007bff;">Marquer comme lu</button>
+                                        </form>
                                     </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -159,14 +171,6 @@ if ($notificationEnabled) {
     font-weight: bold;
     color: #333;
     padding: 10px 15px;
-    border-bottom: 1px solid #f1f1f1;
-}
-
-.notification-dropdown .notification-item {
-    padding: 10px 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     border-bottom: 1px solid #f1f1f1;
 }
 
