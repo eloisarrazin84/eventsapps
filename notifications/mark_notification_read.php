@@ -1,27 +1,30 @@
 <?php
 session_start();
 
+// Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php"); // Rediriger vers la page de connexion si non connecté
+    echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
-
+// Connexion à la base de données
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['notification_id'])) {
     $notification_id = $_POST['notification_id'];
-    
+
+    // Marquer la notification comme lue
     $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE id = :notification_id AND user_id = :user_id");
     $stmt->bindParam(':notification_id', $notification_id);
-    $stmt->bindParam(':user_id', $user_id);
+    $stmt->bindParam(':user_id', $_SESSION['user_id']);
     
     if ($stmt->execute()) {
         echo json_encode(['status' => 'success']);
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to mark notification as read.']);
+        echo json_encode(['status' => 'error', 'message' => 'Unable to mark notification as read']);
     }
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
 }
 ?>
