@@ -70,8 +70,8 @@ $emailTemplate = '
             left: 10px; /* Positionnement à gauche */
             top: 50%; /* Centrer verticalement */
             transform: translateY(-50%); /* Ajustement du centrage */
-            width: 24px; /* Taille de l'icône */
-            height: 24px; /* Taille de l'icône */
+            width: 24px; 
+            height: 24px; 
         }
         .footer {
             margin-top: 30px;
