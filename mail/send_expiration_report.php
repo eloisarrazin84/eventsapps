@@ -49,7 +49,7 @@ $emailTemplate = '
         .logo {
             display: block;
             margin: 0 auto 20px;
-            width: 150px; /* Ajustez la taille du logo selon vos besoins */
+            width: 150px; 
         }
         .med-list {
             margin: 20px 0;
@@ -62,8 +62,8 @@ $emailTemplate = '
             background: #e7f3fe;
             border-left: 4px solid #2196F3;
             border-radius: 4px;
-            position: relative; /* Pour positionner l'icône */
-            padding-left: 40px; /* Ajout d'espace pour l'icône */
+            position: relative; 
+            padding-left: 40px; 
         }
         .med-list li:before {
             content: ""; /* Icône de médicament */
