@@ -91,7 +91,7 @@ try {
 <body>
 
 <!-- Inclusion du menu -->
-<?php include 'menu_admin.php'; ?>
+<?php include 'menus/menu_admin.php'; ?>
 
 <div class="container">
     <h1 class="mt-5 text-center">Gestion des utilisateurs</h1>
