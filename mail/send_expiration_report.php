@@ -1,5 +1,6 @@
 <?php
 require 'EmailService.php'; // Assurez-vous que votre service d'envoi d'e-mails est correctement inclus
+require 'EmailTemplate.php';
 
 function loadEmailTemplate($templateFile, $data) {
     if (!file_exists($templateFile)) {
