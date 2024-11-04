@@ -66,8 +66,6 @@ $emailTemplate = '
             padding-left: 40px; 
         }
         .med-list li:before {
-            content: ""; /* Icône de médicament */
-            background: url("https://example.com/path/to/med-icon.png") no-repeat; /* Remplacez par l'URL de votre icône */
             position: absolute;
             left: 10px; /* Positionnement à gauche */
             top: 50%; /* Centrer verticalement */
