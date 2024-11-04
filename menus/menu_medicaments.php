@@ -124,7 +124,7 @@ if ($notificationEnabled) {
 <script>
 $(document).ready(function() {
     $('.mark-notification').on('click', function() {
-        var notificationId = $(this).data('id'); // Récupérer l'ID de notification à partir de l'attribut de données
+        var notificationId = $(this).data('id');
         $.ajax({
             url: 'notifications/mark_notification_read.php',
             method: 'POST',
@@ -133,32 +133,28 @@ $(document).ready(function() {
                 var data = JSON.parse(response);
                 if (data.status === 'success') {
                     location.reload(); // Recharger la page pour afficher les notifications mises à jour
-                } else {
-                    console.error('Erreur lors du marquage de la notification comme lue:', data.message);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Erreur AJAX:', error);
+                console.error('AJAX error:', error);
             }
         });
     });
 
-    // Marquer toutes les notifications comme lues
     $('.mark-all-read').on('click', function() {
+        var userId = $(this).data('user-id');
         $.ajax({
-            url: 'notifications/mark_all_notifications_read.php', // Créez ce fichier pour gérer la logique
+            url: 'notifications/mark_all_notifications_read.php',
             method: 'POST',
-            data: { user_id: $(this).data('user-id') },
+            data: { user_id: userId },
             success: function(response) {
                 var data = JSON.parse(response);
                 if (data.status === 'success') {
                     location.reload(); // Recharger la page pour afficher les notifications mises à jour
-                } else {
-                    console.error('Erreur lors du marquage de toutes les notifications comme lues:', data.message);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Erreur AJAX:', error);
+                console.error('AJAX error:', error);
             }
         });
     });
