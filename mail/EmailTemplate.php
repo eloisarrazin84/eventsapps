@@ -23,3 +23,4 @@ class EmailTemplate
         return $templateContent;
     }
 }
+?>
