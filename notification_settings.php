@@ -63,6 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container mt-5">
     <h2>Paramètres de Notification</h2>
 
+    <!-- Bouton de retour vers le profil -->
+    <a href="profile.php" class="btn btn-secondary mb-3">Retour vers le Profil</a>
+
     <!-- Afficher le message de confirmation si présent -->
     <?php if (isset($confirmationMessage)): ?>
         <div class="confirmation-message">
