@@ -41,6 +41,14 @@ if ($notificationEnabled) {
     $stmt->execute();
     $expiringSoonMeds = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+// Gérer le marquage des notifications comme lues
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
+    $notification_id = $_POST['notification_id'];
+    markNotificationAsRead($conn, $notification_id, $user_id);
+    header("Location: " . $_SERVER['PHP_SELF']); // Recharger la page pour mettre à jour l'affichage
+    exit();
+}
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
@@ -86,7 +94,7 @@ if ($notificationEnabled) {
                                 <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
                             <?php else: ?>
                                 <?php foreach ($expiringSoonMeds as $med): ?>
-                                    <form method="POST" class="notification-form">
+                                    <form method="POST" action="notifications/mark_notification_read.php">
                                         <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['med_id']); ?>">
                                         <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
                                             <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
@@ -188,40 +196,3 @@ if ($notificationEnabled) {
     min-width: 200px;
 }
 </style>
-
-<!-- JavaScript pour gérer le marquage des notifications comme lues -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('.notification-form').submit(function(e) {
-        e.preventDefault(); // Empêche le formulaire de se soumettre normalement
-
-        var form = $(this);
-        var notificationId = form.find('input[name="notification_id"]').val();
-
-        $.ajax({
-            type: 'POST',
-            url: 'notifications/mark_notification_read.php',
-            data: { notification_id: notificationId },
-            success: function(response) {
-                var data = JSON.parse(response);
-                if (data.status === 'success') {
-                    // Supprime la notification du menu
-                    form.closest('.dropdown-item').remove();
-                    // Mettre à jour le badge de notifications
-                    var count = parseInt($('.notification-badge').text()) - 1;
-                    $('.notification-badge').text(count);
-                    if (count <= 0) {
-                        $('.notification-badge').remove(); // Supprimer le badge si aucune notification
-                    }
-                } else {
-                    alert(data.message); // Afficher un message d'erreur si nécessaire
-                }
-            },
-            error: function() {
-                alert('Erreur lors de la mise à jour de la notification.');
-            }
-        });
-    });
-});
-</script>
