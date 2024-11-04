@@ -1,56 +1,3 @@
-<?php
-session_start();
-
-// Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php"); // Rediriger vers la page de connexion si non connecté
-    exit();
-}
-
-$user_id = $_SESSION['user_id'];
-
-// Connexion à la base de données
-$conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
-$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-// Récupérer la photo de profil de l'utilisateur
-$stmt = $conn->prepare("SELECT profile_picture FROM users WHERE id = :user_id");
-$stmt->bindParam(':user_id', $user_id);
-$stmt->execute();
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-// Inclure le fichier de notifications
-include 'notifications/notifications_medicaments.php'; // Inclure le fichier de notifications
-
-// Récupérer les notifications non lues
-$notifications = getUnreadNotifications($conn, $user_id);
-$unreadNotifications = count($notifications);
-
-// Vérifier si les notifications pour les médicaments expirant bientôt sont activées
-$notificationEnabled = getNotificationSetting($conn, $user_id);
-
-// Récupérer les médicaments expirant dans moins de 30 jours
-$expiringSoonMeds = [];
-if ($notificationEnabled) {
-    $stmt = $conn->prepare("
-        SELECT m.id AS med_id, m.nom, m.date_expiration, m.numero_lot, sl.location_name 
-        FROM medicaments m 
-        JOIN stock_locations sl ON m.stock_location_id = sl.id 
-        WHERE m.date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-    ");
-    $stmt->execute();
-    $expiringSoonMeds = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Gérer le marquage des notifications comme lues
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
-    $notification_id = $_POST['notification_id'];
-    markNotificationAsRead($conn, $notification_id, $user_id);
-    header("Location: " . $_SERVER['PHP_SELF']); // Recharger la page pour mettre à jour l'affichage
-    exit();
-}
-?>
-
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
     <a class="navbar-brand" href="#">
         <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png" alt="Logo" style="width: 50px; margin-right: 10px;">
@@ -94,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
                                 <p class="dropdown-item">Aucun médicament expirant bientôt.</p>
                             <?php else: ?>
                                 <?php foreach ($expiringSoonMeds as $med): ?>
-                                    <form method="POST" action="notifications/mark_notification_read.php">
+                                    <form method="POST" class="mark-as-read">
                                         <input type="hidden" name="notification_id" value="<?php echo htmlspecialchars($med['med_id']); ?>">
                                         <button type="submit" name="mark_as_read" class="dropdown-item" style="text-align: left; white-space: normal;">
                                             <strong><?php echo htmlspecialchars($med['nom']); ?></strong> - Lieu : <?php echo htmlspecialchars($med['location_name']); ?>, 
@@ -127,6 +74,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_as_read'])) {
         </ul>
     </div>
 </nav>
+
+<!-- AJAX pour le marquage des notifications comme lues -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.mark-as-read').on('submit', function(e) {
+        e.preventDefault(); // Empêche le rechargement de la page
+        var form = $(this);
+        $.ajax({
+            type: 'POST',
+            url: 'notifications/mark_notification_read.php',
+            data: form.serialize(), // Serialize les données du formulaire
+            success: function(response) {
+                // Traitement de la réponse si nécessaire
+                console.log(response); // Vous pouvez vérifier la réponse dans la console
+                form.closest('.dropdown-item').remove(); // Supprimer la notification marquée
+            },
+            error: function(xhr, status, error) {
+                console.error(error); // Log de l'erreur
+            }
+        });
+    });
+});
+</script>
 
 <!-- CSS pour le menu amélioré -->
 <style>
