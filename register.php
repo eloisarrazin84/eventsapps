@@ -70,10 +70,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->execute();
 
                 // Email de confirmation pour l'utilisateur
-                $userVariables = ['first_name' => $firstName];
-                $subject = "Confirmation d'inscription";
-                $emailService = new EmailService();
-                $emailService->sendEmail($email, $subject, 'confirmation_registration', $userVariables);
+$userVariables = ['first_name' => $firstName];
+$subject = "Confirmation d'inscription";
+
+// Assurez-vous que la classe EmailService est correctement instanciée
+$emailService = new EmailService();
+
+// Vérifiez si l'e-mail a été envoyé avec succès
+if ($emailService->sendEmail($email, $subject, 'confirmation_registration', $userVariables)) {
+    $success = "Un e-mail de confirmation a été envoyé à $email.";
+} else {
+    $error = "Erreur lors de l'envoi de l'e-mail de confirmation.";
+}
 
                 // Récupérer les administrateurs pour les notifier
                 $stmt = $conn->prepare("SELECT email FROM users WHERE role = 'admin'");
