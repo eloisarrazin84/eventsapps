@@ -2,7 +2,8 @@
 
 require_once __DIR__ . '/EmailService.php';
 
-function getExpiringMeds($conn) {
+function getExpiringMeds($conn)
+{
     $stmt = $conn->prepare("
         SELECT nom, date_expiration, numero_lot, location_name 
         FROM medicaments m 
@@ -18,7 +19,6 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $expiringMeds = getExpiringMeds($conn);
 
-// Modèle d'e-mail en HTML intégré
 $emailTemplate = '
 <!DOCTYPE html>
 <html lang="fr">
@@ -60,9 +60,4 @@ if (!empty($expiringMeds)) {
 }
 
 $emailService = new EmailService();
-try {
-    $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
-} catch (Exception $e) {
-    echo "Erreur d'envoi d'email : " . $e->getMessage();
-}
-?>
+$emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
