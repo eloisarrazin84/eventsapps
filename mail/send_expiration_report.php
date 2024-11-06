@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/EmailService.php'; // Chemin correct pour EmailService.php
+require_once __DIR__ . '/EmailService.php';
 
 function getExpiringMeds($conn) {
     $stmt = $conn->prepare("
@@ -12,14 +12,11 @@ function getExpiringMeds($conn) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Connexion à la base de données
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Récupérer les médicaments qui expirent
 $expiringMeds = getExpiringMeds($conn);
 
-// Modèle d'e-mail en HTML intégré
 $emailTemplate = '
 <!DOCTYPE html>
 <html lang="fr">
@@ -67,6 +64,7 @@ $emailTemplate = '
         }
         .med-list li:before {
             content: "";
+            background: url("https://example.com/path/to/med-icon.png") no-repeat; 
             position: absolute;
             left: 10px; 
             top: 50%; 
@@ -100,15 +98,11 @@ if (!empty($expiringMeds)) {
     foreach ($expiringMeds as $med) {
         $medList .= "<li>" . htmlspecialchars($med['nom']) . " - Lot: " . htmlspecialchars($med['numero_lot']) . ", Expire le: " . htmlspecialchars($med['date_expiration']) . ", Lieu: " . htmlspecialchars($med['location_name']) . "</li>";
     }
-
-    // Insérer la liste des médicaments dans le modèle
     $body = str_replace('{{medicaments}}', $medList, $emailTemplate);
 } else {
-    // Pas de médicaments expirants
     $body = str_replace('{{medicaments}}', '<li>Aucun médicament n\'est en cours d\'expiration.</li>', $emailTemplate);
 }
 
-// Envoyer l'e-mail
 $emailService = new EmailService();
 $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
 ?>
