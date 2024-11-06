@@ -27,13 +27,58 @@ $emailTemplate = '
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Récapitulatif des Médicaments Expirants</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #333; text-align: center; }
-        .logo { display: block; margin: 0 auto 20px; width: 150px; }
-        .med-list { margin: 20px 0; padding: 0; list-style-type: none; }
-        .med-list li { margin-bottom: 15px; padding: 10px; background: #e7f3fe; border-left: 4px solid #2196F3; border-radius: 4px; }
-        .footer { margin-top: 30px; font-size: 12px; color: #777; text-align: center; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 150px; 
+        }
+        .med-list {
+            margin: 20px 0;
+            padding: 0;
+            list-style-type: none;
+        }
+        .med-list li {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #e7f3fe;
+            border-left: 4px solid #2196F3;
+            border-radius: 4px;
+            position: relative; 
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+        .action-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -43,6 +88,7 @@ $emailTemplate = '
         <ul class="med-list">{{medicaments}}</ul>
         <div class="footer">
             <p>Cet e-mail a été envoyé par votre système de gestion de médicaments.</p>
+            <a href="#" class="action-button">Voir plus de détails</a>
         </div>
     </div>
 </body>
