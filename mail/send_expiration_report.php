@@ -57,11 +57,25 @@ $emailTemplate = '
         }
         .med-list li {
             margin-bottom: 15px;
-            padding: 10px;
+            padding: 15px;
             background: #e7f3fe;
             border-left: 4px solid #2196F3;
             border-radius: 4px;
             position: relative; 
+            transition: background 0.3s;
+        }
+        .med-list li:hover {
+            background: #d0e7ff; /* Change color on hover */
+        }
+        .med-list li:before {
+            content: "";
+            background: url('https://example.com/path/to/med-icon.png') no-repeat; 
+            position: absolute;
+            left: 10px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            width: 24px; 
+            height: 24px; 
         }
         .footer {
             margin-top: 30px;
@@ -78,6 +92,7 @@ $emailTemplate = '
             text-decoration: none;
             border-radius: 5px;
             text-align: center;
+            transition: background-color 0.3s;
         }
         .action-button:hover {
             background-color: #1e88e5; /* Couleur du bouton au survol */
@@ -96,6 +111,7 @@ $emailTemplate = '
     </div>
 </body>
 </html>
+
 
 ';
 
