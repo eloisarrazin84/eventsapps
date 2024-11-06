@@ -47,20 +47,20 @@ class EmailService
 
     }
 
-    private function loadEmailTemplate($templateName, $variables)
-    {
-        $templatePath = __DIR__ . "/email_templates/$templateName.html";
+   private function loadEmailTemplate($templateName, $variables)
+{
+    $templatePath = __DIR__ . "/email_templates/$templateName.html"; // Assurez-vous que le chemin est correct
 
-        if (!file_exists($templatePath)) {
-            throw new Exception("Template non trouvé : $templatePath");
-        }
-
-        $templateContent = file_get_contents($templatePath);
-        foreach ($variables as $key => $value) {
-            $escapedValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-            $templateContent = str_replace("{{ $key }}", $escapedValue, $templateContent);
-        }
-
-        return $templateContent;
+    if (!file_exists($templatePath)) {
+        throw new Exception("Template non trouvé : $templatePath"); // Affiche le chemin exact
     }
+
+    $templateContent = file_get_contents($templatePath);
+    foreach ($variables as $key => $value) {
+        $escapedValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        $templateContent = str_replace("{{ $key }}", $escapedValue, $templateContent);
+    }
+
+    return $templateContent;
+}
 }
