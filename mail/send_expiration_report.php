@@ -79,6 +79,9 @@ $emailTemplate = '
             border-radius: 5px;
             text-align: center;
         }
+        .action-button:hover {
+            background-color: #1e88e5; /* Couleur du bouton au survol */
+        }
     </style>
 </head>
 <body>
@@ -86,13 +89,14 @@ $emailTemplate = '
         <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png" alt="Logo" class="logo">
         <h1>Récapitulatif des Médicaments Expirants</h1>
         <ul class="med-list">{{medicaments}}</ul>
+        <a href="https://event.outdoorsecours.fr/dashboard_medicaments.php" class="action-button">Voir plus de détails</a>
         <div class="footer">
             <p>Cet e-mail a été envoyé par votre système de gestion de médicaments.</p>
-            <a href="#" class="action-button">Voir plus de détails</a>
         </div>
     </div>
 </body>
 </html>
+
 ';
 
 if (!empty($expiringMeds)) {
