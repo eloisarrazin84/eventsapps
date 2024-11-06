@@ -66,10 +66,11 @@ $emailTemplate = '
             padding-left: 40px; 
         }
         .med-list li:before {
+            content: "";
             position: absolute;
-            left: 10px; /* Positionnement à gauche */
-            top: 50%; /* Centrer verticalement */
-            transform: translateY(-50%); /* Ajustement du centrage */
+            left: 10px; 
+            top: 50%; 
+            transform: translateY(-50%); 
             width: 24px; 
             height: 24px; 
         }
