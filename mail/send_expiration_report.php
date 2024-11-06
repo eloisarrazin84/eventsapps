@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once __DIR__ . '/EmailService.php';
+require_once __DIR__ . '/EmailService.php'; // Chemin correct pour EmailService.php
 
 function getExpiringMeds($conn) {
     $stmt = $conn->prepare("
@@ -88,7 +88,7 @@ $emailTemplate = '
     <div class="container">
         <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1-100x100.png" alt="Logo" class="logo">
         <h1>Récapitulatif des Médicaments Expirants</h1>
-        <ul class="med-list">{{medicaments}}</ul>
+        <ul class="med-list>{{medicaments}}</ul>
         <div class="footer">
             <p>Cet e-mail a été envoyé par votre système de gestion de médicaments.</p>
         </div>
