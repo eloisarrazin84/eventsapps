@@ -69,7 +69,7 @@ $emailTemplate = '
         }
         .med-list li:before {
             content: "";
-            background: url('https://www.flaticon.com/free-icon/pill_483462?term=pill&page=1&position=1&origin=search&related_id=483462') no-repeat; 
+            background: url('uploads/img/pill.png') no-repeat; 
             position: absolute;
             left: 10px; 
             top: 50%; 
