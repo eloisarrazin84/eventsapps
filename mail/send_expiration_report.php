@@ -65,11 +65,11 @@ $emailTemplate = '
             transition: background 0.3s;
         }
         .med-list li:hover {
-            background: #d0e7ff; /* Change color on hover */
+            background: #d0e7ff; 
         }
         .med-list li:before {
             content: "";
-            background: url('uploads/img/pill.png') no-repeat; 
+            background: url("uploads/img/pill.png") no-repeat; 
             position: absolute;
             left: 10px; 
             top: 50%; 
@@ -95,7 +95,7 @@ $emailTemplate = '
             transition: background-color 0.3s;
         }
         .action-button:hover {
-            background-color: #1e88e5; /* Couleur du bouton au survol */
+            background-color: #1e88e5; 
         }
     </style>
 </head>
@@ -111,8 +111,6 @@ $emailTemplate = '
     </div>
 </body>
 </html>
-
-
 ';
 
 if (!empty($expiringMeds)) {
@@ -127,3 +125,5 @@ if (!empty($expiringMeds)) {
 
 $emailService = new EmailService();
 $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
+?>
+
