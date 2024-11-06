@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/EmailService.php';
+require_once __DIR__ . '/EmailTemplate.php'; // Assurez-vous d'inclure ce fichier
 
 function getExpiringMeds($conn) {
     $stmt = $conn->prepare("SELECT nom, date_expiration, numero_lot, location_name FROM medicaments m JOIN stock_locations sl ON m.stock_location_id = sl.id WHERE m.date_expiration BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)");
@@ -27,3 +28,4 @@ if (!empty($expiringMeds)) {
 }
 
 $emailService->sendEmail('contact@outdoorsecours.fr', 'Récapitulatif des Médicaments Expirants', $body);
+
