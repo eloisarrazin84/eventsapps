@@ -47,22 +47,23 @@ class EmailService
 
     }
 
-   private function loadEmailTemplate($templateName, $variables)
+ private function loadEmailTemplate($templateName, $variables)
 {
-    $templatePath = '/var/www/html/outdoorsecevent/mail/email_templates/' . $templateName . '.html'; // Assurez-vous que le chemin est correct
+    // Enlever l'extension ici pour éviter le problème
+    $templatePath = '/var/www/html/outdoorsecevent/mail/email_templates/' . $templateName . '.html';
+
+    error_log("Tentative de chargement du template à : $templatePath"); // Log du chemin
 
     if (!file_exists($templatePath)) {
         throw new Exception("Template non trouvé : $templatePath"); // Affiche le chemin exact
-
-    error_log("Tentative de chargement du template à : $templatePath");
     }
 
     $templateContent = file_get_contents($templatePath);
+
     foreach ($variables as $key => $value) {
         $escapedValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
         $templateContent = str_replace("{{ $key }}", $escapedValue, $templateContent);
     }
 
     return $templateContent;
-}
 }
