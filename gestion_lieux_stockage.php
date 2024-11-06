@@ -8,7 +8,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Traitement des requêtes POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST['add_location'])) {
         $locationName = htmlspecialchars($_POST['location_name']);
@@ -47,18 +46,88 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Lieux de Stockage</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Vos styles ici */
+        .container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #007bff;
+            text-align: center;
+        }
+
+        .action-menu {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-inline {
+            display: flex;
+            justify-content: flex-end; /* Align to the right */
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-right: 10px;
+        }
+
+        .btn {
+            border-radius: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+        }
+
+        .table {
+            margin-top: 15px;
+            font-size: 1em;
+            border-spacing: 0 10px;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .table tbody tr {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <a href="dashboard_medicaments.php" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Retour</a>
-    <h2>Gestion des Lieux de Stockage</h2>
+    <h1>Gestion des Lieux de Stockage</h1>
+
+    <div class="action-menu">
+        <a href="dashboard_medicaments.php" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
 
     <form method="POST" class="form-inline justify-content-center mb-4">
         <input type="text" name="location_name" class="form-control mr-2" placeholder="Nom du lieu de stockage" required>
@@ -90,7 +159,6 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <i class="fas fa-edit"></i> Modifier
                         </button>
 
-                        <!-- Modal pour modifier un lieu -->
                         <div class="modal fade" id="editModal<?php echo $location['id']; ?>" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
