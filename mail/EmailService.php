@@ -32,39 +32,26 @@ class EmailService
         }
     }
 
-    public function sendEmail($to, $subject, $templateName, $variables = [])
+    public function sendEmail($to, $subject, $body)
     {
         try {
             $this->mailer->addAddress($to);
             $this->mailer->isHTML(true);
             $this->mailer->Subject = $subject;
-            $this->mailer->Body = $this->loadEmailTemplate($templateName, $variables);
+            $this->mailer->Body = $body;
             $this->mailer->send();
         } catch (Exception $e) {
-    error_log("Erreur d'envoi d'email : " . $this->mailer->ErrorInfo);
-    error_log("Détails de l'erreur : " . $e->getMessage());
+            error_log("Erreur d'envoi d'email : " . $this->mailer->ErrorInfo);
+            error_log("Détails de l'erreur : " . $e->getMessage());
+        }
+    }
+
+    public function loadTemplate($templateContent, $variables)
+    {
+        foreach ($variables as $key => $value) {
+            $escapedValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+            $templateContent = str_replace("{{ $key }}", $escapedValue, $templateContent);
+        }
+        return $templateContent;
+    }
 }
-
-    }
-
- private function loadEmailTemplate($templateName, $variables)
-{
-    // Enlever l'extension ici pour éviter le problème
-    $templatePath = '/var/www/html/outdoorsecevent/mail/email_templates/' . $templateName . '.html';
-
-    error_log("Tentative de chargement du template à : $templatePath"); // Log du chemin
-
-    if (!file_exists($templatePath)) {
-        throw new Exception("Template non trouvé : $templatePath"); // Affiche le chemin exact
-    }
-
-    $templateContent = file_get_contents($templatePath);
-
-    foreach ($variables as $key => $value) {
-        $escapedValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-        $templateContent = str_replace("{{ $key }}", $escapedValue, $templateContent);
-    }
-
-    return $templateContent;
-}
-}    
