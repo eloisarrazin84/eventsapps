@@ -53,6 +53,8 @@ class EmailService
 
     if (!file_exists($templatePath)) {
         throw new Exception("Template non trouvé : $templatePath"); // Affiche le chemin exact
+
+    error_log("Tentative de chargement du template à : $templatePath");
     }
 
     $templateContent = file_get_contents($templatePath);
