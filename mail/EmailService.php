@@ -41,8 +41,10 @@ class EmailService
             $this->mailer->Body = $this->loadEmailTemplate($templateName, $variables);
             $this->mailer->send();
         } catch (Exception $e) {
-            error_log("Erreur d'envoi d'email : {$this->mailer->ErrorInfo}");
-        }
+    error_log("Erreur d'envoi d'email : " . $this->mailer->ErrorInfo);
+    error_log("Détails de l'erreur : " . $e->getMessage());
+}
+
     }
 
     private function loadEmailTemplate($templateName, $variables)
