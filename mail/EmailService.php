@@ -49,7 +49,7 @@ class EmailService
 
    private function loadEmailTemplate($templateName, $variables)
 {
-    $templatePath = __DIR__ . "/email_templates/$templateName.html"; // Assurez-vous que le chemin est correct
+    $templatePath = '/var/www/html/outdoorsecevent/mail/email_templates/' . $templateName . '.html'; // Assurez-vous que le chemin est correct
 
     if (!file_exists($templatePath)) {
         throw new Exception("Template non trouvé : $templatePath"); // Affiche le chemin exact
