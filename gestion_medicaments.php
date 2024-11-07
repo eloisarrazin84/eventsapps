@@ -89,7 +89,7 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .form-inline {
             display: flex;
-            justify-content: flex-end;
+            justify-content: flex-end; /* Align to the right */
             margin-bottom: 20px;
         }
 
@@ -140,6 +140,19 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <a href="dashboard_medicaments.php" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
+        <div class="btn-group">
+            <button class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-cogs"></i> Actions
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="ajouter_medicament.php">
+                    <i class="fas fa-plus-circle"></i> Ajouter un Médicament
+                </a>
+                <a class="dropdown-item" data-toggle="modal" data-target="#pdfModal">
+                    <i class="fas fa-file-pdf"></i> Générer Inventaire PDF
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Formulaire de Filtrage -->
@@ -208,8 +221,33 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </table>
 </div>
 
+<!-- Modal pour Génération PDF -->
+<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="generer_pdf.php" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <label for="locationSelect">Lieu de stockage</label>
+                    <select class="form-control" id="locationSelect" name="location_id" required>
+                        <?php foreach ($stockLocations as $location): ?>
+                            <option value="<?php echo $location['id']; ?>">
+                                <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label for="signatureImage">Signature :</label>
+                    <input type="file" class="form-control" id="signatureImage" name="signature_image" accept="image/*" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Générer PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
