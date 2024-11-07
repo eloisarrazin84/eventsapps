@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
@@ -6,22 +10,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 // Inclure la bibliothèque PHP QR Code
-require_once __DIR__ . '/vendor/phpqrcode/qrlib.php';
+require_once __DIR__ . '/../vendor/phpqrcode/qrlib.php'; // Assurez-vous que le chemin est correct
 
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Fonction pour générer un QR code
 function generateQRCode($bagId) {
-    // URL vers laquelle le QR code pointera, ajustez l'URL selon votre site
     $url = "https://event.outdoorsecours.fr/sacs/bag_tracking.php?bag_id=" . $bagId;
     $qrCodePath = 'uploads/qrcodes/bag_' . $bagId . '.png';
-    
-    // Vérifiez que le dossier existe et créez-le s'il n'existe pas
+
     if (!is_dir('uploads/qrcodes')) {
         mkdir('uploads/qrcodes', 0777, true);
     }
-    
+
     // Générer le QR code
     QRcode::png($url, $qrCodePath, QR_ECLEVEL_L, 10);
     return $qrCodePath;
@@ -38,18 +40,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_bag'])) {
     $bagName = $_POST['name'];
     $contents = $_POST['contents'];
 
-    // Insérer le sac dans la base de données
     $stmt = $conn->prepare("INSERT INTO bags (location_id, name, contents) VALUES (:location_id, :name, :contents)");
     $stmt->bindParam(':location_id', $locationId);
     $stmt->bindParam(':name', $bagName);
     $stmt->bindParam(':contents', $contents);
     $stmt->execute();
 
-    // Récupérer l'ID du sac nouvellement inséré et générer le QR code
     $bagId = $conn->lastInsertId();
     $qrCodePath = generateQRCode($bagId);
 
-    // Mettre à jour le chemin du QR code dans la base de données
     $stmt = $conn->prepare("UPDATE bags SET qr_code_path = :qr_code_path WHERE id = :id");
     $stmt->bindParam(':qr_code_path', $qrCodePath);
     $stmt->bindParam(':id', $bagId);
@@ -78,7 +77,6 @@ $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-5">
     <h2>Gestion des Sacs</h2>
 
-    <!-- Formulaire pour ajouter un sac -->
     <form method="POST" class="form-inline mb-4">
         <select name="location_id" class="form-control mr-2" required>
             <option value="">Sélectionner un lieu de stockage</option>
@@ -93,7 +91,6 @@ $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <button type="submit" name="add_bag" class="btn btn-primary">Ajouter</button>
     </form>
 
-    <!-- Table pour afficher les sacs existants -->
     <table class="table table-bordered">
         <thead>
             <tr>
