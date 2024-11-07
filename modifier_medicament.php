@@ -36,7 +36,7 @@ if (isset($_GET['id'])) {
             }
 
             // Mise à jour des informations du médicament
-            $stmt = $conn->prepare("UPDATE medicaments SET nom = :nom, description = :description, numero_lot = :numero_lot, quantite = :quantite, date_expiration = :date_expiration, type_produit = :type_produit, stock_location_id = :stock_location_id, photo_path = :photo_path WHERE id = :id");
+            $stmt = $conn->prepare("UPDATE medicaments SET nom = :nom, description = :description, numero_lot = :numero_lot, quantite = :quantite, date_expiration = :date_expiration, type_produit = :type_produit, stock_location_id = :stock_location_id, photo_path = :photo_path, ampoulier_type = :ampoulier_type WHERE id = :id");
             $stmt->bindParam(':nom', $_POST['nom']);
             $stmt->bindParam(':description', $_POST['description']);
             $stmt->bindParam(':numero_lot', $_POST['numero_lot']);
@@ -45,6 +45,7 @@ if (isset($_GET['id'])) {
             $stmt->bindParam(':type_produit', $_POST['type_produit']);
             $stmt->bindParam(':stock_location_id', $_POST['stock_location_id']);
             $stmt->bindParam(':photo_path', $imagePath);
+            $stmt->bindParam(':ampoulier_type', $_POST['ampoulier_type']);
             $stmt->bindParam(':id', $medicament_id);
             $stmt->execute();
 
@@ -178,6 +179,15 @@ if (isset($_GET['id'])) {
                             <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
                         </option>
                     <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ampoulier_type">Type d'Ampoulier</label>
+                <select class="form-control" id="ampoulier_type" name="ampoulier_type">
+                    <option value="Ampoulier Principal" <?php if ($medicament['ampoulier_type'] == 'Ampoulier Principal') echo 'selected'; ?>>Ampoulier Principal</option>
+                    <option value="Ampoulier de réserve" <?php if ($medicament['ampoulier_type'] == 'Ampoulier de réserve') echo 'selected'; ?>>Ampoulier de réserve</option>
+                    <option value="Caisse de réserve" <?php if ($medicament['ampoulier_type'] == 'Caisse de réserve') echo 'selected'; ?>>Caisse de réserve</option>
+                    <option value="Pochette médicament" <?php if ($medicament['ampoulier_type'] == 'Pochette médicament') echo 'selected'; ?>>Pochette médicament</option>
                 </select>
             </div>
             <div class="form-group">
