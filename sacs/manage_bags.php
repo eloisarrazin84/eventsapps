@@ -5,6 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
+// Inclure la bibliothèque PHP QR Code
 require_once __DIR__ . '/vendor/phpqrcode/qrlib.php';
 
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
@@ -12,8 +13,16 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Fonction pour générer un QR code
 function generateQRCode($bagId) {
-    $url = "https://event.outdoorsecours.fr/sacs/bag_tracking.php?bag_id=" . $bagId;
+    // URL vers laquelle le QR code pointera, ajustez l'URL selon votre site
+    $url = "https://event.outdoorsecours.fr/bag_tracking.php?bag_id=" . $bagId;
     $qrCodePath = 'uploads/qrcodes/bag_' . $bagId . '.png';
+    
+    // Vérifiez que le dossier existe et créez-le s'il n'existe pas
+    if (!is_dir('uploads/qrcodes')) {
+        mkdir('uploads/qrcodes', 0777, true);
+    }
+    
+    // Générer le QR code
     QRcode::png($url, $qrCodePath, QR_ECLEVEL_L, 10);
     return $qrCodePath;
 }
@@ -46,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_bag'])) {
     $stmt->bindParam(':id', $bagId);
     $stmt->execute();
 
-    header("Location: sacs/manage_bags.php");
+    header("Location: manage_bags.php");
     exit();
 }
 
@@ -100,13 +109,7 @@ $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                     <td><?php echo htmlspecialchars($bag['name']); ?></td>
                     <td><?php echo htmlspecialchars($bag['location_name'] . " - " . $bag['bag_name']); ?></td>
-                    <td>
-                        <?php if (!empty($bag['qr_code_path'])): ?>
-                            <img src="<?php echo htmlspecialchars($bag['qr_code_path']); ?>" width="100">
-                        <?php else: ?>
-                            Pas de QR Code
-                        <?php endif; ?>
-                    </td>
+                    <td><img src="<?php echo htmlspecialchars($bag['qr_code_path']); ?>" width="100"></td>
                     <td><?php echo htmlspecialchars($bag['last_inventory_date']); ?></td>
                     <td>
                         <a href="sacs/bag_tracking.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-info">Suivre</a>
