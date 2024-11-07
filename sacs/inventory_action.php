@@ -8,5 +8,5 @@ $stmt->bindParam(':bag_id', $bagId);
 $stmt->bindParam(':action_type', $actionType);
 $stmt->execute();
 
-header("Location: bag_tracking.php?bag_id=$bagId");
+header("Location: sacs/bag_tracking.php?bag_id=$bagId");
 exit();
