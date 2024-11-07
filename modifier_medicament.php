@@ -18,9 +18,18 @@ if (isset($_GET['id'])) {
         $medicament = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Récupérer les lieux de stockage disponibles
-        $stmt = $conn->prepare("SELECT DISTINCT location_name, bag_name, id FROM stock_locations");
+       $stmt = $conn->prepare("SELECT location_name, bag_name, id FROM stock_locations");
 $stmt->execute();
-$stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$allStockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Filtrer les doublons en utilisant un tableau pour stocker les valeurs uniques
+$uniqueStockLocations = [];
+foreach ($allStockLocations as $location) {
+    $key = $location['location_name'] . '-' . $location['bag_name'];
+    if (!isset($uniqueStockLocations[$key])) {
+        $uniqueStockLocations[$key] = $location;
+    }
+}
 
 
         // Traitement du formulaire de modification
@@ -174,13 +183,13 @@ $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <div class="form-group">
                 <label for="stock_location_id">Lieu de Stockage</label>
-                <select class="form-control" id="stock_location_id" name="stock_location_id">
-                    <?php foreach ($stockLocations as $location): ?>
-                        <option value="<?php echo $location['id']; ?>" <?php if ($medicament['stock_location_id'] == $location['id']) echo 'selected'; ?>>
-                            <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+               <select class="form-control" id="stock_location_id" name="stock_location_id">
+    <?php foreach ($uniqueStockLocations as $location): ?>
+        <option value="<?php echo $location['id']; ?>">
+            <?php echo htmlspecialchars($location['location_name'] . ($location['bag_name'] ? " - " . $location['bag_name'] : '')); ?>
+        </option>
+    <?php endforeach; ?>
+</select>
             </div>
             <div class="form-group">
                 <label for="ampoulier_type">Type d'Ampoulier</label>
