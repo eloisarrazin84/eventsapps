@@ -5,8 +5,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
+require_once __DIR__ . '/vendor/phpqrcode/qrlib.php';
+
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Fonction pour générer un QR code
+function generateQRCode($bagId) {
+    $url = "https://event.outdoorsecours.fr/sacs/bag_tracking.php?bag_id=" . $bagId;
+    $qrCodePath = 'uploads/qrcodes/bag_' . $bagId . '.png';
+    QRcode::png($url, $qrCodePath, QR_ECLEVEL_L, 10);
+    return $qrCodePath;
+}
 
 // Récupérer tous les lieux de stockage
 $stmt = $conn->prepare("SELECT * FROM stock_locations");
@@ -19,16 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_bag'])) {
     $bagName = $_POST['name'];
     $contents = $_POST['contents'];
 
+    // Insérer le sac dans la base de données
     $stmt = $conn->prepare("INSERT INTO bags (location_id, name, contents) VALUES (:location_id, :name, :contents)");
     $stmt->bindParam(':location_id', $locationId);
     $stmt->bindParam(':name', $bagName);
     $stmt->bindParam(':contents', $contents);
     $stmt->execute();
 
+    // Récupérer l'ID du sac nouvellement inséré et générer le QR code
     $bagId = $conn->lastInsertId();
     $qrCodePath = generateQRCode($bagId);
 
-    // Mettre à jour le chemin du QR code
+    // Mettre à jour le chemin du QR code dans la base de données
     $stmt = $conn->prepare("UPDATE bags SET qr_code_path = :qr_code_path WHERE id = :id");
     $stmt->bindParam(':qr_code_path', $qrCodePath);
     $stmt->bindParam(':id', $bagId);
@@ -88,10 +100,16 @@ $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                     <td><?php echo htmlspecialchars($bag['name']); ?></td>
                     <td><?php echo htmlspecialchars($bag['location_name'] . " - " . $bag['bag_name']); ?></td>
-                    <td><img src="<?php echo htmlspecialchars($bag['qr_code_path']); ?>" width="100"></td>
+                    <td>
+                        <?php if (!empty($bag['qr_code_path'])): ?>
+                            <img src="<?php echo htmlspecialchars($bag['qr_code_path']); ?>" width="100">
+                        <?php else: ?>
+                            Pas de QR Code
+                        <?php endif; ?>
+                    </td>
                     <td><?php echo htmlspecialchars($bag['last_inventory_date']); ?></td>
                     <td>
-                        <a href="bag_tracking.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-info">Suivre</a>
+                        <a href="sacs/bag_tracking.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-info">Suivre</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
