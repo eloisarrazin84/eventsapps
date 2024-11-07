@@ -14,7 +14,7 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 // Fonction pour générer un QR code
 function generateQRCode($bagId) {
     // URL vers laquelle le QR code pointera, ajustez l'URL selon votre site
-    $url = "https://event.outdoorsecours.fr/bag_tracking.php?bag_id=" . $bagId;
+    $url = "https://event.outdoorsecours.fr/sacs/bag_tracking.php?bag_id=" . $bagId;
     $qrCodePath = 'uploads/qrcodes/bag_' . $bagId . '.png';
     
     // Vérifiez que le dossier existe et créez-le s'il n'existe pas
