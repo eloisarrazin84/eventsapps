@@ -18,9 +18,10 @@ if (isset($_GET['id'])) {
         $medicament = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Récupérer les lieux de stockage disponibles
-        $stmt = $conn->prepare("SELECT * FROM stock_locations");
-        $stmt->execute();
-        $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $conn->prepare("SELECT DISTINCT location_name, bag_name, id FROM stock_locations");
+$stmt->execute();
+$stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
         // Traitement du formulaire de modification
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
