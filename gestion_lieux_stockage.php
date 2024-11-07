@@ -12,10 +12,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST['add_location'])) {
         $locationName = htmlspecialchars($_POST['location_name']);
         $bagName = isset($_POST['bag_name']) ? htmlspecialchars($_POST['bag_name']) : null;
+        $ampoulier = isset($_POST['ampoulier']) ? htmlspecialchars($_POST['ampoulier']) : null;
 
-        $stmt = $conn->prepare("INSERT INTO stock_locations (location_name, bag_name) VALUES (:location_name, :bag_name)");
+        $stmt = $conn->prepare("INSERT INTO stock_locations (location_name, bag_name, ampoulier) VALUES (:location_name, :bag_name, :ampoulier)");
         $stmt->bindParam(':location_name', $locationName);
         $stmt->bindParam(':bag_name', $bagName);
+        $stmt->bindParam(':ampoulier', $ampoulier);
         $stmt->execute();
 
     } elseif (isset($_POST['delete_location'])) {
@@ -23,15 +25,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt = $conn->prepare("DELETE FROM stock_locations WHERE id = :location_id");
         $stmt->bindParam(':location_id', $locationId);
         $stmt->execute();
-        
+       
     } elseif (isset($_POST['edit_location'])) {
         $locationId = $_POST['location_id'];
         $locationName = htmlspecialchars($_POST['location_name']);
         $bagName = isset($_POST['bag_name']) ? htmlspecialchars($_POST['bag_name']) : null;
+        $ampoulier = isset($_POST['ampoulier']) ? htmlspecialchars($_POST['ampoulier']) : null;
 
-        $stmt = $conn->prepare("UPDATE stock_locations SET location_name = :location_name, bag_name = :bag_name WHERE id = :location_id");
+        $stmt = $conn->prepare("UPDATE stock_locations SET location_name = :location_name, bag_name = :bag_name, ampoulier = :ampoulier WHERE id = :location_id");
         $stmt->bindParam(':location_name', $locationName);
         $stmt->bindParam(':bag_name', $bagName);
+        $stmt->bindParam(':ampoulier', $ampoulier);
         $stmt->bindParam(':location_id', $locationId);
         $stmt->execute();
     }
@@ -132,6 +136,13 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <form method="POST" class="form-inline justify-content-center mb-4">
         <input type="text" name="location_name" class="form-control mr-2" placeholder="Nom du lieu de stockage" required>
         <input type="text" name="bag_name" class="form-control mr-2" placeholder="Nom du sac (facultatif)">
+        <select name="ampoulier" class="form-control mr-2" required>
+            <option value="">Sélectionner l'ampoulier</option>
+            <option value="Ampoulier Principal">Ampoulier Principal</option>
+            <option value="Ampoulier de réserve">Ampoulier de réserve</option>
+            <option value="Caisse de réserve">Caisse de réserve</option>
+            <option value="Pochette médicament">Pochette médicament</option>
+        </select>
         <button type="submit" name="add_location" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Ajouter</button>
     </form>
 
@@ -140,6 +151,7 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <tr>
                 <th>Lieu de stockage</th>
                 <th>Sac</th>
+                <th>Ampoulier</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -148,6 +160,7 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                     <td><?php echo htmlspecialchars($location['location_name']); ?></td>
                     <td><?php echo htmlspecialchars($location['bag_name']); ?></td>
+                    <td><?php echo htmlspecialchars($location['ampoulier']); ?></td>
                     <td>
                         <form method="POST" style="display:inline;">
                             <input type="hidden" name="location_id" value="<?php echo $location['id']; ?>">
@@ -178,6 +191,15 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <div class="form-group">
                                                 <label for="bag_name">Nom du sac</label>
                                                 <input type="text" name="bag_name" class="form-control" value="<?php echo htmlspecialchars($location['bag_name']); ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="ampoulier">Ampoulier</label>
+                                                <select name="ampoulier" class="form-control" required>
+                                                    <option value="Ampoulier Principal" <?php echo $location['ampoulier'] == 'Ampoulier Principal' ? 'selected' : ''; ?>>Ampoulier Principal</option>
+                                                    <option value="Ampoulier de réserve" <?php echo $location['ampoulier'] == 'Ampoulier de réserve' ? 'selected' : ''; ?>>Ampoulier de réserve</option>
+                                                    <option value="Caisse de réserve" <?php echo $location['ampoulier'] == 'Caisse de réserve' ? 'selected' : ''; ?>>Caisse de réserve</option>
+                                                    <option value="Pochette médicament" <?php echo $location['ampoulier'] == 'Pochette médicament' ? 'selected' : ''; ?>>Pochette médicament</option>
+                                                </select>
                                             </div>
                                             <button type="submit" name="edit_location" class="btn btn-primary">Modifier</button>
                                         </form>
