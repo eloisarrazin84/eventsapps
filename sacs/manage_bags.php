@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_bag'])) {
     $stmt->bindParam(':id', $bagId);
     $stmt->execute();
 
-    header("Location: manage_bags.php");
+    header("Location: sacs/manage_bags.php");
     exit();
 }
 
