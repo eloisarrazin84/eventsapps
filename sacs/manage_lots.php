@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
@@ -10,22 +14,21 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Ajouter un lot
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_lot'])) {
-    $name = $_POST['name'];
+    $lotName = $_POST['name'];
     $description = $_POST['description'];
 
-    $stmt = $conn->prepare("INSERT INTO lots (name, description) VALUES (:name, :description)");
-    $stmt->bindParam(':name', $name);
-    $stmt->bindParam(':description', $description);
-    $stmt->execute();
-
-    header("Location: manage_lots.php");
-    exit();
+    try {
+        $stmt = $conn->prepare("INSERT INTO lots (name, description) VALUES (:name, :description)");
+        $stmt->bindParam(':name', $lotName);
+        $stmt->bindParam(':description', $description);
+        $stmt->execute();
+        
+        header("Location: manage_lot.php");
+        exit();
+    } catch (PDOException $e) {
+        echo "Erreur lors de l'ajout du lot : " . $e->getMessage();
+    }
 }
-
-// Récupérer tous les lots
-$stmt = $conn->prepare("SELECT * FROM lots");
-$stmt->execute();
-$lots = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -42,7 +45,7 @@ $lots = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Formulaire pour ajouter un lot -->
     <form method="POST" class="form-inline mb-4">
         <input type="text" name="name" class="form-control mr-2" placeholder="Nom du lot" required>
-        <input type="text" name="description" class="form-control mr-2" placeholder="Description du lot">
+        <input type="text" name="description" class="form-control mr-2" placeholder="Description">
         <button type="submit" name="add_lot" class="btn btn-primary">Ajouter</button>
     </form>
 
@@ -55,7 +58,11 @@ $lots = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($lots as $lot): ?>
+            <?php
+            $stmt = $conn->prepare("SELECT * FROM lots");
+            $stmt->execute();
+            $lots = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($lots as $lot): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($lot['name']); ?></td>
                     <td><?php echo htmlspecialchars($lot['description']); ?></td>
