@@ -27,7 +27,13 @@ if (!$bag) {
     exit();
 }
 
-// Récupérer la liste des lots
+// Récupérer les lots actuellement associés au sac
+$stmt = $conn->prepare("SELECT lot_id FROM bag_lots WHERE bag_id = :bag_id");
+$stmt->bindParam(':bag_id', $bagId);
+$stmt->execute();
+$assignedLotIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+// Récupérer la liste complète des lots
 $stmt = $conn->prepare("SELECT * FROM lots");
 $stmt->execute();
 $lots = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -76,20 +82,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($bag['name']); ?>" required>
         </div>
         
-       <div class="form-group">
-    <label for="lots">Lots dans le Sac</label>
-    <select name="lots[]" id="lots" class="form-control" multiple>
-        <?php
-        $stmt = $conn->prepare("SELECT * FROM lots");
-        $stmt->execute();
-        $allLots = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($allLots as $lot) {
-            $selected = in_array($lot['id'], $assignedLotIds) ? 'selected' : '';
-            echo "<option value='{$lot['id']}' $selected>{$lot['name']}</option>";
-        }
-        ?>
-    </select>
-</div>
+        <div class="form-group">
+            <label for="lots">Lots dans le Sac</label>
+            <select name="lots[]" id="lots" class="form-control" multiple>
+                <?php
+                foreach ($lots as $lot) {
+                    $selected = in_array($lot['id'], $assignedLotIds) ? 'selected' : '';
+                    echo "<option value='{$lot['id']}' $selected>{$lot['name']}</option>";
+                }
+                ?>
+            </select>
+        </div>
         
         <button type="submit" class="btn btn-primary">Enregistrer</button>
         <a href="manage_bags.php" class="btn btn-secondary">Annuler</a>
