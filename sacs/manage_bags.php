@@ -26,7 +26,7 @@ function generateQRCode($bagId) {
     return 'uploads/qrcodes/bag_' . $bagId . '.png';
 }
 
-
+// Récupérer tous les lieux de stockage
 $stmt = $conn->prepare("SELECT * FROM stock_locations");
 $stmt->execute();
 $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_bag'])) {
     exit();
 }
 
+// Récupérer les sacs existants
 $stmt = $conn->prepare("SELECT bags.*, stock_locations.location_name, stock_locations.bag_name FROM bags JOIN stock_locations ON bags.location_id = stock_locations.id");
 $stmt->execute();
 $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -107,12 +108,10 @@ $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endif; ?>
                     </td>
                     <td><?php echo htmlspecialchars($bag['last_inventory_date'] ?? 'Non défini'); ?></td>
-                   <td>
-    <a href="/sacs/bag_tracking.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-info">Suivre</a>
-    <a href="/sacs/edit_bag.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-warning">Modifier</a>
-</td>
-
-
+                    <td>
+                        <a href="bag_tracking.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-info">Suivre</a>
+                        <a href="edit_bag.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-warning">Modifier</a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
