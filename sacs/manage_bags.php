@@ -9,32 +9,33 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Inclure la bibliothèque PHP QR Code
-require_once __DIR__ . '/../vendor/phpqrcode/qrlib.php'; // Assurez-vous que le chemin est correct
+require_once __DIR__ . '/../vendor/phpqrcode/qrlib.php';
 
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Fonction pour générer un QR code
 function generateQRCode($bagId) {
     $url = "https://event.outdoorsecours.fr/sacs/bag_tracking.php?bag_id=" . $bagId;
-    $qrCodePath = 'uploads/qrcodes/bag_' . $bagId . '.png';
+    $qrCodePath = __DIR__ . '/../uploads/qrcodes/bag_' . $bagId . '.png';
 
-    if (!is_dir('uploads/qrcodes')) {
-        mkdir('uploads/qrcodes', 0777, true);
+    if (!is_dir(__DIR__ . '/../uploads/qrcodes')) {
+        mkdir(__DIR__ . '/../uploads/qrcodes', 0777, true);
     }
 
-    // Générer le QR code
-    QRcode::png($url, $qrCodePath, QR_ECLEVEL_L, 10);
+    try {
+        QRcode::png($url, $qrCodePath, QR_ECLEVEL_L, 10);
+    } catch (Exception $e) {
+        error_log("Erreur de génération de QR Code : " . $e->getMessage());
+        return null;
+    }
+    
     return $qrCodePath;
 }
 
-// Récupérer tous les lieux de stockage
 $stmt = $conn->prepare("SELECT * FROM stock_locations");
 $stmt->execute();
 $stockLocations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Ajouter un sac
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_bag'])) {
     $locationId = $_POST['location_id'];
     $bagName = $_POST['name'];
@@ -58,10 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_bag'])) {
     exit();
 }
 
-// Récupérer les sacs existants
-$stmt = $conn->prepare("SELECT bags.*, stock_locations.location_name, stock_locations.bag_name
-                        FROM bags
-                        JOIN stock_locations ON bags.location_id = stock_locations.id");
+$stmt = $conn->prepare("SELECT bags.*, stock_locations.location_name, stock_locations.bag_name FROM bags JOIN stock_locations ON bags.location_id = stock_locations.id");
 $stmt->execute();
 $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -106,8 +104,14 @@ $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                     <td><?php echo htmlspecialchars($bag['name']); ?></td>
                     <td><?php echo htmlspecialchars($bag['location_name'] . " - " . $bag['bag_name']); ?></td>
-                    <td><img src="<?php echo htmlspecialchars($bag['qr_code_path']); ?>" width="100"></td>
-                    <td><?php echo htmlspecialchars($bag['last_inventory_date']); ?></td>
+                    <td>
+                        <?php if ($bag['qr_code_path']): ?>
+                            <img src="<?php echo htmlspecialchars('/uploads/qrcodes/' . basename($bag['qr_code_path'])); ?>" width="100">
+                        <?php else: ?>
+                            Pas de QR Code
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo htmlspecialchars($bag['last_inventory_date'] ?? 'Non défini'); ?></td>
                     <td>
                         <a href="sacs/bag_tracking.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-info">Suivre</a>
                     </td>
