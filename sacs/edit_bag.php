@@ -83,19 +83,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         
         <div class="form-group">
-            <label for="lots">Lots dans le Sac</label>
-            <select name="lots[]" id="lots" class="form-control" multiple>
-                <?php
-                foreach ($lots as $lot) {
-                    $selected = in_array($lot['id'], $assignedLotIds) ? 'selected' : '';
-                    echo "<option value='{$lot['id']}' $selected>{$lot['name']}</option>";
-                }
-                ?>
-            </select>
+            <label>Lots dans le Sac</label>
+            <div class="form-check">
+                <?php foreach ($lots as $lot): ?>
+                    <input type="checkbox" class="form-check-input" name="lots[]" value="<?php echo $lot['id']; ?>" 
+                           id="lot_<?php echo $lot['id']; ?>" <?php echo in_array($lot['id'], $assignedLotIds) ? 'checked' : ''; ?>>
+                    <label class="form-check-label" for="lot_<?php echo $lot['id']; ?>"><?php echo htmlspecialchars($lot['name']); ?></label><br>
+                <?php endforeach; ?>
+            </div>
         </div>
         
         <button type="submit" class="btn btn-primary">Enregistrer</button>
-        <a href="manage_bags.php" class="btn btn-secondary">Annuler</a>
+        <a href="/sacs/manage_bags.php" class="btn btn-secondary">Annuler</a>
     </form>
 </div>
 </body>
