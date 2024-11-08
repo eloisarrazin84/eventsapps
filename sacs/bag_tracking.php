@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="card-body">
             <h5 class="card-title">Détails du Sac</h5>
             <p><strong>Lieu de Stockage :</strong> <?php echo htmlspecialchars($bag['location_name'] . " - " . $bag['bag_name']); ?></p>
-            <p><strong>Contenu :</strong> <?php echo !empty($lots) ? implode(", ", array_map('htmlspecialchars', $lots)) : 'Aucun lot associé'; ?></p>
+            <p><strong>Lots Présents :</strong> <?php echo !empty($lots) ? implode(", ", array_map('htmlspecialchars', $lots)) : 'Aucun lot associé'; ?></p>
             <p><strong>Date du Dernier Inventaire :</strong> <?php echo htmlspecialchars($bag['last_inventory_date'] ?? 'Non défini'); ?></p>
         </div>
     </div>
