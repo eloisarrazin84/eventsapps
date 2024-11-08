@@ -93,6 +93,7 @@ $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <th>QR Code</th>
                 <th>Date dernier inventaire</th>
                 <th>Actions</th>
+                <th>Documents</th>
             </tr>
         </thead>
         <tbody>
@@ -111,6 +112,28 @@ $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td>
                         <a href="bag_tracking.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-info">Suivre</a>
                         <a href="edit_bag.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-warning">Modifier</a>
+                    </td>
+                    <td>
+                        <!-- Afficher les documents associés au sac -->
+                        <?php
+                        $stmt = $conn->prepare("SELECT * FROM documents WHERE bag_id = :bag_id");
+                        $stmt->execute([':bag_id' => $bag['id']]);
+                        $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        if (!empty($documents)):
+                        ?>
+                            <ul>
+                                <?php foreach ($documents as $doc): ?>
+                                    <li>
+                                        <a href="<?php echo htmlspecialchars($doc['document_path']); ?>" target="_blank">
+                                            <?php echo htmlspecialchars(date('d-m-Y', strtotime($doc['document_date']))); ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else: ?>
+                            Aucun document
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
