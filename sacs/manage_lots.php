@@ -55,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_lot'])) {
             <tr>
                 <th>Nom du lot</th>
                 <th>Description</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -66,6 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_lot'])) {
                 <tr>
                     <td><?php echo htmlspecialchars($lot['name']); ?></td>
                     <td><?php echo htmlspecialchars($lot['description']); ?></td>
+                    <td>
+                        <a href="edit_lot.php?lot_id=<?php echo $lot['id']; ?>" class="btn btn-warning btn-sm">Modifier</a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
