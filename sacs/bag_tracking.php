@@ -91,6 +91,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_inventory'])) 
 <head>
     <meta charset="UTF-8">
     <title>Suivi du Sac</title>
+    
+    <!-- Intégration de Bootstrap et jQuery -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <div class="container mt-5">
