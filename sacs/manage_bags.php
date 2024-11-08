@@ -112,10 +112,11 @@ $bags = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endif; ?>
                     </td>
                     <td><?php echo htmlspecialchars($bag['last_inventory_date'] ?? 'Non défini'); ?></td>
-                    <td>
-    <a href="sacs/bag_tracking.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-info">Suivre</a>
-    <a href="sacs/edit_bag.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-warning">Modifier</a>
+                   <td>
+    <a href="/sacs/bag_tracking.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-info">Suivre</a>
+    <a href="/sacs/edit_bag.php?bag_id=<?php echo $bag['id']; ?>" class="btn btn-warning">Modifier</a>
 </td>
+
 
                 </tr>
             <?php endforeach; ?>
