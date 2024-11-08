@@ -76,16 +76,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($bag['name']); ?>" required>
         </div>
         
-        <div class="form-group">
-            <label for="lots">Lots dans le Sac</label>
-            <select class="form-control" id="lots" name="lots[]" multiple>
-                <?php foreach ($lots as $lot): ?>
-                    <option value="<?php echo $lot['id']; ?>" <?php echo in_array($lot['id'], array_column($selectedLots, 'lot_id')) ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($lot['name']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+       <div class="form-group">
+    <label for="lots">Lots dans le Sac</label>
+    <select name="lots[]" id="lots" class="form-control" multiple>
+        <?php
+        $stmt = $conn->prepare("SELECT * FROM lots");
+        $stmt->execute();
+        $allLots = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($allLots as $lot) {
+            $selected = in_array($lot['id'], $assignedLotIds) ? 'selected' : '';
+            echo "<option value='{$lot['id']}' $selected>{$lot['name']}</option>";
+        }
+        ?>
+    </select>
+</div>
         
         <button type="submit" class="btn btn-primary">Enregistrer</button>
         <a href="manage_bags.php" class="btn btn-secondary">Annuler</a>
