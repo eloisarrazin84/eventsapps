@@ -21,16 +21,11 @@ function generateQRCode($bagId) {
     if (!is_dir(__DIR__ . '/../uploads/qrcodes')) {
         mkdir(__DIR__ . '/../uploads/qrcodes', 0777, true);
     }
-    
-    try {
-        QRcode::png($url, $qrCodePath, QR_ECLEVEL_L, 10);
-    } catch (Exception $e) {
-        error_log("Erreur de génération de QR Code : " . $e->getMessage());
-        return null;
-    }
-    
-    return $qrCodePath;
+
+    QRcode::png($url, $qrCodePath, QR_ECLEVEL_L, 10);
+    return 'uploads/qrcodes/bag_' . $bagId . '.png';
 }
+
 
 $stmt = $conn->prepare("SELECT * FROM stock_locations");
 $stmt->execute();
