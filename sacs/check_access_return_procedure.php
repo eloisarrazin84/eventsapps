@@ -11,7 +11,8 @@ if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin') {
     $_SESSION['redirect_to'] = "return_procedure.php?bag_id=" . urlencode($_GET['bag_id']);
     
     // Rediriger vers la page de connexion avec une URL de redirection
-    header("Location: login.php?redirect=" . urlencode("return_procedure.php") . "&bag_id=" . urlencode($_GET['bag_id']));
-    exit();
+    header("Location: https://event.outdoorsecours.fr/login.php?redirect=return_procedure.php&bag_id=" . urlencode($_GET['bag_id']));
+exit();
+
 }
 ?>
