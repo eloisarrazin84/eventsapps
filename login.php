@@ -30,9 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['role'] = $user['role'];
 
                 // Redirection conditionnelle
-                if (isset($_SESSION['redirect_to'])) {
-                    $redirectUrl = $_SESSION['redirect_to'];
-                    unset($_SESSION['redirect_to']); // Supprimer la variable de session après redirection
+                if (isset($_GET['redirect']) && isset($_GET['bag_id'])) {
+                    $redirectUrl = $_GET['redirect'] . "?bag_id=" . urlencode($_GET['bag_id']);
                     header("Location: $redirectUrl");
                 } else {
                     header("Location: home.php");
