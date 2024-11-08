@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         
         <button type="submit" class="btn btn-primary">Enregistrer</button>
-        <a href="manage_consommables.php" class="btn btn-secondary">Annuler</a>
+        <a href="/consommables/manage_consommables.php" class="btn btn-secondary">Annuler</a>
     </form>
 </div>
 </body>
