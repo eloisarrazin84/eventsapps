@@ -5,6 +5,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
+require_once __DIR__ . '/../vendor/fpdf/fpdf.php';
+
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -33,42 +35,62 @@ $stmt->bindParam(':bag_id', $bagId);
 $stmt->execute();
 $lots = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_return'])) {
     $event = $_POST['event'];
     $medicName = $_POST['medic_name'];
     $returnDate = $_POST['return_date'];
     $inspectorName = $_POST['inspector_name'];
     $inventoryResults = [];
+    $pdfContent = "";
 
     foreach ($lots as $lot) {
         $lotId = $lot['id'];
-        $rehassortDone = isset($_POST["rehassort_$lotId"]) ? 1 : 0;
+        $rehassortDone = isset($_POST["rehassort_$lotId"]) ? "Oui" : "Non";
         $comment = $_POST["comment_$lotId"] ?? '';
 
         $inventoryResults[] = [
-            'lot_id' => $lotId,
+            'lot_name' => $lot['name'],
             'rehassort' => $rehassortDone,
             'comment' => $comment,
         ];
+        $pdfContent .= "Lot: " . $lot['name'] . " - Réassort fait: $rehassortDone - Commentaire: $comment\n";
     }
 
-    $stmt = $conn->prepare("UPDATE bags SET last_inventory_date = NOW() WHERE id = :id");
-    $stmt->bindParam(':id', $bagId);
-    $stmt->execute();
+    // Générer le PDF
+    $pdf = new FPDF();
+    $pdf->AddPage();
+    $pdf->SetFont('Arial', 'B', 16);
+    $pdf->Cell(40, 10, 'Procédure de Retour du Sac');
+    $pdf->Ln(10);
+    $pdf->SetFont('Arial', '', 12);
 
+    $pdf->Cell(0, 10, "Nom du sac : " . $bag['name'], 0, 1);
+    $pdf->Cell(0, 10, "Lieu de stockage : " . $bag['location_name'] . " - " . $bag['bag_name'], 0, 1);
+    $pdf->Cell(0, 10, "Événement : " . $event, 0, 1);
+    $pdf->Cell(0, 10, "Médecin/infirmer sur place : " . $medicName, 0, 1);
+    $pdf->Cell(0, 10, "Date de retour : " . $returnDate, 0, 1);
+    $pdf->Cell(0, 10, "Inspecteur : " . $inspectorName, 0, 1);
+    $pdf->Ln(10);
+    
+    $pdf->Cell(0, 10, 'Lots dans le Sac', 0, 1);
     foreach ($inventoryResults as $result) {
-        $stmt = $conn->prepare("INSERT INTO return_logs (bag_id, lot_id, rehassort, comment, event, medic_name, inspector_name, return_date) 
-                                VALUES (:bag_id, :lot_id, :rehassort, :comment, :event, :medic_name, :inspector_name, NOW())");
-        $stmt->execute([
-            ':bag_id' => $bagId,
-            ':lot_id' => $result['lot_id'],
-            ':rehassort' => $result['rehassort'],
-            ':comment' => $result['comment'],
-            ':event' => $event,
-            ':medic_name' => $medicName,
-            ':inspector_name' => $inspectorName
-        ]);
+        $pdf->Cell(0, 10, "Lot: " . $result['lot_name'] . " - Réassort: " . $result['rehassort'] . " - Commentaire: " . $result['comment'], 0, 1);
     }
+    
+    // Enregistrer le PDF
+    $pdfDir = __DIR__ . '/../uploads/documents/';
+    if (!is_dir($pdfDir)) {
+        mkdir($pdfDir, 0777, true);
+    }
+    $pdfFileName = $pdfDir . 'return_' . $bagId . '_' . date('Ymd_His') . '.pdf';
+    $pdf->Output('F', $pdfFileName);
+
+    // Sauvegarder le chemin d'accès du PDF dans la base de données
+    $stmt = $conn->prepare("INSERT INTO documents (bag_id, document_path, document_date) VALUES (:bag_id, :document_path, NOW())");
+    $stmt->execute([
+        ':bag_id' => $bagId,
+        ':document_path' => $pdfFileName
+    ]);
 
     header("Location: /sacs/bag_tracking.php?bag_id=" . $bagId);
     exit();
