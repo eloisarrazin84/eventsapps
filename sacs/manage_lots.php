@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_lot'])) {
         $stmt->bindParam(':description', $description);
         $stmt->execute();
         
-        header("Location: manage_lot.php");
+        header("Location: sacs/manage_lot.php");
         exit();
     } catch (PDOException $e) {
         echo "Erreur lors de l'ajout du lot : " . $e->getMessage();
