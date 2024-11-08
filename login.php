@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Connexion à la base de données
     $servername = "localhost";
-    $username_db = "root";  
+    $username_db = "root";
     $password_db = "Lipton2019!";
     $dbname = "outdoorsec";
 
@@ -28,7 +28,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
-                header("Location: home.php");
+
+                // Redirection conditionnelle
+                if (isset($_SESSION['redirect_to'])) {
+                    $redirectUrl = $_SESSION['redirect_to'];
+                    unset($_SESSION['redirect_to']); // Supprimer la variable de session après redirection
+                    header("Location: $redirectUrl");
+                } else {
+                    header("Location: home.php");
+                }
                 exit();
             } else {
                 $error = "Votre compte n'a pas encore été validé par un administrateur.";
@@ -40,6 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (PDOException $e) {
         $error = "Erreur de connexion à la base de données : " . $e->getMessage();
     }
+}
+
 }
 ?>
 
