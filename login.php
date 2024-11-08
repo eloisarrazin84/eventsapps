@@ -30,20 +30,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['role'] = $user['role'];
 
                 // Redirection conditionnelle
-               if ($user && password_verify($password, $user['password'])) {
+     if ($user && password_verify($password, $user['password'])) {
     if ($user['is_approved']) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
         
-        // Redirige vers la page demandée, ou vers home.php par défaut
-        $redirect_url = isset($_GET['redirect']) ? $_GET['redirect'] : 'home.php';
-        header("Location: /sacs/$redirect_url?bag_id=" . urlencode($_GET['bag_id']));
+        // Rediriger vers la page demandée, ou vers home.php par défaut
+        $redirect_page = isset($_GET['redirect']) ? $_GET['redirect'] : 'home.php';
+        $redirect_url = "/sacs/" . $redirect_page . "?bag_id=" . urlencode($_GET['bag_id']);
+        
+        header("Location: $redirect_url");
         exit();
     } else {
         $error = "Votre compte n'a pas encore été validé par un administrateur.";
     }
-} else {
+}
+else {
             $error = "Nom d'utilisateur ou mot de passe incorrect.";
         }
 
