@@ -1,9 +1,9 @@
 <?php
-// Désactiver la vérification de session pour rendre la page accessible à tous
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
+// Connexion à la base de données
 $conn = new PDO("mysql:host=localhost;dbname=outdoorsec", "root", "Lipton2019!");
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -30,26 +30,54 @@ if (!$bag) {
 }
 
 // Récupérer les lots associés au sac
-$stmt = $conn->prepare("SELECT lots.name 
+$stmt = $conn->prepare("SELECT lots.id, lots.name 
                         FROM lots 
                         JOIN bag_lots ON lots.id = bag_lots.lot_id 
                         WHERE bag_lots.bag_id = :bag_id");
 $stmt->bindParam(':bag_id', $bagId);
 $stmt->execute();
-$lots = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$lots = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Gérer les actions pour l'inventaire ou la remise en service
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['inventory_action'])) {
-        // Mettre à jour la date du dernier inventaire
-        $stmt = $conn->prepare("UPDATE bags SET last_inventory_date = NOW() WHERE id = :id");
-        $stmt->bindParam(':id', $bagId);
-        $stmt->execute();
-        header("Location: /sacs/bag_tracking.php?bag_id=" . $bagId);
-        exit();
-    } elseif (isset($_POST['reset_action'])) {
-        echo "<script>alert('Le sac a été remis en service.');</script>";
+// Gérer la soumission de l'inventaire
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_inventory'])) {
+    $inspectorName = $_POST['inspector_name'];
+    $inventoryResults = [];
+
+    foreach ($lots as $lot) {
+        $lotId = $lot['id'];
+        $present = isset($_POST["present_$lotId"]) ? 1 : 0;
+        $operational = $_POST["operational_$lotId"] ?? '';
+        $comment = $_POST["comment_$lotId"] ?? '';
+
+        $inventoryResults[] = [
+            'lot_id' => $lotId,
+            'present' => $present,
+            'operational' => $operational,
+            'comment' => $comment,
+        ];
     }
+
+    // Mettre à jour la date du dernier inventaire
+    $stmt = $conn->prepare("UPDATE bags SET last_inventory_date = NOW() WHERE id = :id");
+    $stmt->bindParam(':id', $bagId);
+    $stmt->execute();
+
+    // Sauvegarder les résultats de l'inventaire
+    foreach ($inventoryResults as $result) {
+        $stmt = $conn->prepare("INSERT INTO inventory_logs (bag_id, lot_id, present, operational, comment, inspector_name, inventory_date) 
+                                VALUES (:bag_id, :lot_id, :present, :operational, :comment, :inspector_name, NOW())");
+        $stmt->execute([
+            ':bag_id' => $bagId,
+            ':lot_id' => $result['lot_id'],
+            ':present' => $result['present'],
+            ':operational' => $result['operational'],
+            ':comment' => $result['comment'],
+            ':inspector_name' => $inspectorName
+        ]);
+    }
+
+    header("Location: /sacs/bag_tracking.php?bag_id=" . $bagId);
+    exit();
 }
 ?>
 
@@ -69,51 +97,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="card-body">
             <h5 class="card-title">Détails du Sac</h5>
             <p><strong>Lieu de Stockage :</strong> <?php echo htmlspecialchars($bag['location_name'] . " - " . $bag['bag_name']); ?></p>
-            <p><strong>Lots Présents :</strong> <?php echo !empty($lots) ? implode(", ", array_map('htmlspecialchars', $lots)) : 'Aucun lot associé'; ?></p>
+            <p><strong>Lots Présents :</strong> <?php echo !empty($lots) ? implode(", ", array_map(fn($lot) => htmlspecialchars($lot['name']), $lots)) : 'Aucun lot associé'; ?></p>
             <p><strong>Date du Dernier Inventaire :</strong> <?php echo htmlspecialchars($bag['last_inventory_date'] ?? 'Non défini'); ?></p>
         </div>
     </div>
 
     <h4>Actions</h4>
-    <form method="POST" class="mb-3">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#inventoryModal">Faire un Inventaire</button>
-        <button type="submit" name="reset_action" class="btn btn-secondary">Remettre en Service</button>
-    </form>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#inventoryModal">Faire un Inventaire</button>
 </div>
 
-<!-- Modal pour l'inventaire -->
-<div class="modal fade" id="inventoryModal" tabindex="-1" aria-labelledby="inventoryModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<!-- Modal d'Inventaire -->
+<div class="modal fade" id="inventoryModal" tabindex="-1" role="dialog" aria-labelledby="inventoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <form method="POST">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="inventoryModalLabel">Faire l'Inventaire du Sac</h5>
+                    <h5 class="modal-title" id="inventoryModalLabel">Inventaire du Sac</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="form-group">
+                        <label for="inspector_name">Nom et Prénom de l'inspecteur :</label>
+                        <input type="text" name="inspector_name" id="inspector_name" class="form-control" required>
+                    </div>
                     <?php foreach ($lots as $lot): ?>
                         <div class="form-group">
-                            <label>
-                                <input type="checkbox" name="lot_status[<?php echo htmlspecialchars($lot); ?>]" value="1">
-                                <?php echo htmlspecialchars($lot); ?> - Opérationnel
-                            </label>
-                            <textarea class="form-control mt-2" name="comments[<?php echo htmlspecialchars($lot); ?>]" placeholder="Commentaire"></textarea>
+                            <label><?php echo htmlspecialchars($lot['name']); ?></label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="present_<?php echo $lot['id']; ?>" id="present_<?php echo $lot['id']; ?>">
+                                <label class="form-check-label" for="present_<?php echo $lot['id']; ?>">Présent</label>
+                            </div>
+                            <select name="operational_<?php echo $lot['id']; ?>" class="form-control mt-2">
+                                <option value="">Statut</option>
+                                <option value="Opérationnel">Opérationnel</option>
+                                <option value="Non opérationnel">Non opérationnel</option>
+                            </select>
+                            <input type="text" name="comment_<?php echo $lot['id']; ?>" class="form-control mt-2" placeholder="Commentaire">
                         </div>
                     <?php endforeach; ?>
-                    <div class="form-group">
-                        <label>Nom de l'Inspecteur</label>
-                        <input type="text" name="inspector_name" class="form-control" required>
-                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" name="inventory_action" class="btn btn-primary">Valider l'Inventaire</button>
+                    <button type="submit" name="submit_inventory" class="btn btn-primary">Valider l'Inventaire</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 </body>
 </html>
