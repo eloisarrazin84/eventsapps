@@ -104,9 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_inventory'])) 
 
     <h4>Actions</h4>
     <button class="btn btn-primary" data-toggle="modal" data-target="#inventoryModal">Faire un Inventaire</button>
-   <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-    <a href="/sacs/return_procedure.php?bag_id=<?php echo $bagId; ?>" class="btn btn-warning">Faire procédure de retour</a>
-<?php endif; ?>
+   <a href="check_access_return_procedure.php?bag_id=<?php echo $bagId; ?>" class="btn btn-warning">Faire procédure de retour</a>
 </div>
 
 <!-- Modal d'Inventaire -->
