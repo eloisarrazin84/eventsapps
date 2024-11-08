@@ -21,7 +21,7 @@ function generateQRCode($bagId) {
     if (!is_dir(__DIR__ . '/../uploads/qrcodes')) {
         mkdir(__DIR__ . '/../uploads/qrcodes', 0777, true);
     }
-
+    
     try {
         QRcode::png($url, $qrCodePath, QR_ECLEVEL_L, 10);
     } catch (Exception $e) {
