@@ -1,53 +1,3 @@
-<?php
-session_start();
-$error = "";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = htmlspecialchars($_POST['username']);
-    $password = $_POST['password'];
-
-    // Connexion à la base de données
-    $servername = "localhost";
-    $username_db = "root";  
-    $password_db = "Lipton2019!";
-    $dbname = "outdoorsec";
-
-    try {
-        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        // Récupérer l'utilisateur
-        $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        // Vérification du mot de passe
-        if ($user && password_verify($password, $user['password'])) {
-            if ($user['is_approved']) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
-
-                // Rediriger vers la page demandée ou vers home.php par défaut
-                $redirect_page = isset($_GET['redirect']) ? $_GET['redirect'] : 'home.php';
-                $redirect_url = "/" . $redirect_page;
-
-                header("Location: $redirect_url");
-                exit();
-            } else {
-                $error = "Votre compte n'a pas encore été validé par un administrateur.";
-            }
-        } else {
-            $error = "Nom d'utilisateur ou mot de passe incorrect.";
-        }
-
-    } catch (PDOException $e) {
-        $error = "Erreur de connexion à la base de données : " . $e->getMessage();
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -64,7 +14,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             align-items: center;
             height: 100vh;
         }
-
         .login-container {
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 15px;
@@ -75,30 +24,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
             backdrop-filter: blur(10px);
         }
-
         .login-container img {
             width: 80px;
             margin-bottom: 15px;
         }
-
         .error {
             color: #dc3545;
             margin-bottom: 15px;
         }
-
         .btn-block {
             margin-bottom: 15px;
             padding: 10px;
         }
-
         .social-icons {
             margin: 20px 0;
         }
-
         .social-icons a {
             margin: 0 10px;
         }
-
         .btn-help {
             margin-top: 30px;
         }
@@ -107,9 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
     <div class="login-container">
-        <!-- Logo -->
         <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1.png" alt="Logo Outdoor Secours">
-
         <h2 class="text-center">Connexion</h2>
         <p>Bienvenue chez Outdoor Secours. Connectez-vous pour accéder à vos événements et services.</p>
 
@@ -132,6 +73,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <div class="text-center">
             <a href="register.php" class="btn btn-success btn-block">S'inscrire</a>
+        </div>
+        
+        <!-- Lien pour réinitialiser le mot de passe -->
+        <div class="text-center">
+            <a href="/password/forgot_password.php" class="btn btn-link">Mot de passe oublié ?</a>
         </div>
 
         <div class="social-icons">
