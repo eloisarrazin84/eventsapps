@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 session_start();
-require_once '../EmailService.php';
+require_once '/../mail/EmailService.php';
 require_once '../config.php'; // Assurez-vous de configurer vos constantes ici, comme les informations de la base de données
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
