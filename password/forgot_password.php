@@ -42,15 +42,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Mot de passe oublié</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réinitialisation du mot de passe</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f6f9;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 1.8em;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            border-radius: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <?php if ($error): ?><p><?php echo $error; ?></p><?php endif; ?>
-    <?php if ($success): ?><p><?php echo $success; ?></p><?php endif; ?>
-    <form method="POST" action="">
-        <label>Email :</label>
-        <input type="email" name="email" required>
-        <button type="submit">Réinitialiser le mot de passe</button>
+
+<div class="container">
+    <h1>Réinitialisation du mot de passe</h1>
+    <p>Entrez votre adresse email pour recevoir un lien de réinitialisation.</p>
+
+    <form method="POST" action="forgot_password_handler.php">
+        <div class="form-group">
+            <label for="email">Email :</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Réinitialiser le mot de passe</button>
     </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
