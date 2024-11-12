@@ -2,9 +2,15 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 session_start();
-require_once '/../mail/EmailService.php';
-require_once '../config.php'; // Assurez-vous de configurer vos constantes ici, comme les informations de la base de données
+require_once __DIR__ . '/../mail/EmailService.php'; // Chemin absolu pour EmailService.php
+
+// Assurez-vous de configurer les informations de connexion à la base de données ici
+$servername = "localhost";
+$username_db = "root";
+$password_db = "Lipton2019!";
+$dbname = "outdoorsec";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = htmlspecialchars($_POST['email']);
@@ -45,4 +51,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 } else {
     echo "Méthode de requête non autorisée.";
 }
-?>
