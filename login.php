@@ -29,9 +29,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
 
-                // Rediriger vers la page demandée ou vers home.php par défaut
+                // Redirection conditionnelle
                 $redirect_page = isset($_GET['redirect']) ? $_GET['redirect'] : 'home.php';
-                $redirect_url = strpos($redirect_page, '/') === 0 ? $redirect_page : "/$redirect_page";
+                $redirect_url = (strpos($redirect_page, '/') === false ? "/sacs/" : "/") . $redirect_page;
 
                 // Ajouter le paramètre bag_id s'il est présent dans l'URL de la demande
                 if (isset($_GET['bag_id'])) {
@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Connexion</title>
-        <style>
+    <style>
         body {
             background-image: url('https://www.odsradio.com/media/news/haute-savoie-deux-morts-en-montagne-et-une-fuite-de-gaz_65f9df9a57367.jpg');
             background-size: cover;
@@ -109,12 +109,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
-        <!-- Logo et formulaire de connexion -->
+        <!-- Logo -->
+        <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1.png" alt="Logo Outdoor Secours">
+
+        <h2 class="text-center">Connexion</h2>
+        <p>Bienvenue chez Outdoor Secours. Connectez-vous pour accéder à vos événements et services.</p>
+
+        <!-- Message d'erreur -->
         <?php if (!empty($error)): ?>
-            <p class="error"><?php echo $error; ?></p>
+        <p class="error"><?php echo $error; ?></p>
         <?php endif; ?>
+
         <form method="POST" action="">
             <div class="form-group">
                 <label for="username">Nom d'utilisateur</label>
@@ -126,6 +134,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
         </form>
+
+        <div class="text-center">
+            <a href="register.php" class="btn btn-success btn-block">S'inscrire</a>
+        </div>
+
+        <div class="social-icons">
+            <a href="#"><img src="https://cdn-icons-png.flaticon.com/256/124/124010.png" alt="Facebook"></a>
+            <a href="#"><img src="https://cdn-icons-png.freepik.com/256/15707/15707869.png?semt=ais_hybrid" alt="Instagram"></a>
+        </div>
+
+        <a href="contact.php" class="btn btn-link btn-help">Besoin d'aide ?</a>
     </div>
 
     <!-- Bootstrap JS -->
