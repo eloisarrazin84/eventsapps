@@ -29,24 +29,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
 
-                // Redirection conditionnelle
-     if ($user && password_verify($password, $user['password'])) {
-    if ($user['is_approved']) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-        
-        // Rediriger vers la page demandée, ou vers home.php par défaut
-        $redirect_page = isset($_GET['redirect']) ? $_GET['redirect'] : 'home.php';
-        $redirect_url = "/sacs/" . $redirect_page . "?bag_id=" . urlencode($_GET['bag_id']);
-        
-        header("Location: $redirect_url");
-        exit();
-    } else {
-        $error = "Votre compte n'a pas encore été validé par un administrateur.";
-    }
-}
-else {
+                // Rediriger vers la page demandée ou vers home.php par défaut
+                $redirect_page = isset($_GET['redirect']) ? $_GET['redirect'] : 'home.php';
+                $redirect_url = "/sacs/" . $redirect_page;
+
+                // Ajouter le paramètre bag_id s'il est présent dans l'URL de la demande
+                if (isset($_GET['bag_id'])) {
+                    $redirect_url .= "?bag_id=" . urlencode($_GET['bag_id']);
+                }
+
+                header("Location: $redirect_url");
+                exit();
+            } else {
+                $error = "Votre compte n'a pas encore été validé par un administrateur.";
+            }
+        } else {
             $error = "Nom d'utilisateur ou mot de passe incorrect.";
         }
 
@@ -58,7 +55,6 @@ else {
 
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -95,27 +91,26 @@ else {
             margin-bottom: 15px;
         }
 
-       .btn-block {
-    margin-bottom: 15px; /* Adds space between buttons */
-    padding: 10px;
-}
+        .btn-block {
+            margin-bottom: 15px;
+            padding: 10px;
+        }
 
-.social-icons {
-    margin: 20px 0; /* Adds space above and below the social icons */
-}
+        .social-icons {
+            margin: 20px 0;
+        }
 
-.social-icons a {
-    margin: 0 10px;
-}
+        .social-icons a {
+            margin: 0 10px;
+        }
 
-.btn-help {
-    margin-top: 30px; /* Adds more space above the 'Besoin d'aide' link */
-}
-
+        .btn-help {
+            margin-top: 30px;
+        }
     </style>
 </head>
-<body>
 
+<body>
     <div class="login-container">
         <!-- Logo -->
         <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1.png" alt="Logo Outdoor Secours">
@@ -140,18 +135,15 @@ else {
             <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
         </form>
 
-        <!-- Bouton S'inscrire -->
         <div class="text-center">
             <a href="register.php" class="btn btn-success btn-block">S'inscrire</a>
         </div>
 
-        <!-- Réseaux sociaux -->
         <div class="social-icons">
             <a href="#"><img src="https://cdn-icons-png.flaticon.com/256/124/124010.png" alt="Facebook"></a>
             <a href="#"><img src="https://cdn-icons-png.freepik.com/256/15707/15707869.png?semt=ais_hybrid" alt="Instagram"></a>
         </div>
 
-        <!-- Bouton Aide -->
         <a href="contact.php" class="btn btn-link btn-help">Besoin d'aide ?</a>
     </div>
 
