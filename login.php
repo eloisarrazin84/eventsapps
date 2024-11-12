@@ -29,13 +29,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
 
-                // Rediriger vers la page d'accueil
-                header("Location: home.php");
-                exit();
-            } else {
-                $error = "Votre compte n'a pas encore été validé par un administrateur.";
-            }
-        } else {
+                // Redirection conditionnelle
+     if ($user && password_verify($password, $user['password'])) {
+    if ($user['is_approved']) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
+        
+        // Rediriger vers la page demandée, ou vers home.php par défaut
+        $redirect_page = isset($_GET['redirect']) ? $_GET['redirect'] : 'home.php';
+        $redirect_url = "/sacs/" . $redirect_page . "?bag_id=" . urlencode($_GET['bag_id']);
+        
+        header("Location: $redirect_url");
+        exit();
+    } else {
+        $error = "Votre compte n'a pas encore été validé par un administrateur.";
+    }
+}
+else {
             $error = "Nom d'utilisateur ou mot de passe incorrect.";
         }
 
@@ -44,8 +55,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,6 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             align-items: center;
             height: 100vh;
         }
+
         .login-container {
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 15px;
@@ -70,33 +84,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
             backdrop-filter: blur(10px);
         }
+
         .login-container img {
             width: 80px;
             margin-bottom: 15px;
         }
+
         .error {
             color: #dc3545;
             margin-bottom: 15px;
         }
-        .btn-block {
-            margin-bottom: 15px;
-            padding: 10px;
-        }
-        .social-icons {
-            margin: 20px 0;
-        }
-        .social-icons a {
-            margin: 0 10px;
-        }
-        .btn-help {
-            margin-top: 30px;
-        }
+
+       .btn-block {
+    margin-bottom: 15px; /* Adds space between buttons */
+    padding: 10px;
+}
+
+.social-icons {
+    margin: 20px 0; /* Adds space above and below the social icons */
+}
+
+.social-icons a {
+    margin: 0 10px;
+}
+
+.btn-help {
+    margin-top: 30px; /* Adds more space above the 'Besoin d'aide' link */
+}
+
     </style>
 </head>
 
 <body>
+
     <div class="login-container">
+        <!-- Logo -->
         <img src="https://outdoorsecours.fr/wp-content/uploads/2023/07/thumbnail_image001-1.png" alt="Logo Outdoor Secours">
+
         <h2 class="text-center">Connexion</h2>
         <p>Bienvenue chez Outdoor Secours. Connectez-vous pour accéder à vos événements et services.</p>
 
@@ -117,20 +141,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
         </form>
 
+        <!-- Bouton S'inscrire -->
         <div class="text-center">
             <a href="register.php" class="btn btn-success btn-block">S'inscrire</a>
         </div>
-        
-        <!-- Lien pour réinitialiser le mot de passe -->
-        <div class="text-center">
-            <a href="/password/forgot_password.php" class="btn btn-link">Mot de passe oublié ?</a>
-        </div>
 
+        <!-- Réseaux sociaux -->
         <div class="social-icons">
             <a href="#"><img src="https://cdn-icons-png.flaticon.com/256/124/124010.png" alt="Facebook"></a>
             <a href="#"><img src="https://cdn-icons-png.freepik.com/256/15707/15707869.png?semt=ais_hybrid" alt="Instagram"></a>
         </div>
 
+        <!-- Bouton Aide -->
         <a href="contact.php" class="btn btn-link btn-help">Besoin d'aide ?</a>
     </div>
 
@@ -139,4 +161,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>
