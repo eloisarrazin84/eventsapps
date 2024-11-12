@@ -3,7 +3,15 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 session_start();
-require_once __DIR__ . '/../chemin_correct/EmailService.php';
+
+// Assurez-vous que le chemin est correct
+require_once __DIR__ . '/../mail/EmailService.php';
+
+// Définir les informations de connexion directement ou inclure un fichier de configuration approprié
+$servername = "localhost";
+$username_db = "root";
+$password_db = "Lipton2019!";
+$dbname = "outdoorsec";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = htmlspecialchars($_POST['email']);
