@@ -12,22 +12,18 @@ if (isset($_GET['token'])) {
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // Vérifiez si le token est valide et non expiré
-        $stmt = $conn->prepare("SELECT * FROM password_resets WHERE token = :token AND expires_at > NOW()");
+        $stmt = $conn->prepare("SELECT * FROM users WHERE reset_token = :token AND token_expiry > NOW()");
         $stmt->execute([':token' => $token]);
-        $reset = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($reset) {
+        if ($user) {
             // Si le formulaire est soumis
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $new_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
                 // Mise à jour du mot de passe dans la table `users`
-                $stmt = $conn->prepare("UPDATE users SET password = :password WHERE id = :user_id");
-                $stmt->execute([':password' => $new_password, ':user_id' => $reset['user_id']]);
-
-                // Suppression du token utilisé
-                $stmt = $conn->prepare("DELETE FROM password_resets WHERE token = :token");
-                $stmt->execute([':token' => $token]);
+                $stmt = $conn->prepare("UPDATE users SET password = :password, reset_token = NULL, token_expiry = NULL WHERE id = :user_id");
+                $stmt->execute([':password' => $new_password, ':user_id' => $user['id']]);
 
                 $success = "Votre mot de passe a été réinitialisé avec succès.";
             }
@@ -101,3 +97,4 @@ if (isset($_GET['token'])) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
