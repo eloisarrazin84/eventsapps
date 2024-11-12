@@ -29,14 +29,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
 
-                // Redirection conditionnelle
+                // Rediriger vers la page demandée ou vers home.php par défaut
                 $redirect_page = isset($_GET['redirect']) ? $_GET['redirect'] : 'home.php';
-                $redirect_url = (strpos($redirect_page, '/') === false ? "/sacs/" : "/") . $redirect_page;
-
-                // Ajouter le paramètre bag_id s'il est présent dans l'URL de la demande
-                if (isset($_GET['bag_id'])) {
-                    $redirect_url .= "?bag_id=" . urlencode($_GET['bag_id']);
-                }
+                $redirect_url = "/" . $redirect_page;
 
                 header("Location: $redirect_url");
                 exit();
