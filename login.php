@@ -60,8 +60,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Connexion</title>
-    <style>
-        /* Ajoutez ici votre style */
+        <style>
+        body {
+            background-image: url('https://www.odsradio.com/media/news/haute-savoie-deux-morts-en-montagne-et-une-fuite-de-gaz_65f9df9a57367.jpg');
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-container img {
+            width: 80px;
+            margin-bottom: 15px;
+        }
+
+        .error {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .btn-block {
+            margin-bottom: 15px;
+            padding: 10px;
+        }
+
+        .social-icons {
+            margin: 20px 0;
+        }
+
+        .social-icons a {
+            margin: 0 10px;
+        }
+
+        .btn-help {
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
