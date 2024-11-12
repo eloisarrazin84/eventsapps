@@ -1,3 +1,49 @@
+<?php
+session_start();
+$error = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = htmlspecialchars($_POST['username']);
+    $password = $_POST['password'];
+
+    // Connexion à la base de données
+    $servername = "localhost";
+    $username_db = "root";  
+    $password_db = "Lipton2019!";
+    $dbname = "outdoorsec";
+
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username_db, $password_db);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Récupérer l'utilisateur
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Vérification du mot de passe
+        if ($user && password_verify($password, $user['password'])) {
+            if ($user['is_approved']) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
+
+                // Rediriger vers la page d'accueil
+                header("Location: home.php");
+                exit();
+            } else {
+                $error = "Votre compte n'a pas encore été validé par un administrateur.";
+            }
+        } else {
+            $error = "Nom d'utilisateur ou mot de passe incorrect.";
+        }
+
+    } catch (PDOException $e) {
+        $error = "Erreur de connexion à la base de données : " . $e->getMessage();
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
